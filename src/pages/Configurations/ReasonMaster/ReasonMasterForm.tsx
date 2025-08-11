@@ -5,7 +5,7 @@ import Field from '../../../components/Field';
 import { callPostAPI } from '../../../services/apis';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { toast } from 'react-toastify';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../../../components/FormHeader/FormHeader';
 import Select from "../../../components/Dropdown/Dropdown";
@@ -17,10 +17,14 @@ import { saveTracker } from "../../../utils/constants";
 const ReasonMasterForm = (props: any) => {
     const { t } = useTranslation();
     let { pathname } = useLocation();
-    const [selectedFacility, menuList]: any = useOutletContext();
+    const { search } = useLocation();
+    const [, menuList]: any = useOutletContext();
     const [SEND_APP_TEXT, setAppValue] = useState("");
+    const getId: any = localStorage.getItem("Id");
+    const dataId = JSON.parse(getId);
     const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL)?.filter((detail: any) => detail.URL === pathname)[0];
     const [options, setOptions] = useState<any>([]);
+    const [IsSubmit, setIsSubmit] = useState<any | null>(false);
     const {
         register,
         handleSubmit,
@@ -29,36 +33,40 @@ const ReasonMasterForm = (props: any) => {
         formState: { errors, isSubmitting },
     } = useForm({
         defaultValues: {
-            MODE: props?.selectedData ? 'E' : 'A',
-            PARA: props?.selectedData ? { "para1": `${props?.headerName}`, "para2": "Updated" }
+            MODE: search === '?edit=' ? 'E' : 'A',
+            PARA: search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": "Updated" }
                 : { "para1": `${props?.headerName}`, "para2": "Added" },
-            STATUS_DESC: props?.selectedData?.STATUS_DESC || "",
-            REASON_DESC: props?.selectedData?.REASON_DESC || "",
-            ACTIVE: props?.selectedData?.ACTIVE !== undefined ? props.selectedData.ACTIVE : true,
+            STATUS_DESC: search === '?edit=' ? dataId?.STATUS_DESC : "",
+            REASON_DESC: search === '?edit=' ? dataId?.REASON_DESC : "",
+            ACTIVE: search === '?edit=' ? dataId?.ACTIVE : true,
 
-            REASON_ID: props?.selectedData ? props?.selectedData?.REASON_ID : 0
+            REASON_ID: search === '?edit=' ? dataId?.REASON_ID : 0
 
         },
         mode: "onSubmit",
     });
-    const onSubmit = async (payload: any) => {
+    const onSubmit = useCallback(async (payload: any) => {
         payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
         payload.STATUS_CODE = payload?.STATUS_DESC?.STATUS_CODE;
-
+        if (IsSubmit) return true
+        setIsSubmit(true)
         try {
             const res = await callPostAPI(ENDPOINTS.SAVE_REASON_MASTER, payload)
             if (res.FLAG === true) {
                 toast?.success(res?.MSG)
                 props?.getAPI()
+                setIsSubmit(false)
                 props?.isClick()
             } else {
+                setIsSubmit(false)
                 toast?.error(res?.MSG)
             }
 
         } catch (error: any) {
+            setIsSubmit(false)
             toast?.error(error)
         }
-    }
+    }, [IsSubmit, callPostAPI, toast, props?.getAPI, props?.isClick])
     const getOptions = async () => {
         try {
             const res = await callPostAPI(
@@ -74,8 +82,11 @@ const ReasonMasterForm = (props: any) => {
     };
 
     useEffect(() => {
-        getOptions();
-        saveTracker(currentMenu)
+        (async function () {
+            await getOptions()
+           await saveTracker(currentMenu)
+           })();
+       
     }, [setOptions]);
 
     useEffect(() => {
@@ -93,6 +104,7 @@ const ReasonMasterForm = (props: any) => {
                     headerName={props?.headerName}
                     isSelected={props?.selectedData ? true : false}
                     isClick={props?.isClick}
+                    IsSubmit={IsSubmit}
                 />
                 <Card className='mt-2'>
                     <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">

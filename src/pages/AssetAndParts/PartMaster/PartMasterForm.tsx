@@ -8,7 +8,7 @@ import "../PartMaster/PartMaster.css";
 import DocumentUpload from "../../../components/pageComponents/DocumentUpload/DocumentUpload";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { validation } from "../../../utils/validation";
@@ -24,6 +24,9 @@ import { decryptData } from "../../../utils/encryption_decryption";
 const PartMasterForm = (props: any) => {
   let { search } = useLocation();
   const { t } = useTranslation();
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const [options, setOptions] = useState<any>({});
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const [typeList, setTypeList] = useState<any | null>([])
@@ -43,26 +46,26 @@ const PartMasterForm = (props: any) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      MODE: props?.selectedData ? "E" : "A",
-      PARA: props?.selectedData
+      MODE: search === "?edit=" ? "E" : "A",
+      PARA: search === "?edit="
         ? { para1: `${props?.headerName}`, para2: t("Updated") }
         : { para1: `${props?.headerName}`, para2: t("Added") },
-      PART_ID: props?.selectedData?.PART_ID || 0,
+      PART_ID:search === "?edit="? dataId.PART_ID :0,
       PART_CODE: "", PART_NAME: "",
       ASSETTYPE_ID: "",
       MAKE_ID: "",
       MODEL_ID: "",
       UOM_ID: "",
       CAPACITY_SIZE: "",
-      MAINTAIN_INVENTORY: props?.selectedData?.MAINTAIN_INVENTORY || false,
+      MAINTAIN_INVENTORY:search === "?edit="? dataId?.MAINTAIN_INVENTORY :false,
       STORE_ID: "",
       RACK_ID: "",
       MIN_STOCK: "",
       MAX_STOCK: "",
       REORDER_LEVEL: "",
       ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
+       search === "?edit="
+          ? dataId.ACTIVE
           : true,
       DOC_LIST: [],
       ASSETGROUP_ID: "",
@@ -73,10 +76,10 @@ const PartMasterForm = (props: any) => {
 
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
 
-  const { append, remove } = useFieldArray({
-    control,
-    name: "DOC_LIST",
-  });
+  // const { append } = useFieldArray({
+  //   control,
+  //   name: "DOC_LIST",
+  // });
   const { fields, append: colAppend } = useFieldArray({
     name: "EXTRA_COL_LIST",
     control,
@@ -86,7 +89,9 @@ const PartMasterForm = (props: any) => {
   const assetGroup: any = watch('ASSETGROUP_ID')
   const assetType: any = watch('ASSETTYPE_ID')
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return;
+    setIsSubmit(true)
     const updateColList: any = payload?.EXTRA_COL_LIST?.filter(
       (item: any) => item?.VALUE
     ).map((data: any) => ({
@@ -126,22 +131,27 @@ const PartMasterForm = (props: any) => {
         }
 
         const eventPayload = { ...eventNotification, ...notifcation }
-        helperEventNotification(eventPayload)
+        await helperEventNotification(eventPayload)
         props?.getAPI()
+
         props?.isClick()
       } else {
+
         toast?.error(res?.MSG)
       }
 
     } catch (error: any) {
-      toast.error(error)
-    }
-  };
 
+      toast.error(error)
+    } finally {
+      setIsSubmit(false)
+    }
+  }, [IsSubmit, search, props, eventNotification, toast])
   const getPartDetailsList = async (columnCaptions: any) => {
     const payload = {
-      PART_ID: props?.selectedData?.PART_ID,
+      PART_ID: search === "?edit=" ? dataId?.PART_ID : selectedDetails?.PART_ID,
     };
+    
     const response = await callPostAPI(
       ENDPOINTS.getPartDetailsList,
       payload,
@@ -196,8 +206,8 @@ const PartMasterForm = (props: any) => {
         VALUE: "",
       }));
       if (res?.FLAG === 1) {
-        if (props?.selectedData?.PART_ID) {
-          getPartDetailsList(columnCaptions)
+        if (dataId?.PART_ID) {
+          await getPartDetailsList(columnCaptions)
         } else {
           colAppend(columnCaptions);
         }
@@ -207,8 +217,9 @@ const PartMasterForm = (props: any) => {
   }
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await getOptions();
+    await saveTracker(currentMenu)})();
   }, [menuList]);
 
   useEffect(() => {
@@ -251,6 +262,7 @@ const PartMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="headingConainer">
@@ -360,12 +372,9 @@ const PartMasterForm = (props: any) => {
                       <Select
                         options={options?.assetMake}
                         {...register("MAKE_ID", {
-                          // required: 'Please fill the required fields.'
                         })}
                         label="Equipment Make"
                         optionLabel="MAKE_NAME"
-                        // require={true}
-                        // invalid={errors.MAKE_ID}
                         findKey={'MAKE_ID'}
                         selectedData={selectedDetails?.MAKE_ID}
                         setValue={setValue}
@@ -384,12 +393,9 @@ const PartMasterForm = (props: any) => {
                       <Select
                         options={options?.assetModel}
                         {...register("MODEL_ID", {
-                          // required: 'Please fill the required fields.'
                         })}
                         label="Equipment Model"
                         optionLabel="MODEL_NAME"
-                        // require={true}
-                        // invalid={errors.MODEL_ID}
                         findKey={'MODEL_ID'}
                         selectedData={selectedDetails?.MODEL_ID}
                         setValue={setValue}
@@ -438,7 +444,6 @@ const PartMasterForm = (props: any) => {
                         }
                       )}
                       label="Capacity Size"
-                      // invalid={errors.CAPACITY_SIZE}
                       {...field}
                     />
                   );
@@ -507,7 +512,6 @@ const PartMasterForm = (props: any) => {
                           label="Min Stock"
                           require={MAINTAIN_INVENTORY === true ? true : false}
                           invalid={MAINTAIN_INVENTORY === true ? errors?.MIN_STOCK : ''}
-                          // invalidMessage={errors.MIN_STOCK?.message}
                           {...field}
                         />
                       );
@@ -522,23 +526,15 @@ const PartMasterForm = (props: any) => {
                       return (
                         <InputField
                           {...register("MAX_STOCK", {
-                            // required: MAINTAIN_INVENTORY === true ? 'Please fill the required fields.' : "",
                             validate: (fieldValue: any) => {
                               const sanitizedValue = fieldValue
                                 ?.toString()
                                 ?.replace(/[^0-9]/g, "");
                               setValue("MAX_STOCK", sanitizedValue);
                               return true
-                              // return (
-                              //   sanitizedValue >= +getValues("MIN_STOCK") ||
-                              //   "Should be Greater than MIN Stock"
-                              // );
                             },
                           })}
                           label="Max Stock"
-                          //require={MAINTAIN_INVENTORY === true ? true : false}
-                          // invalid={MAINTAIN_INVENTORY === true ? errors?.MAX_STOCK : false}
-                          // invalidMessage={errors.MAX_STOCK?.message}
                           {...field}
                         />
                       );
@@ -568,7 +564,6 @@ const PartMasterForm = (props: any) => {
                           label="Reorder Level"
                           require={MAINTAIN_INVENTORY === true ? true : false}
                           invalid={MAINTAIN_INVENTORY === true ? errors?.REORDER_LEVEL : ""}
-                          // invalidMessage={errors.REORDER_LEVEL?.message}
                           {...field}
                         />
                       );
@@ -586,7 +581,7 @@ const PartMasterForm = (props: any) => {
                     return (
                       <Checkboxs
                         {...register("MAINTAIN_INVENTORY")}
-                        checked={props?.selectedData?.MAINTAIN_INVENTORY || false}
+                        checked={dataId?.MAINTAIN_INVENTORY || false}
                         className={`md:mt-7`}
                         label={"Inventory To Be Maintained"}
                         isTooltip={true}
@@ -608,7 +603,7 @@ const PartMasterForm = (props: any) => {
                     return (
                       <Checkboxs
                         {...register("ACTIVE")}
-                        checked={props?.selectedData?.ACTIVE || false}
+                        checked={dataId?.ACTIVE || false}
                         className={`${MAINTAIN_INVENTORY && "md:mt-7"}`}
                         label="Active"
                         setValue={setValue}

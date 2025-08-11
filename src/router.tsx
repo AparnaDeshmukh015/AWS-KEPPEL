@@ -2,9 +2,20 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { PATH } from "./utils/pagePath";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { lazy } from "react";
-import { basename } from "path";
+import { ErrorBoundary, useErrorBoundary } from "react-error-boundary";
 
 //Import Lazy Loading Pages Here
+function ErrorFallback({ error }: any) {
+  const { resetBoundary } = useErrorBoundary();
+
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+      <button onClick={resetBoundary}>Try again</button>
+    </div>
+  );
+}
 
 const LazyPostLogin = lazy(() => import("./layouts/MainLayout/Layout"));
 const LazyLogin = lazy(() => import("./pages/Login/Login"));
@@ -40,6 +51,10 @@ const LazyLocationTypeMaster = lazy(
 const LazySeverityMaster = lazy(
   () => import("./pages/Configurations/SeverityMaster/SeverityMaster")
 );
+const LazyConfigCredentialMaster = lazy(
+  () => import("./pages/Configurations/CredentialConfig/CredentialMaster")
+);
+
 const LazySaveNumberRangeConfig = lazy(
   () =>
     import("./pages/Configurations/SaveNumberRangeConfig/SaveNumberRangeConfig")
@@ -112,6 +127,14 @@ const LazyWorkorderMasterMaster = lazy(
 const LazyVendorMaster = lazy(
   () => import("./pages/Inventory/VendorMaster/VendorMaster")
 );
+
+//const LazyVendorContractmaster = lazy(() =>import("./pages/Inventory/VendorMaster/VendorContract"))
+const LazyVendorManagement = lazy(
+  () => import("./pages/Inventory/VendorMaster/VendorManagement")
+);
+const LazyVendorSorComparision = lazy(
+  () => import("./pages/Inventory/VendorMaster/VendorSorCompare")
+);
 const LazyServiceMaster = lazy(
   () => import("./pages/AssetAndParts/ServiceMaster/ServiceMaster")
 );
@@ -126,6 +149,9 @@ const LazyEscalationMatrix = lazy(
 );
 const LazyPPMSchedule = lazy(
   () => import("./pages/Maintenance/PPMSchedule/PPMSchedule")
+);
+const LazyInfraPPMSchedule = lazy(
+  () => import("./pages/Maintenance/PPMSchedule/InfraNewPPMSchedule")
 );
 const LazyMaterialRequest = lazy(
   () => import("./pages/Inventory/MaterialRequest/MaterialRequest")
@@ -148,6 +174,10 @@ const LazyInventoryMaster = lazy(
 const LazyPpmScheduleDetails = lazy(
   () => import("./pages/Maintenance/PPMSchedule/PPMScheduleDetails")
 );
+
+const LazyInfraPpmScheduleDetails = lazy(
+  () => import("./pages/Maintenance/PPMSchedule/InfraPPmScheduleDetails")
+);
 const LazyAssetScheduleMaster = lazy(
   () => import("./pages/AssetAndParts/AssetScheduleMaster/AssetScheduleMaster")
 );
@@ -165,11 +195,8 @@ const LazyAnalyticsPlateformAssetLIST = lazy(
 );
 const LazyRectifiedCommentMaster = lazy(
   () =>
-    import(
-      "./pages/Configurations/RectifyCommentMaster/RectifyCommentMaster"
-    )
+    import("./pages/Configurations/RectifyCommentMaster/RectifyCommentMaster")
 );
-
 
 const LazyAnanlyticsFddMaster = lazy(
   () => import("./pages/AssetAndParts/AnanlyticsFddMaster/AnanlyticsFddMaster")
@@ -178,12 +205,57 @@ const LazyAnanlyticsFddMaster = lazy(
 const LazyReasonMaster = lazy(
   () => import("./pages/Configurations/ReasonMaster/ReasonMaster")
 );
+
+const LazyLogDetails = lazy(
+  () => import("./pages/Report/LogDetails/LogDetails")
+);
+
+const LazyPageNotFound = lazy(
+  () => import("./pages/ErrorComponenet/ErrorPage")
+);
+
+const LazyInfraAssetSchedule = lazy(
+  () => import("./components/pageComponents/AssetSchedule/InfraAssetSchedule")
+);
+
+const LazyAssetHierarchyMaster = lazy(
+  () =>
+    import(
+      "./pages/AssetAndParts/AssetHierarchyMaster/AssetHierarchyMaster"
+    )
+);
+const LazyAssetHierarchyMasterForm = lazy(
+  () =>
+    import(
+      "./pages/AssetAndParts/AssetHierarchyMaster/AssetHierarchyMasterForm"
+    )
+);
+const LazyInfraServiceRequestForm = lazy(
+  () => import("./pages/Helpdesk/ServiceRequest/InfraServiceRequest")
+);
+
+const LazyActionDetailsMaster = lazy(
+  () => import("./pages/Configurations/ActionMaster/ActionMaster")
+);
+const LazyActionMaster = lazy(
+  () => import("./pages/Users/UserActionMaster/UserActionMaster")
+);
+
+const LazyPdfReport = lazy(() =>
+  import(
+    "./pages/Report/PdfReport/PdfReport"));
+
+const LazyReport = lazy(() =>
+  import("./pages/Report/ReportList/Report"));
+
+const LazyReportTemplate = lazy(() =>
+  import("./pages/Report/ReportTempate/ReportTemplate"));
+
+
 //Add Custom Paths Here
 export const router = createBrowserRouter(
-
   [
     {
-
       path: PATH.DEFAULT,
       element: <Navigate to={PATH.LOGIN} replace />,
     },
@@ -192,222 +264,575 @@ export const router = createBrowserRouter(
       element: <LazyLogin />,
     },
     {
-      element: <p> Page Not Found </p>,
       path: PATH.PAGE_NOT_FOUND,
+      element: <LazyPageNotFound />,
     },
     {
       element: (
         <ProtectedRoute check={"Gawresh"}>
+          {/* <ErrorBoundary FallbackComponent={ErrorFallback}> */}
           <LazyPostLogin />
+          {/* </ErrorBoundary> */}
         </ProtectedRoute>
       ),
       children: [
         {
           path: PATH.DASHBOARD,
-          element: <LazyDashboard />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyDashboard />
+            </ErrorBoundary>
+          ),
+          //  element:<LazyDashboard />
         },
         {
           path: PATH.USERROLEMASTER,
-          element: <LazyUserRoleMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyUserRoleMaster />
+            </ErrorBoundary>
+          ),
+          // element:<LazyUserRoleMaster />
         },
         {
           path: PATH.SKILLMASTER,
-          element: <LazySkillsMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazySkillsMaster />
+            </ErrorBoundary>
+          ),
+          // element:<LazySkillsMaster />
         },
         {
           path: PATH.USERMASTER,
-          element: <LazyUserMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyUserMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.USERROLE_RIGHT,
-          element: <LazyUserRoleRights />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyUserRoleRights />
+            </ErrorBoundary>
+          ),
         },
         {
           path: `${PATH.USERSKILLMSATER}`,
-          element: <LazyUserSkillMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyUserSkillMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.LANGUAGECHANGE,
-          element: <LazyLanguageChange />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyLanguageChange />
+            </ErrorBoundary>
+          ),
         },
         //Building
         {
           path: PATH.LOCATIONTYPE,
-          element: <LazyLocationTypeMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyLocationTypeMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ADDBUILDING,
-          element: <LazyAddBuilding />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAddBuilding />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.BUILDINGSETUP,
-          element: <LazyBuildingSetUp />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyBuildingSetUp />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ADDLOCATION,
-          element: <LazyAddLocation />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAddLocation />
+            </ErrorBoundary>
+          ),
         },
 
         // Asset
         {
           path: PATH.MAKEMASTER,
-          element: <LazyMakeMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyMakeMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.TASKMASTER,
-          element: <LazyTaskMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyTaskMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.MODELMASTER,
-          element: <LazyAssetModelMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetModelMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ASSETGROUPMASTER,
-          element: <LazyAssetGroupMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetGroupMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SERVICEGROUPMASTER,
-          element: <LazyAssetGroupMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetGroupMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ASSETTYPEMASTER,
-          element: <LazyAssetTypeMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetTypeMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SERVICETYPEMASTER,
-          element: <LazyServiceTypeMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyServiceTypeMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.UOMMASTER,
-          element: <LazyUomMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyUomMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SEVERITYMASTER,
-          element: <LazySeverityMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazySeverityMaster />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.CREDENTIALCONFIGMASTER,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyConfigCredentialMaster />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.CREDENTIALCONFIGMASTER,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyConfigCredentialMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.WORKORDERTYPE,
-          element: <LazyWorkOrderType />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyWorkOrderType />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.WORKORDERSTATUS,
-          element: <LazyWorkOrderStatus />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyWorkOrderStatus />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.CURRENTSTATUSCONFIG,
-          element: <LazyCurrentStatsConfig />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyCurrentStatsConfig />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.STOREMASTER,
-          element: <LazyStoreMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyStoreMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.RACKMASTER,
-          element: <LazyRackMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyRackMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ASSETMASTER,
-          element: <LazyAssetMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.PARTMASTER,
-          element: <LazyPartMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyPartMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.WEEKOFMASTER,
-          element: <LazyWeekOFMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyWeekOFMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.REQDESCRIPTIONMASTER,
-          element: <LazyReqDescriptionMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyReqDescriptionMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.WORKORDERMASTER,
-          element: <LazyWorkorderMasterMaster />,
+          element: (
+            // <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <LazyWorkorderMasterMaster />
+            // </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.WORKORDERMASTER_DETAILS,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyWorkorderMasterMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SAVENUMBERRANGECONFIG,
-          element: <LazySaveNumberRangeConfig />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazySaveNumberRangeConfig />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ASSETMASTERCONFIGURATION,
-          element: <LazyAssetMasterConfiguration />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetMasterConfiguration />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.VENDORMASTER,
-          element: <LazyVendorMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyVendorMaster />
+            </ErrorBoundary>
+          ),
+        },
+        // {
+        //   path: PATH.VENDOR_CONTRACT,
+        //   element: <ErrorBoundary FallbackComponent={ErrorFallback}><LazyVendorContractmaster /></ErrorBoundary>,
+        // },
+        // {
+        //   path: PATH.VENDOR_CONTRACT,
+        //   element: <ErrorBoundary FallbackComponent={ErrorFallback}><LazyVendorContractmaster /></ErrorBoundary>,
+        // },
+        {
+          path: PATH.VENDORMANAGEMENT,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyVendorManagement />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.VENDORSORCOMPARISION,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyVendorSorComparision />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SERVICEMASTER,
-          element: <LazyServiceMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyServiceMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.TEAMMASTER,
-          element: <LazyTeamMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyTeamMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.EVENTMASTER,
-          element: <LazyEventMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyEventMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ESCALATIONMATRIX,
-          element: <LazyEscalationMatrix />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyEscalationMatrix />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.PPMSCHEDULE,
-          element: <LazyPPMSchedule />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyPPMSchedule />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.INFRAPPMSCHEDULE,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyInfraPPMSchedule />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.MATERIALREQUEST,
-          element: <LazyMaterialRequest />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyMaterialRequest />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ISSUEMATERIAL,
-          element: <LazyIssueMaterial />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyIssueMaterial />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.RETURNMATERIAL,
-          element: <LazyReturnMaterial />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyReturnMaterial />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.STORETOSTORE,
-          element: <LazyStoreToStore />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyStoreToStore />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.SERVICEREQUEST,
-          element: <LazyServiceRequest />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              {" "}
+              <LazyServiceRequest />
+            </ErrorBoundary>
+          ),
         },
-        { path: PATH.INVENTORYMASTER, element: <LazyInventoryMaster /> },
+        {
+          path: PATH.INVENTORYMASTER,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyInventoryMaster />{" "}
+            </ErrorBoundary>
+          ),
+        },
         {
           path: PATH.PPMSCHEDULEDETAILS,
-          element: <LazyPpmScheduleDetails />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyPpmScheduleDetails />
+            </ErrorBoundary>
+          ),
+        },
+
+        {
+          path: PATH.INFR_PPMSCHEDULEDETAILS,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyInfraPpmScheduleDetails />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ASSETSCHEDULEMASTER,
-          element: <LazyAssetScheduleMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetScheduleMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.MATERIALREQUESTPROVISION,
-          element: <LazyMaterialRequestProvision />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyMaterialRequestProvision />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ANALYTICSPLATEFORMASSETLINK,
-          element: <LazyAnalyticsPlateformAssetLIST />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAnalyticsPlateformAssetLIST />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.ANANLYTICSFDD,
-          element: <LazyAnanlyticsFddMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAnanlyticsFddMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.REASONMASTER,
-          element: <LazyReasonMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyReasonMaster />
+            </ErrorBoundary>
+          ),
         },
         {
           path: PATH.RECTIFIEDCOMMENT,
-          element: <LazyRectifiedCommentMaster />,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyRectifiedCommentMaster />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.LOGDETAILS,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyLogDetails />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.INFRASCEDULE,
+          element: <LazyInfraAssetSchedule />,
+        },
+
+        {
+          path: PATH.ASSET_HIERARCHY,
+          element: <LazyAssetHierarchyMaster />,
+        },
+        {
+          path: PATH.ADD_ASSET_HIERARCHY,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyAssetHierarchyMasterForm />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.INFRA_SERVICE_REQUEST,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyInfraServiceRequestForm />
+            </ErrorBoundary>
+          ),
+        },
+
+        {
+          path: PATH.USER_ACTION_DETAILS,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyActionMaster />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.ACTION_MASTER,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyActionDetailsMaster />
+            </ErrorBoundary>
+          ),
+        },
+        {
+          path: PATH.PDF_REPORT,
+          element: <LazyPdfReport />,
+        },
+        {
+          path: PATH.REPORT,
+          element: <LazyReport />,
+        },
+
+        {
+          path: PATH.INFRA_REPORT_TEMPLATE,
+          element: (
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <LazyReportTemplate />
+            </ErrorBoundary>
+          ),
         },
       ],
     },
 
-      //  ],)
-      ], { basename: process.env.REACT_APP_CUSTOM_VARIABLE });
+    //  ],)
+  ],
+  { basename: process.env.REACT_APP_CUSTOM_VARIABLE }
+);

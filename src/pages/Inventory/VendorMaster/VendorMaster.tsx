@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Table from '../../../components/Table/Table';
 import VendorMasterForm from './VendorMasterForm';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { callPostAPI } from '../../../services/apis';
-import { useLocation, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import TableListLayout from '../../../layouts/TableListLayout/TableListLayout'
 
@@ -26,7 +26,9 @@ const VendorMaster = (props: any) => {
     }
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+            })();
         }
     }, [selectedFacility, currentMenu])
     return (

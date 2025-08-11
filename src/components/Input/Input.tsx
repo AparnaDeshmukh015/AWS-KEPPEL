@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const InputField = (props: any) => {
     const { t } = useTranslation();
-    
+
     return (
 
         <div className={`${props?.invalid ? 'errorBorder' : ''}`}>
@@ -21,7 +21,7 @@ const InputField = (props: any) => {
                     }
                     <InputText
                         {...props}
-                        placeholder={t(`Please Enter`)}
+                        placeholder={props?.placeholder === true ? t(`Select Equipment`) : props?.placeholder === "role" ? t(`Select Building & Role`) : t(`Please Enter`)}
                         className={twMerge(props.className, `${props?.error && "requiredField"}`)}
                         disabled={props?.disabled === true ? "disabled" : ""}
                         type={props?.type}

@@ -8,7 +8,6 @@ const MultiSelectCheckbox = ({ teamMasterCheckbox, setTeamMasterCheckbox, select
 }: any) => {
   const { t } = useTranslation();
   const [isCheckAll, setIsCheckAll] = useState<any>(false);
-  const [isCheck, setIsCheck] = useState<any>([]);
   const [list, setList] = useState<any>([]);
 
   const handleSelectAll = (e: any) => {

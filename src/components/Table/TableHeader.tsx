@@ -11,22 +11,16 @@ import { Dialog } from "primereact/dialog";
 import {
   TemplateDownload,
   readUploadFile,
-  upploadexceljson,
 } from "../TemplateDownload/TemplateDownload";
 import { FileUpload } from "primereact/fileupload";
-import { SplitButton } from "primereact/splitbutton";
 import * as xlsx from "xlsx";
 import FileSaver from "file-saver";
 import { appName } from "../../utils/pagePath";
 import { PATH } from '../../utils/pagePath';
-import { loadavg } from "os";
 
 
-type TableProps = {
-  fucCode: string;
-};
+const TableHeader = (props: any) => {
 
-const TableHeader = (props: any, { fucCode }: TableProps) => {
   const pagePath: any = [PATH?.SKILLMASTER,
   PATH?.MAKEMASTER,
   PATH?.MODELMASTER, PATH?.ASSETGROUPMASTER,
@@ -40,30 +34,35 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
   PATH?.WORKORDERTYPE,
   PATH?.WORKORDERSTATUS,
   PATH?.CURRENTSTATUSCONFIG,
+  PATH?.CREDENTIALCONFIGMASTER,
   PATH?.SERVICEMASTER,
   PATH?.ASSETMASTER,
-  PATH?.REQDESCRIPTIONMASTER]
+  PATH?.REQDESCRIPTIONMASTER,
+  PATH?.USERMASTER,
+  PATH?.SEVERITYMASTER,
+  PATH?.PARTMASTER,
+  PATH?.USER_ACTION_DETAILS
+  ]
 
   const location: any = useLocation();
   const { t } = useTranslation();
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
-  const [globalValue, setglobalValue] = useState<string>("");
+  // const [globalValue, setglobalValue] = useState<string>("");
 
-  const [fileValue, setFileValue] = useState<string>("");
   const [, menuList]: any = useOutletContext();
   const [visible, setVisible] = useState<boolean>(false);
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
     setVisible(!visible);
   };
+  const FACILITY: any = localStorage.getItem("FACILITYID")
+  const FACILITY_ID: any = JSON.parse(FACILITY)
+  if (FACILITY_ID) {
+    var facility_type: any = FACILITY_ID?.FACILITY_TYPE
+  }
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     ?.filter((detail: any) => detail.URL === location?.pathname)[0];
-  const clearFilter = () => {
-    // Reset to default filters
-    props?.setFilters(...props?.filters);
-    setGlobalFilterValue('');   // Clear global filter value
-    props?.setboolValue(false)
-  };
+
   const onGlobalFilterChange = (e: any) => {
     const value = e.target.value;
     let _filters = { ...props?.filters };
@@ -71,7 +70,7 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
     _filters["global"].value = value;
     props?.setFilters(_filters);
     setGlobalFilterValue(value);
-    setglobalValue(value)
+    // setglobalValue(value)
   };
   const getAPI = async () => {
     try {
@@ -98,15 +97,15 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
     {
       label: t("Download Template"),
       icon: "pi pi-download",
-      command: () => {
-        getAPI();
+      command: async () => {
+        await getAPI();
       },
     },
     {
       label: t("Download Data"),
       icon: "pi pi-download",
-      command: () => {
-        handlerDownload();
+      command: async () => {
+        await handlerDownload();
       },
     },
   ];
@@ -118,8 +117,8 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
     {
       label: "Download Data",
       icon: "pi pi-download",
-      command: () => {
-        handlerDownload();
+      command: async () => {
+        await handlerDownload();
       },
     },
   ];
@@ -216,10 +215,12 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
           )}
           <div>
             {
-              location?.pathname === PATH?.WORKORDERTYPE ||
+              facility_type === "R" && location?.pathname === PATH?.WORKORDERTYPE ||
                 location?.pathname === PATH?.WORKORDERSTATUS ||
                 location?.pathname === PATH?.SAVENUMBERRANGECONFIG ||
-
+                location?.pathname === PATH?.CREDENTIALCONFIGMASTER ||
+                location?.pathname === PATH?.USER_ACTION_DETAILS ||
+                facility_type === "R" && location?.pathname === PATH?.SEVERITYMASTER ||
                 location?.pathname === `${appName}/materialrequestapprovelist` ||
                 location?.pathname === `${appName}/workorderlist`
                 ? (
@@ -241,19 +242,31 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
                           location?.pathname === PATH?.WEEKOFMASTER ||
                           location?.pathname === PATH?.TASKMASTER ||
                           location?.pathname === PATH?.USERROLEMASTER ||
+                          location?.pathname === PATH?.CREDENTIALCONFIGMASTER ||
                           location?.pathname === PATH?.RACKMASTER ||
                           location?.pathname === PATH?.VENDORMASTER ||
                           location?.pathname === PATH?.STOREMASTER ||
                           location?.pathname === PATH?.SERVICEREQUEST ||
                           location?.pathname === PATH?.WORKORDERMASTER ||
+                          location?.pathname === PATH?.ACTION_MASTER ||
+                          location?.pathname === PATH?.TEAMMASTER ||
                           location?.pathname === `${appName}/assettaskschedulelist` ? (
                           ""
                         ) : (
                           <>
                             {" "}
                             {location?.pathname === PATH?.RACKMASTER ||
+                              location?.pathname === PATH?.ISSUEMATERIAL ||
+                              location?.pathname === PATH?.RETURNMATERIAL ||
+                              location?.pathname === PATH?.STORETOSTORE ||
+                              location?.pathname === PATH?.MATERIALREQUEST ||
+                              location?.pathname === PATH?.INVENTORYMASTER ||
+                              location?.pathname === PATH?.EVENTMASTER ||
+                              location?.pathname === PATH?.ESCALATIONMATRIX ||
+                              location?.pathname === PATH?.USERSKILLMSATER ||
                               location?.pathname === PATH?.VENDORMASTER ||
                               location?.pathname === PATH?.STOREMASTER ||
+                              location?.pathname === PATH?.VENDORMANAGEMENT ||
                               location?.pathname === PATH?.SERVICEREQUEST ||
                               location?.pathname === PATH?.WORKORDERMASTER ? (
                               ""
@@ -261,12 +274,13 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
                               <SplitButtons
                                 label={t("Action")}
                                 model={
-                                  location?.pathname === PATH?.EVENTMASTER ||
-                                    location?.pathname === PATH?.ESCALATIONMATRIX ||
-                                    location?.pathname === PATH?.USERROLEMASTER ||
+                                  // location?.pathname === PATH?.EVENTMASTER ||
+                                  //   location?.pathname === PATH?.ESCALATIONMATRIX ||
+                                  location?.pathname === PATH?.USERROLEMASTER ||
                                     location?.pathname === PATH?.TEAMMASTER ||
                                     location?.pathname === PATH?.INVENTORYMASTER ||
                                     location?.pathname === PATH?.MATERIALREQUEST ||
+                                    location?.pathname === PATH?.WORKORDERTYPE ||
                                     // location?.pathname === PATH?.REQDESCRIPTIONMASTER ||
                                     location?.pathname === PATH?.USERSKILLMSATER ||
                                     location?.pathname === PATH?.TASKMASTER ||
@@ -292,16 +306,17 @@ const TableHeader = (props: any, { fucCode }: TableProps) => {
         header="Bulk Upload"
         visible={visible}
         style={{ width: "30vw" }}
-        onHide={() => setDialogVisible(false)}
+        onHide={() => setDialogVisible()}
       >
         <div className="">
           <FileUpload
             mode="basic"
             name="demo[]"
             accept="xlsx/*"
-            maxFileSize={1000000}
+            // maxFileSize={100000000}
             className="ml-2"
             onSelect={async (e) => {
+
               try {
                 const response: any = await readUploadFile(e, currentMenu?.FUNCTION_CODE, setVisible);
                 if (response?.flag || response?.FLAG) {

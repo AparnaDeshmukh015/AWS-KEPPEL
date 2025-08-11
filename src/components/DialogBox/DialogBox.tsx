@@ -3,19 +3,18 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import deleteIcon from "../../assest/images/icon-delete.png";
 import "./DialogBox.css";
-import { callPostAPI } from "../../services/apis";
-import { ENDPOINTS } from "../../utils/APIEndpoints";
+
 const DialogBox = (props: any) => {
   const [visible, setVisible] = useState<boolean>(false);
   const [filteredList, setFilteredList] = useState<string | undefined>();
   // let filteredList: string[] = [];
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
     setVisible(!visible);
     const obj = props?.data;
     const keys = Object.keys(obj);
     const filteredListData = keys.filter((e: any) => e.includes("NAME"));
     for (const [key, value] of Object.entries(obj)) {
-      if (filteredListData[0] == key) {
+      if (filteredListData[0] === key) {
         setFilteredList(value?.toString());
       }
     }
@@ -32,13 +31,14 @@ const DialogBox = (props: any) => {
         label=""
         icon="pi pi-trash"
         className="deleteButton"
-        onClick={() => setDialogVisible(true)}
+        onClick={() => setDialogVisible()}
       />
       <Dialog
+      // blockScroll={true}
         header={props?.data.MAKE_NAME}
         visible={visible}
         style={{ width: "20vw" }}
-        onHide={() => setDialogVisible(false)}
+        onHide={() => setDialogVisible()}
       >
         <div className="grid justify-items-center">
           <div className="">

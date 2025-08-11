@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
-import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { useFieldArray, useForm} from "react-hook-form";
 import Field from "../../../components/Field";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
 import Select from "../../../components/Dropdown/Dropdown";
@@ -21,8 +21,6 @@ import { saveTracker } from "../../../utils/constants";
 import { decryptData } from "../../../utils/encryption_decryption";
 import { appName } from "../../../utils/pagePath";
 import { Checkbox } from "primereact/checkbox";
-import { flattenDiagnosticMessageText } from "typescript";
-import { findAllByTestId } from "@testing-library/react";
 
 interface EVENTTYPE {
   ESC_LEVEL: any;
@@ -72,12 +70,13 @@ const EscalationMatrixForm = (props: any) => {
   const [options, setOptions] = useState<any | null>([]);
   const [statusTo, setStatusTo] = useState<any | null>([]);
   const { search }: any = useLocation();
-  const [rowId, setRowId] = useState<any | null>()
   const [assetTypeList, setAssetTypeList] = useState<any | null>([])
   const location: any = useLocation();
-  const [escDetails, setEscDetails] = useState<any | null>([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const getId: any = localStorage.getItem("Id");
+    const dataId = JSON.parse(getId);
   const [checked, setChecked] = useState(localData ? localData : false);
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
@@ -86,7 +85,6 @@ const EscalationMatrixForm = (props: any) => {
     register,
     handleSubmit,
     control,
-    getValues,
     setValue,
     watch,
     formState: { errors, isSubmitting },
@@ -98,7 +96,7 @@ const EscalationMatrixForm = (props: any) => {
       //   : props?.selectedData
       //     ? props?.selectedData?.OBJ_ID
       //     : 0,
-      EVENT_ID: props?.selectedData ? props?.selectedData?.EVENT_ID : 0,
+      EVENT_ID: search === "?edit=" ? dataId?.EVENT_ID : 0,
       PARA:
         location?.state && location?.state?.OBJ_ID
           ? { para1: `${props?.headerName}`, para2: t("Updated") }
@@ -116,10 +114,7 @@ const EscalationMatrixForm = (props: any) => {
       SEVERITY_CODE: "",
       STATUS_FROM: "",
       STATUS_TO: "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props?.selectedData?.ACTIVE
-          : true,
+      ACTIVE: search === "?edit="? dataId?.ACTIVE: true,
       ALL_ASSETTYPE: false,
       SELECTED_ASSET_LIST: "",
       ESC_DETAILS: [],
@@ -138,7 +133,9 @@ const EscalationMatrixForm = (props: any) => {
   const watchAll: any = watch();
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return;
+    setIsSubmit(true);
 
     const updated_EventDetails = payload?.ESC_DETAILS.map((event: any, index: any) => ({
       ESC_LEVEL: index + 1,
@@ -195,7 +192,7 @@ const EscalationMatrixForm = (props: any) => {
           };
 
           const eventPayload = { ...eventNotification, ...notifcation };
-          helperEventNotification(eventPayload);
+          await helperEventNotification(eventPayload);
           props?.getAPI();
           props?.isClick();
         }
@@ -204,11 +201,16 @@ const EscalationMatrixForm = (props: any) => {
         }
       } catch (error: any) {
         toast?.error(error);
+        setIsSubmit(false)
+      }
+      finally {
+        setIsSubmit(false)
       }
     } else {
       toast?.error(t("Please fill at least one escalation details"));
     }
-  };
+
+  }, [IsSubmit, setIsSubmit, checked, search, selectedDetails, toast, currentMenu, User_Name, eventNotification, helperEventNotification, props]);
 
   useEffect(() => {
 
@@ -217,7 +219,7 @@ const EscalationMatrixForm = (props: any) => {
   const watchFieldArray: any = watch("ESC_DETAILS");
 
 
-  const handlerAdd = (e: any) => {
+  const handlerAdd = () => {
     const isLastRowFilled = watchFieldArray.every(
       (entry: any) => entry.TIME !== "" && entry.EVENT !== null
     );
@@ -242,7 +244,7 @@ const EscalationMatrixForm = (props: any) => {
         OBJ_ID:
           location?.state !== null
             ? location?.state?.OBJ_ID
-            : props?.selectedData?.OBJ_ID,
+            : dataId?.OBJ_ID,
       }
     );
     if (res?.FLAG === 1) {
@@ -296,7 +298,7 @@ const EscalationMatrixForm = (props: any) => {
         setStatusTo(tolist);
 
         if (props?.selectedData !== undefined || search === "?edit=") {
-          getOptionDetails();
+          await getOptionDetails();
         }
 
         if (location?.state?.data?.OBJ_ID === 0) {
@@ -333,7 +335,9 @@ const EscalationMatrixForm = (props: any) => {
   }, [statusFromSelectWatch]);
 
   useEffect(() => {
-    getOptions();
+    (async function () {
+      await getOptions();
+    await saveTracker(currentMenu)})()
   }, []);
 
   useEffect(() => {
@@ -350,7 +354,7 @@ const EscalationMatrixForm = (props: any) => {
 
 
   useEffect(() => {
-    saveTracker(currentMenu)
+    
   }, [])
 
 
@@ -363,6 +367,7 @@ const EscalationMatrixForm = (props: any) => {
             headerName={props?.headerName}
             isSelected={props?.selectedData ? true : false}
             isClick={props?.isClick}
+            IsSubmit={IsSubmit}
           />
           <Card className="mt-2">
             <div className="headingConainer">
@@ -560,7 +565,7 @@ const EscalationMatrixForm = (props: any) => {
                           checked={
                             props?.selectedData?.ACTIVE === true
                               ? true
-                              : false || false
+                              : false
                           }
                           className={`${!checked && "md:mt-7"}`}
                           label="Active"
@@ -584,7 +589,7 @@ const EscalationMatrixForm = (props: any) => {
                   label={t("Add Level")}
                   icon="pi pi-plus"
                   type={"button"}
-                  onClick={(e: any) => handlerAdd(e)}
+                  onClick={() => handlerAdd()}
                 />
               </div>
             </div>

@@ -1,15 +1,51 @@
-.p-datepicker table td > span {
+.p-datepicker table td>span {
     width: 1.8rem;
     height: 1.8rem;
+    color: #272B30;
 }
-.p-datepicker-calendar{
+
+.p-datepicker-calendar {
     font-size: 14px;
 }
-.p-datepicker table td.p-datepicker-today > span {
+
+.p-datepicker table td.p-datepicker-today>span {
     background: #8e724a;
     color: #fff;
 }
 
-.p-calendar-time-panel .p-calendar-am-pm-picker {
+/* .p-calendar-time-panel .p-calendar-am-pm-picker {
     display: none;
+} */
+
+.p-datepicker-title {
+    color: #272B30;
+    font-family: 'Lato', sans-serif !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 28px;
+    /* 28px */
+    letter-spacing: 0.15px;
 }
+
+.p-datepicker-prev,
+.p-datepicker-next {
+    width: 24px;
+    height: 24px;
+    background: #EFF0F2;
+    border-radius: 0;
+}
+
+.p-datepicker-other-month .p-disabled {
+    background-color: transparent !important;
+}
+
+
+.errorBorder .invalid  {
+    border: 1px solid #dc2020  ;
+    border-radius: 6px;
+}
+
+/* .p-datepicker {
+    z-index: 1140 !important;
+} */

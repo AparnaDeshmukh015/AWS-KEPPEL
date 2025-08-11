@@ -1,33 +1,33 @@
 import { useTranslation } from "react-i18next";
-import { useFieldArray } from "react-hook-form";
-import { useEffect, useState } from "react";
+// import { useFieldArray } from "react-hook-form";
+import { useEffect} from "react";
 import { Checkbox } from "primereact/checkbox";
 
 const TaskAndDoc = ({
   setValue,
-  watchAll,
-  register,
-  control,
+  // watchAll,
+  // register,
+  // control,
   tasklistOptions,
-  selectedData,
-  taskList,
+  // selectedData,
+  // taskList,
   disabled,
   AccessKey = ''
 }: any) => {
-  const { fields, append, remove }: any = useFieldArray({
-    name: "SCHEDULER.SCHEDULE_TASK_D",
-    control,
-  });
+  // const {fields }: any = useFieldArray({
+  //   name: "SCHEDULER.SCHEDULE_TASK_D",
+  //   control,
+  // });
   const { t } = useTranslation();
-  const [tasklist, setTasklistOptions] = useState<any | null>([]);
+  //const [tasklist, setTasklistOptions] = useState<any | null>([]);
 
-
+  
   useEffect(() => {
-    if (AccessKey == 'Equipment') {
+    if (AccessKey === 'Equipment') {
       const updatedTasklistOptions: any = tasklistOptions.filter(
         (task: any) => task.isChecked === true
       );
-      setTasklistOptions(updatedTasklistOptions);
+     // setTasklistOptions(updatedTasklistOptions);
       setValue("SCHEDULER.SCHEDULE_TASK_D", updatedTasklistOptions);
     }
 
@@ -43,7 +43,7 @@ const TaskAndDoc = ({
       return task;
     });
 
-    setTasklistOptions(updatedTasklistOptions);
+  //  setTasklistOptions(updatedTasklistOptions);
     setValue("SCHEDULER.SCHEDULE_TASK_D", updatedTasklistOptions);
   };
 

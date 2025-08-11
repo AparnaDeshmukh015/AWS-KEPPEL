@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect} from 'react'
 import { toast } from 'react-toastify'
 import Table from '../../../components/Table/Table'
 import { callPostAPI } from '../../../services/apis'
@@ -6,9 +6,7 @@ import { ENDPOINTS } from '../../../utils/APIEndpoints'
 import { useLocation, useOutletContext } from 'react-router-dom'
 import TableListLayout from '../../../layouts/TableListLayout/TableListLayout'
 import SkillsMasterForm from './SkillsMasterForm'
-import { Button } from 'primereact/button'
-import { Dialog } from 'primereact/dialog'
-import * as XLSX from "xlsx";
+
 const SkillsMaster = (props: any) => {
     let { pathname } = useLocation();
 
@@ -22,12 +20,15 @@ const SkillsMaster = (props: any) => {
             localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
         } catch (error: any) {
             toast.error(error)
+           
         }
     }
 
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu])
     return (

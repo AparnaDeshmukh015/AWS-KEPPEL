@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
 import Select from "../../../components/Dropdown/Dropdown";
 import InputField from "../../../components/Input/Input";
-import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -23,6 +22,8 @@ const RackMasterForm = (props: any) => {
   const { t } = useTranslation();
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -38,13 +39,13 @@ const RackMasterForm = (props: any) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      MODE: props?.selectedData || search === '?edit=' ? "E" : "A",
-      PARA: props?.selectedData || search === '?edit='
+      MODE:search === '?edit=' ? "E" : "A",
+      PARA: search === '?edit='
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
-      RACK_ID: props?.selectedData ? props?.selectedData?.RACK_ID : search === '?edit=' ? dataId?.RACK_ID : 0,
-      RACK_NAME: props?.selectedData ? props?.selectedData?.RACK_NAME : search === '?edit=' ? dataId?.RACK_NAME : '',
-      STORE: props?.selectedData ? props?.selectedData?.STORE_NAME : search === '?edit=' ? dataId?.STORE_NAME : '',
+      RACK_ID: search === '?edit=' ? dataId?.RACK_ID : 0,
+      RACK_NAME:  search === '?edit=' ? dataId?.RACK_NAME : '',
+      STORE:  search === '?edit=' ? dataId?.STORE_NAME : '',
       ACTIVE:
         props?.selectedData?.ACTIVE !== undefined
           ? props.selectedData.ACTIVE
@@ -53,7 +54,9 @@ const RackMasterForm = (props: any) => {
     mode: "onSubmit",
   });
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     try {
       payload.ACTIVE = payload?.ACTIVE === true ? "1" : "0";
       payload.LOCATION_ID = payload?.STORE?.LOCATION_ID;
@@ -74,16 +77,21 @@ const RackMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
+
         props?.isClick();
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, props?.functionCode, props?.selectedData, props?.getAPI, props?.isClick, callPostAPI, toast, eventNotification, helperEventNotification,]);
 
 
   const getOptions = async () => {
@@ -99,8 +107,10 @@ const RackMasterForm = (props: any) => {
   };
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, []);
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
@@ -115,8 +125,9 @@ const RackMasterForm = (props: any) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           headerName={props?.headerName}
-          isSelected={props?.selectedData ? true : false}
+          isSelected={search === "?edit=" ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -155,7 +166,7 @@ const RackMasterForm = (props: any) => {
                       require={true}
                       findKey={"STORE_NAME"}
                       optionLabel="STORE_NAME"
-                      selectedData={props?.selectedData?.STORE_NAME}
+                      selectedData={search === "?edit=" ? dataId?.STORE_NAME : props?.selectedData?.STORE_NAME}
                       setValue={setValue}
                       invalid={errors.STORE}
                       {...field}
@@ -174,9 +185,9 @@ const RackMasterForm = (props: any) => {
                       <Checkboxs
                         {...register("ACTIVE")}
                         checked={
-                          props?.selectedData?.ACTIVE === true
+                          dataId?.ACTIVE === true
                             ? true
-                            : false || false
+                            : false 
                         }
                         className="md:mt-7"
                         label="Active"

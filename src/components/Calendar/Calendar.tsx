@@ -2,19 +2,15 @@ import { Calendar } from "primereact/calendar";
 import React, { memo, useEffect, useState } from "react";
 import "./Calendar.css";
 import { twMerge } from "tailwind-merge";
-import { dateFormat, LOCALSTORAGE } from "../../utils/constants";
+import { dateFormat, } from "../../utils/constants";
 import { useOutletContext } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import moment from "moment";
+
+
 const DateCalendar = (props: any) => {
   const { t } = useTranslation()
   const [selectedFacility, menuList]: any = useOutletContext();
-  const [date, setDate] = useState<any | null>(null);
   const [format, setFormat] = useState<any | null>()
-
-
-
-
   const dateFormatJOSN: any = [
     { DATE_FORMAT: "DD-MM-YYYY", DATE_CONVERTER: "103", FORMAT_DATE: "dd-mm-yy" },
 
@@ -27,7 +23,7 @@ const DateCalendar = (props: any) => {
       const formatDate: any = dateFormatJOSN?.find((f: any) => f.DATE_FORMAT === dateFormat())
       setFormat(formatDate?.FORMAT_DATE)
     }
-  }, [selectedFacility])
+  }, [selectedFacility, menuList])
 
   return (
     <div className={`${props?.invalid ? "errorBorder" : ""}`}>
@@ -37,15 +33,15 @@ const DateCalendar = (props: any) => {
             {t(`${props?.label}`)}
             {props?.require && <span className="text-red-600"> *</span>}
           </label>
+          <div className="invalid">
+            <Calendar
+              value={props?.value}
+              dateFormat={format}
 
-          <Calendar
-            onSelect={() => console.log('clo')
-            }
-            value={props?.value}
-            dateFormat={format}
-            placeholder={"Please Select"}
-            {...props}
-          />
+              placeholder={"dd-mm-yyyy"}
+              {...props}
+            />
+          </div>
         </span>
       </div>
     </div>

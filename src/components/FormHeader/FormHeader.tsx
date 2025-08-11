@@ -8,14 +8,14 @@ const FormHeader = (props: any) => {
     let { pathname } = useLocation();
     const location: any = useLocation();
     const { t } = useTranslation()
-    const [selectedFacility, menuList]: any = useOutletContext();
+    const [,menuList]: any = useOutletContext();
     const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL)?.filter((detail: any) => detail?.URL === pathname)[0]
     let { search } = useLocation();
     return (
         <div className="flex flex-wrap justify-between mt-1">
             <div>
                 <h6 className="Text_Primary">
-                    {t(`${props?.isSelected ? "Edit" : "Add"}`)} {props?.headerName}  {location?.pathname === PATH?.CURRENTSTATUSCONFIG
+                    {t(`${search === "?edit=" ? "Edit" : "Add"}`)} {props?.headerName}  {location?.pathname === PATH?.CURRENTSTATUSCONFIG
                         || location?.pathname === PATH?.ASSETMASTERCONFIGURATION
                         || location?.pathname === PATH?.SAVENUMBERRANGECONFIG
                         ? "Configuration" : ""}{" "}
@@ -29,13 +29,14 @@ const FormHeader = (props: any) => {
                             type="submit"
                             className="Primary_Button  w-20 me-2"
                             label={"Save"}
-                            disabled={props.isSubmit}
+                            disabled={props.IsSubmit}
                         />)}</> :
                     <>
                         {search === '?add=' ? <Buttons
                             type="submit"
                             className="Primary_Button  w-20 me-2"
                             label={"Save"}
+                            disabled={props?.IsSubmit}
                         /> : ""}</>}
                 <Buttons
                     className="Secondary_Button w-20 "

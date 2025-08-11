@@ -2,7 +2,7 @@ export const PHONE_REGEX = /^[6789]\d{9}$/;
 export const EMAIL_REGEX = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 export const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,20}$/;
-export const ALPHABATE_REGEX = /^[/s a-z A-Z]+$/;
+//export const ALPHABATE_REGEX = /^[/s a-z A-Z]+$/;
 export const ALPHABATE_WITHOUT_WHITESPACE_REGEX = /[^-\s][a-zA-Z\\s]+$/;
 // export const ALPHABATE_WITHOUT_WHITESPACE_REGEX = /^[A-Za-z]+$/;
 export const NUMBER_REGEX = /^[0-9\b]+$/;
@@ -20,4 +20,4 @@ export const QUESTION_REGEX = /^(?![0-9]+$)(?![!@#$%^&*(),.?":{}|<>_+=\[\];/'\\-
 export const PINCODE_REGEX = /^\d{6}$/;
 export const ALPHA_NUMERIC = /^[a-zA-Z0-9]+$/
 export const ALPHA_NUMERIC_WITH_SPACE = /^[a-zA-Z0-9 ]+$/
-export const NUMBER_WITHOUT_ALPHABET =/[^0-9]/g
+export const NUMBER_WITHOUT_ALPHABET = /[^0-9]/g

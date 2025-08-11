@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
 import Buttons from "../../../components/Button/Button";
@@ -10,16 +10,17 @@ import { Column } from 'primereact/column';
 import { useLocation, useNavigate } from "react-router-dom";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
-import { convertTime, dateFormat, helperNullDate, onlyDateFormat } from "../../../utils/constants";
+import { convertTime, helperNullDate, onlyDateFormat } from "../../../utils/constants";
 import moment from "moment";
 import TimeCalendar from "../../../components/Calendar/TimeCalendar";
 import CancelDialogBox from "../../../components/DialogBox/CancelDialogBox";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
-import { appName, PATH } from "../../../utils/pagePath";
+import { PATH } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
 import MultiSelects from "../../../components/MultiSelects/MultiSelects";
+ import "../../../components/Calendar/Calendar.css";
 
 const PPMScheduleDetails = (props: any) => {
   const location: any = useLocation()
@@ -28,6 +29,14 @@ const PPMScheduleDetails = (props: any) => {
   const [options, setOptions] = useState<any | null>([])
   const [assigneeStatus, setAssigneeStatus] = useState<any | null>(false)
   const [technicianList, setTechnicianList] = useState<any | null>([])
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false)
+   const FACILITY: any = localStorage.getItem("FACILITYID");
+  const FACILITYID: any = JSON.parse(FACILITY);
+
+  if (FACILITYID) {
+    var facility_type: any = FACILITYID?.FACILITY_TYPE;
+
+  }
   const {
     register,
     handleSubmit,
@@ -44,7 +53,9 @@ const PPMScheduleDetails = (props: any) => {
     },
   });
 
-  const onSubmit = async (payload: any, e: any) => {
+  const onSubmit = useCallback(async (payload: any, e: any) => {
+    if (IsSubmit) return true;
+    setIsSubmit(true)
     try {
       setAssigneeStatus(false)
       const buttonMode: any = e?.nativeEvent?.submitter?.name;
@@ -77,18 +88,21 @@ const PPMScheduleDetails = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         navigate(PATH?.PPMSCHEDULE)
       } else {
+        setIsSubmit(false)
         toast.error(res?.MSG.toString())
       }
     } catch (error) {
       toast.error(error === null ? 'Something went wrong' : error?.toString())
+    } finally {
+      setIsSubmit(false)
     }
 
 
 
-  };
+  }, [IsSubmit, location, options, callPostAPI, decryptData, eventNotification, helperEventNotification, navigate, PATH]);
 
   const getOptions = async () => {
     const res = await callPostAPI(ENDPOINTS.GET_PPM_SCHEDULE_DETAILS, { "PPM_ID": location?.state?.schedule_id })
@@ -108,7 +122,7 @@ const PPMScheduleDetails = (props: any) => {
       setValue("TIME", ppmTime)
 
     }
-    getEquipmentGroup(res?.ASSETDETAILS[0]?.ASSETGROUP_ID, res?.ASSETDETAILS[0]?.ASSET_ID)
+    await getEquipmentGroup(res?.ASSETDETAILS[0]?.ASSETGROUP_ID, res?.ASSETDETAILS[0]?.ASSET_ID)
   }
 
 
@@ -119,30 +133,39 @@ const PPMScheduleDetails = (props: any) => {
         ASSETGROUP_ID: groupId,
         WO_ID: 0,
         TYPE: "PPM",
-        ASSET_ID: assetId
+        ASSET_ID: assetId,
+        PPM_ID: location?.state?.schedule_id
       });
 
-
+     
       if (res1?.FLAG === 1) {
+
         setTechnicianList(res1?.TECHLIST)
       } else {
         setTechnicianList([])
       }
     } catch (e: any) {
-      console.log(e ?? 'error', "e")
+      toast.error(e);
     }
 
   };
 
-  const changeAssigneeStatus = () => {
-    setAssigneeStatus(true)
-  }
+  
   useEffect(() => {
-    getOptions()
+    (async function () {
+      await getOptions()})()
   }, [location?.state])
 
+  useEffect(() => {
+    if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
+      const check: any = Object?.values(errors)[0]?.message;
+      toast?.error(t(check));
+    }
+  }, [isSubmitting]);
 
   return (
+    <>
+    
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-wrap justify-between mt-1">
@@ -157,6 +180,7 @@ const PPMScheduleDetails = (props: any) => {
               type="submit"
               className="Primary_Button  w-20 me-2"
               label={"Save"}
+              disabled={IsSubmit}
             />
             <Buttons
               className="Secondary_Button w-20 me-2"
@@ -174,6 +198,8 @@ const PPMScheduleDetails = (props: any) => {
               watch={watch}
               REMARK={"REMARK"}
               errors={errors}
+              IsSubmit={IsSubmit} 
+              setIsSubmit={setIsSubmit}
             />
           </div>
         </div>
@@ -253,23 +279,21 @@ const PPMScheduleDetails = (props: any) => {
 
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Code : {options?.assetDetails?.ASSET_CODE}
+                Code : {options?.assetDetails?.ASSET_CODE === null ? "NA" : options?.assetDetails?.ASSET_CODE}
               </label>
               {/* <label className="Text_Primary Input_Label">AS0323</label> */}
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Group : {options?.assetDetails?.ASSETGROUP_NAME}
+                Group : {options?.assetDetails?.ASSETGROUP_NAME === null ? "NA" : options?.assetDetails?.ASSETGROUP_NAME}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Make : {options?.assetDetails?.MAKE_NAME}
+                Make : {options?.assetDetails?.MAKE_NAME === null ? "NA" : options?.assetDetails?.MAKE_NAME}
               </label>
-              {/* <label className="Text_Primary Input_Label">
-                  STANDARD MAKE:{options?.assetDetails?.MAKE_NAME}
-                </label> */}
+              
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
@@ -282,37 +306,37 @@ const PPMScheduleDetails = (props: any) => {
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Name : {options?.assetDetails?.ASSET_NAME}
+                Name : {options?.assetDetails?.ASSET_NAME === null ? "NA" : options?.assetDetails?.ASSET_NAME}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Type : {options?.assetDetails?.ASSETTYPE_NAME}
+                Type : {options?.assetDetails?.ASSETTYPE_NAME === null ? "NA" : options?.assetDetails?.ASSETTYPE_NAME}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Model : {options?.assetDetails?.MODEL_NAME}
+                Model : {options?.assetDetails?.MODEL_NAME === null ? "NA" : options?.assetDetails?.MODEL_NAME}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Location : {options?.assetDetails?.LOCATION_NAME}
+                Location : {options?.assetDetails?.LOCATION_NAME === null ? "NA" : options?.assetDetails?.LOCATION_NAME}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                Under AMC : {options?.assetDetails?.USERAMC}
+                Under AMC :{options?.assetDetails?.USERAMC === true ? " Yes" : " No"}
               </label>
 
             </div>
             <div className="flex">
               <label className="Text_Secondary Input_Label mr-2">
-                AMC Vendor : {options?.assetDetails?.VENDOR_NAME}
+                AMC Vendor : {options?.assetDetails?.VENDOR_NAME === null ? "NA" : options?.assetDetails?.VENDOR_NAME}
               </label>
 
             </div>
@@ -370,16 +394,15 @@ const PPMScheduleDetails = (props: any) => {
               <Column field="WO_TYPE" sortable header="Type"></Column>
               <Column field="WO_NO" sortable header="Work Order No."></Column>
               <Column field="WO_DATE" header="Date" sortable body={(rowData: any) => {
-
                 return (
                   <>
-                    {onlyDateFormat(rowData?.WO_DATE)}
+                    {rowData?.WO_DATE !== null ? onlyDateFormat(rowData?.WO_DATE):""}
                   </>
                 )
               }}></Column>
-              <Column field="RREQ_DESC" sortable header="Request Title"></Column>
-              <Column field="REMARKS" header="Remarks"></Column>
-              <Column field="COMPLETED_AT" header="Resolved On"></Column>
+              <Column field="REQ_DESC" sortable header="Request Title"></Column>
+              <Column field="REMARKS" header="Schedule Name"></Column>
+              <Column field="COMPLETED_AT" header="Status"></Column>
             </DataTable>
           </div>
         </Card>
@@ -409,6 +432,7 @@ const PPMScheduleDetails = (props: any) => {
         </Card>
       </form>
     </section>
+    </>
   );
 };
 

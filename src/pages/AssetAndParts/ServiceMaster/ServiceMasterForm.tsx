@@ -1,5 +1,5 @@
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import React, { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -11,16 +11,12 @@ import DocumentUpload from "../../../components/pageComponents/DocumentUpload/Do
 import AssetSchedule from "../../../components/pageComponents/AssetSchedule/AssetScheduleForm";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
 import "../../../components/Table/Table.css";
 import "../../../components/DialogBox/DialogBox.css";
-import { Button } from "primereact/button";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import {
-  dateFormat,
   helperNullDate,
   saveTracker,
 } from "../../../utils/constants";
@@ -29,7 +25,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
 import { appName } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
-import LoaderS from "../../../components/Loader/Loader";
+
 
 const ServiceMasterForm = (props: any) => {
   const { search } = useLocation();
@@ -38,19 +34,22 @@ const ServiceMasterForm = (props: any) => {
   const { t } = useTranslation();
   const [options, setOptions] = useState<any>({});
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
-  const SCHEDULE_TASK_LIST: any = [{}];
+
   const [scheduleTaskList, setScheduleTaskList] = useState([]);
   const [editStatus, setEditStatus] = useState<any | null>(false);
-  const [, setEditData] = useState<any | null>([]);
-  const [selectedTaskDetailsList, setSelectedTaskDetailsList] = useState([]);
+  const [schedId, setScheId] = useState<any | null>(0)
+  // const [, setEditData] = useState<any | null>([]);
+  //const [selectedTaskDetailsList, setSelectedTaskDetailsList] = useState([]);
   const [typeList, setTypeList] = useState<any | null>([]);
   const [Descriptionlength, setDescriptionlength] = useState(0);
-  const[loading,setLoading]=useState<any|null>(false)
-  const[issueList, setIssueList]=useState<any|null>([])
+
+  const [issueList, setIssueList] = useState<any | null>([])
   const [selectedScheduleTaskDetails, setSelectedScheduleTaskDetails] =
     useState<any>();
-    const[assetTypeState, setAssetTypeState]=useState<any|null>(false)
-  const[idSchedule, setIdSchedule]=useState<any|null>(null)
+  const [assetTypeState, setAssetTypeState] = useState<any | null>(false)
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<any | null>(null)
+  // const[idSchedule, setIdSchedule]=useState<any|null>(null)
   const getId: any = localStorage.getItem("Id");
   const assetId: any = JSON.parse(getId);
   let { pathname } = useLocation();
@@ -119,7 +118,7 @@ const ServiceMasterForm = (props: any) => {
         SCHEDULE_NAME: selectedScheduleTaskDetails?.SCHEDULE_NAME || null,
         FREQUENCY_TYPE: "",
         PERIOD: "",
-        Record:"",
+        Record: "",
         DAILY_ONCE_EVERY: "O",
         DAILY_ONCE_AT_TIME: "00:00",
         DAILY_ONCE_EVERY_DAYS: 0,
@@ -171,7 +170,10 @@ const ServiceMasterForm = (props: any) => {
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
   const watchAll: any = watch();
   const MANINTENANCE: any = watch("UNDERAMC");
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
+    let schedule_id: any = "0"
     try {
       if (!payload.SCHEDULE_ID || editStatus) {
         const schedulerData = payload.SCHEDULER;
@@ -195,7 +197,7 @@ const ServiceMasterForm = (props: any) => {
         schedulerData.MONTHLY_2_WEEK_NUM =
           schedulerData?.MONTHLY_2_WEEK_NUM?.MONTHLY_2_WEEK_NUM || "0";
         schedulerData.MONTHLYONCETWICE = schedulerData?.MONTHLYONCETWICE?.key;
-        schedulerData.MODE = !payload.SCHEDULE_ID === false ? "E" : "A";
+        schedulerData.MODE = !!payload.SCHEDULE_ID ? "E" : "A";
         const timeConvert = [
           "DAILY_ONCE_AT_TIME",
           "DAILY_EVERY_STARTAT",
@@ -224,7 +226,7 @@ const ServiceMasterForm = (props: any) => {
         const schedulerPayload: any = {
           ...payload?.SCHEDULER,
           ASSETTYPE_ID: payload?.TYPE?.ASSETTYPE_ID,
-          REQ_ID:schedulerData?.Record?.REQ_ID
+          REQ_ID: schedulerData?.Record?.REQ_ID
         };
 
         if (schedulerData?.SCHEDULE_NAME !== null) {
@@ -232,7 +234,7 @@ const ServiceMasterForm = (props: any) => {
             ENDPOINTS.SCHEDULE_SAVE,
             schedulerPayload
           );
-          payload.SCHEDULE_ID = res1?.SCHEDULE_ID;
+          schedule_id = res1?.SCHEDULE_ID;
         }
       }
 
@@ -242,7 +244,8 @@ const ServiceMasterForm = (props: any) => {
       ).map((data: any) => ({
         [data?.FIELDNAME]: data?.VALUE,
       }));
-      payload.SCHEDULE_ID = payload?.SCHEDULE_ID !== 0 ? payload?.SCHEDULE_ID : 0;
+      //  payload.SCHEDULE_ID = payload?.SCHEDULE_ID !== 0 ? payload?.SCHEDULE_ID : 0;
+      payload.SCHEDULE_ID = selectedSchedule === null ? schedule_id : selectedSchedule;
       payload.EXTRA_COL_LIST = updateColList || [];
       payload.ACTIVE = payload?.ACTIVE === true ? 1 : 0;
       payload.LOCATION_ID = payload?.LOCATION?.LOCATION_ID;
@@ -303,12 +306,14 @@ const ServiceMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         if (location?.state === null) {
           props?.getAPI();
+
           props?.isClick();
         }
       } else {
+
         toast?.error(res?.MSG);
       }
       // } else {
@@ -316,8 +321,10 @@ const ServiceMasterForm = (props: any) => {
       // }
     } catch (error: any) {
       toast?.error(error);
+    } finally {
+      setIsSubmit(true)
     }
-  };
+  }, [IsSubmit, props, selectedDetails, search, watchAll, location, currentMenu, eventNotification, User_Name, selectedSchedule])
 
   const { fields, append: colAppend } = useFieldArray({
     name: "EXTRA_COL_LIST",
@@ -340,29 +347,33 @@ const ServiceMasterForm = (props: any) => {
           ASSETTYPE_ID: watchAll?.TYPE?.ASSETTYPE_ID,
         };
         const res = await callPostAPI(ENDPOINTS.SCHEDULE_LIST, payload);
-        setValue("SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0);
-          setValue("SCHEDULER.SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID )
+        setScheduleTaskList(res?.SCHEDULELIST);
+        if (search === "?edit=") {
+          setSelectedSchedule(res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0)
+          setValue("SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0);
+          setValue("SCHEDULER.SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID)
+        }
       }
     } catch (error) { }
   };
 
 
-  const getRequestList = async(ASSETGROUP_ID: any, ASSET_NONASSET?: any, reqId?:any) =>{
+  const getRequestList = async (ASSETGROUP_ID: any, ASSET_NONASSET?: any) => {
     const payload: any = {
       ASSETGROUP_ID: ASSETGROUP_ID,
       ASSET_NONASSET: ASSET_NONASSET?.key
         ? ASSET_NONASSET?.key
         : ASSET_NONASSET,
     };
-      
+
     const res = await callPostAPI(
       ENDPOINTS.GET_SERVICEREQUEST_WORKORDER,
       payload, null
     );
-   
+
     if (res?.FLAG === 1) {
       setIssueList(res?.WOREQLIST)
-      if(search === "?edit=") {
+      if (search === "?edit=") {
         //  setSelectedIssue(reqId)
       }
     } else {
@@ -383,15 +394,16 @@ const ServiceMasterForm = (props: any) => {
     };
 
     try {
-      setLoading(true)
+
       const res = await callPostAPI(
         ENDPOINTS.ASSETMASTER_DETAILS,
         payload
       );
 
       if (res?.FLAG === 1) {
-        getRequestList(res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID, res?.ASSETDETAILSLIST[0]?.ASSET_NONASSET)
-        
+        setScheId(res?.ASSETDETAILSLIST[0]?.SCHEDULE_ID !== null ? res?.ASSETDETAILSLIST[0]?.SCHEDULE_ID : 0)
+        await getRequestList(res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID, res?.ASSETDETAILSLIST[0]?.ASSET_NONASSET)
+
         const configList = res.CONFIGLIST[0];
         for (let key in configList) {
           if (configList[key] === null) {
@@ -408,19 +420,19 @@ const ServiceMasterForm = (props: any) => {
           res?.ASSETDETAILSLIST[0]?.AMC_EXPIRY_DATE
         );
 
-        const lastDate: any = helperNullDate(
-          res?.ASSETDETAILSLIST[0]?.LAST_MAINTANCE_DATE
-        );
+        // const lastDate: any = helperNullDate(
+        //   res?.ASSETDETAILSLIST[0]?.LAST_MAINTANCE_DATE
+        // );
         const commissioningDate: any = helperNullDate(
           res?.ASSETDETAILSLIST[0]?.COMMISSIONING_DATE
         );
-        const warrantyDate: any = helperNullDate(
-          res?.ASSETDETAILSLIST[0]?.WARRANTY_END_DATE
-        );
+        // const warrantyDate: any = helperNullDate(
+        //   res?.ASSETDETAILSLIST[0]?.WARRANTY_END_DATE
+        // );
         setSelectedDetails(res?.ASSETDETAILSLIST[0]);
 
         setSelectedScheduleTaskDetails(res?.SCHEDULELIST[0]);
-        setSelectedTaskDetailsList(res?.SCHEDULETASKLIST);
+        // setSelectedTaskDetailsList(res?.SCHEDULETASKLIST);
         setValue("DOC_LIST", res?.ASSETDOCLIST);
         setValue("ASSET_CODE", res?.ASSETDETAILSLIST[0]?.ASSET_CODE);
         setValue("BAR_CODE", res?.ASSETDETAILSLIST[0]?.BAR_CODE);
@@ -440,8 +452,8 @@ const ServiceMasterForm = (props: any) => {
       }
     } catch (error: any) {
       toast?.error(error);
-    } finally{
-      setLoading(false)
+    } finally {
+
     }
   };
 
@@ -451,11 +463,11 @@ const ServiceMasterForm = (props: any) => {
       ASSETTYPE: "N",
     };
     try {
-      setLoading(true)
+
       const res = await callPostAPI(
         ENDPOINTS.GETASSETMASTEROPTIONS,
         payload
-       
+
       );
 
       const res1 = await callPostAPI(ENDPOINTS.LOCATION_HIERARCHY_LIST, null, "AS0010");
@@ -481,17 +493,17 @@ const ServiceMasterForm = (props: any) => {
 
       if (res?.FLAG === 1) {
         if (search === "?edit=") {
-          getAssetDetails(columnCaptions);
+
           if (location?.state !== null) {
-            getAssetDetails(columnCaptions, location?.state?.ASSET_ID);
-          }
+            await getAssetDetails(columnCaptions, location?.state?.ASSET_ID);
+          } else { await getAssetDetails(columnCaptions); }
         } else {
           colAppend(columnCaptions);
         }
       }
     } catch (error) { }
-    finally{
-      setLoading(false)
+    finally {
+
     }
   };
 
@@ -530,14 +542,24 @@ const ServiceMasterForm = (props: any) => {
   }, [watchAll?.GROUP]);
   useEffect(() => {
     if (watchAll?.TYPE !== null) {
-      getScheduleList();
+      (async function () {
+        if (currentMenu || location.state !== null) {
+          await getScheduleList();
+
+        }
+      })();
+
     }
     // getTaskList()
   }, [watchAll?.TYPE]);
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
+    (async function () {
+      if (currentMenu || location.state !== null) {
+        await getOptions();
+        await saveTracker(currentMenu)
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -559,9 +581,9 @@ const ServiceMasterForm = (props: any) => {
     }
   }, [isSubmitting]);
 
-  if (loading) {
-    return <LoaderS />
-  }
+  // if (loading) {
+  //   return <LoaderS />
+  // }
 
   return (
     <>
@@ -586,6 +608,7 @@ const ServiceMasterForm = (props: any) => {
               <Buttons
                 type="submit"
                 className="Primary_Button  w-20 me-2"
+                disabled={IsSubmit}
                 label={"Save"}
               />
               <Buttons
@@ -674,9 +697,9 @@ const ServiceMasterForm = (props: any) => {
                         options={options?.assetGroup}
                         {...register("GROUP", {
                           required: t("Please fill the required fields."),
-                          onChange: (e: any) => {
-                          
-                            getRequestList(
+                          onChange: async (e: any) => {
+
+                            await getRequestList(
                               e?.target?.value?.ASSETGROUP_ID,
                               e?.target?.value?.ASSETGROUP_TYPE
 
@@ -707,9 +730,9 @@ const ServiceMasterForm = (props: any) => {
                         options={typeList}
                         {...register("TYPE", {
                           required: t("Please fill the required fields."),
-                          onChange:(e:any)=>{
+                          onChange: () => {
                             setAssetTypeState(true)
-                            setIdSchedule(0)
+                            // setIdSchedule(0)
                           }
                         })}
                         label="Type"
@@ -865,7 +888,7 @@ const ServiceMasterForm = (props: any) => {
             control={control}
             resetField={resetField}
             scheduleTaskList={scheduleTaskList}
-            scheduleId={search === '?edit=' ? selectedDetails?.SCHEDULE_ID : 0}
+            scheduleId={search === '?edit=' && assetTypeState === true ? 0 : search === '?edit=' ? schedId : 0}
             getValues={getValues}
             setEditStatus={setEditStatus}
             isSubmitting={isSubmitting}
@@ -874,6 +897,7 @@ const ServiceMasterForm = (props: any) => {
             setScheduleTaskList={setScheduleTaskList}
             setAssetTypeState={setAssetTypeState}
             assetTypeState={assetTypeState}
+            setSelectedSchedule={setSelectedSchedule}
           />
           <Card className="mt-2 ">
             <DocumentUpload
@@ -989,3 +1013,4 @@ const ServiceMasterForm = (props: any) => {
 };
 
 export default ServiceMasterForm;
+

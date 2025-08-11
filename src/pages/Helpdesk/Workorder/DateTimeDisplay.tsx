@@ -1,4 +1,3 @@
-import React from 'react';
 
 type DateTimeDisplayProps = {
     value: any,

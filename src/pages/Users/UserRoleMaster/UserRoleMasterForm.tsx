@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
 import Select from "../../../components/Dropdown/Dropdown";
 import InputField from "../../../components/Input/Input";
-import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -12,7 +11,7 @@ import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import Radio from "../../../components/Radio/Radio";
 import { useTranslation } from "react-i18next";
-import { LOCALSTORAGE, ROLETYPECODE, saveTracker } from "../../../utils/constants";
+import {  saveTracker } from "../../../utils/constants";
 import {
   eventNotification,
   helperEventNotification,
@@ -20,15 +19,10 @@ import {
 import FormHeader from "../../../components/FormHeader/FormHeader";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { decryptData } from "../../../utils/encryption_decryption";
-
+import { validation } from "../../../utils/validation";
 
 const UserRoleMasterForm = (props: any) => {
-  var isDisabled: boolean = false;
-  if (props?.selectedData === undefined) {
-    isDisabled = false;
-  } else {
-    isDisabled = props?.isDisabled;
-  }
+  
   const { t } = useTranslation();
 
   let [roletypeOptions, setRoletypeOptions] = useState([]);
@@ -44,7 +38,7 @@ const UserRoleMasterForm = (props: any) => {
     .filter((detail: any) => detail.URL === pathname)[0];
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
-  const dataId = JSON.parse(getId)
+  const dataId = search === '?edit=' ? JSON.parse(getId):null;
   const {
     register,
     handleSubmit,
@@ -58,24 +52,21 @@ const UserRoleMasterForm = (props: any) => {
       PARA: props?.selectedData || search === '?edit='
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
-      ROLE_ID: props?.selectedData ? props?.selectedData?.ROLE_ID : search === '?edit=' ? dataId?.ROLE_ID : 0,
-      ROLE_NAME: props?.selectedData ? props?.selectedData?.ROLE_NAME : search === '?edit=' ? dataId?.ROLE_NAME : "",
-      ROLE_TYPE: props?.selectedData ? props?.selectedData?.ROLETYPE_NAME : dataId?.ROLETYPE_NAME
-        ? roletypeOptions.filter(
+      ROLE_ID:  search === '?edit=' ? dataId?.ROLE_ID : 0,
+      ROLE_NAME: search === '?edit=' ? dataId?.ROLE_NAME : "",
+      ROLE_TYPE:search === '?edit='?
+         roletypeOptions.filter(
           (item: any) =>
-            item?.ROLETYPE_NAME === props?.selectedData ? props?.selectedData?.ROLETYPE_NAME : dataId?.ROLETYPE_NAME
+            item?.ROLETYPE_NAME === dataId?.ROLETYPE_NAME
         )[0]
-        : " ",
-      ASSIGN_ADD: props?.selectedData?.ASSIGN_ADD
-        ? props.selectedData.ASSIGN_ADD
-        : false,
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
-      FACILITY_GENERIC: props?.selectedData ? props?.selectedData?.FACILITY_GENERIC : search === '?edit=' ? dataId?.FACILITY_GENERIC : "",
+        : "",
+      ASSIGN_ADD: search === '?edit=' ? dataId?.ASSIGN_ADD : false,
+      REOPEN_ADD: search === '?edit=' ? dataId?.REOPEN_ADD: false,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE: true,
+      ISREDIRECT:search === '?edit=' ? dataId?.ISREDIRECT: false,
+      FACILITY_GENERIC: ""
     },
-    mode: "onSubmit",
+    mode: "all",
   });
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
   const getOptions = async () => {
@@ -88,13 +79,16 @@ const UserRoleMasterForm = (props: any) => {
 
   const ROLE_TYPE: any = watch("ROLE_TYPE");
   const onSubmit = async (payload: any) => {
+
     if (props?.selectedData === undefined) {
       payload.FACILITY_GENERIC =
-        payload?.FACILITY_GENERIC?.key === "N" ? "N" : "Y";
-    } else if (props?.selectedData?.FACILITY_GENERIC === "YES") {
-      payload.FACILITY_GENERIC = payload.FACILITY_GENERIC === "Y" ?"Y":"N";
-    } else if (props?.selectedData?.FACILITY_GENERIC === "NO") {
-      payload.FACILITY_GENERIC = payload.FACILITY_GENERIC === "Y" ?"Y":"N";
+        payload?.FACILITY_GENERIC?.key;
+    }
+    else if (props?.selectedData?.FACILITY_GENERIC === "YES") {
+      payload.FACILITY_GENERIC = payload?.FACILITY_GENERIC?.key === "Y" ? "Y" : "N";
+    }
+    else if (props?.selectedData?.FACILITY_GENERIC === "NO") {
+      payload.FACILITY_GENERIC = payload?.FACILITY_GENERIC?.key === "N" ? "N" : "Y";
     }
 
     payload.ROLETYPE_CODE = payload?.ROLE_TYPE?.ROLETYPE_CODE;
@@ -103,12 +97,12 @@ const UserRoleMasterForm = (props: any) => {
     delete payload?.ROLE_TYPE;
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.ASSIGN_ADD = payload?.ASSIGN_ADD ? 1 : 0;
-
-    // return
+    payload.REOPEN_ADD = payload?.REOPEN_ADD ? 1 : 0;
+    payload.ISREDIRECT = payload?.ISREDIRECT ? 1 : 0;
     try {
+    
       const res = await callPostAPI(ENDPOINTS.saveUserRoleMaster, payload);
       if (res?.FLAG === true) {
-    
         toast?.success(res?.MSG);
         const notifcation: any = {
           "FUNCTION_CODE": props?.functionCode,
@@ -120,24 +114,24 @@ const UserRoleMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
-       
         toast?.success(res?.MSG)
       }
     } catch (error: any) {
       toast.error(error);
     }
   };
+
   useEffect(() => {
-    getOptions();
-
-    saveTracker(currentMenu)
-
+    (async function () {
+      await getOptions();
+      await saveTracker(currentMenu)
+    })();
   }, []);
-
+ 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
@@ -165,7 +159,10 @@ const UserRoleMasterForm = (props: any) => {
                       <InputField
                         {...register("ROLE_NAME", {
                           required: t("Please fill the required fields."),
-                          validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                          // 
+                          validate: (fieldValue: any) => {
+                            return validation?.onlyAlphaNumericWhiteSpace(fieldValue, "ROLE_NAME", setValue);
+                          },
 
                         })}
                         require={true}
@@ -189,16 +186,17 @@ const UserRoleMasterForm = (props: any) => {
                       <Select
                         options={roletypeOptions}
                         {...register("ROLE_TYPE", {
-                          required: t("Please fill the required fields."),
+                          required: search === '?add=' ?"Please fill the required fields." :'',
                         })}
                         label="Role Type"
-                        require={true}
+                        require={search === '?add='?true : false}
                         optionLabel="ROLETYPE_NAME"
-                        invalid={errors.ROLE_TYPE}
-                        findKey={"ROLETYPE_NAME"}
-                        disabled={isDisabled}
-                        selectedData={props?.selectedData?.ROLETYPE_NAME}
+                       
+                        findKey={"ROLETYPE_CODE"}
+                        disabled={search === '?edit=' ? true : false}
+                        selectedData={dataId?.ROLETYPE_CODE}
                         setValue={setValue}
+                        invalid={search === '?add=' ?errors.ROLE_TYPE:""}
                         {...field}
                       />
                     );
@@ -207,7 +205,7 @@ const UserRoleMasterForm = (props: any) => {
                 error={errors?.ROLE_TYPE?.message}
               />
             </div>
-            {props?.selectedData?.FACILITY_ID !== 0 && (
+            {/* {props?.selectedData?.FACILITY_ID !== 0 && ( */}
               <Field
                 controller={{
                   name: "FACILITY_GENERIC",
@@ -222,11 +220,10 @@ const UserRoleMasterForm = (props: any) => {
                           labelHead="Building Generic"
                           options={genericLabel}
                           selectedData={
-                            props?.selectedData?.FACILITY_GENERIC || "Y"
+                            (props?.selectedData?.FACILITY_GENERIC === "YES" ? "Y" : "N")
                           }
-                          disabled={
-                            ((decryptData(localStorage.getItem(LOCALSTORAGE?.ROLETYPECODE)) !== ROLETYPECODE?.SYSTEM_ADMIN) && (decryptData(localStorage.getItem(LOCALSTORAGE?.ROLETYPECODE)) !== ROLETYPECODE?.SUPERVISOR))
-                          }
+                          disabled={search === '?edit=' ? true : false}
+                          
                           setValue={setValue}
                           {...field}
                         />
@@ -235,7 +232,7 @@ const UserRoleMasterForm = (props: any) => {
                   },
                 }}
               />
-            )}
+            {/* )} */}
 
 
             <div className="flex items-center">
@@ -260,6 +257,72 @@ const UserRoleMasterForm = (props: any) => {
                 }}
               />
             </div>
+            {/* <div className="flex items-center">
+              <Field
+                controller={{
+                  name: "REOPEN_ADD",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("REOPEN_ADD", {
+
+                        })}
+                        className=""
+                        label="Add Re-open"
+                        checked={props?.selectedData?.REOPEN_ADD || false}
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+            </div> */}
+            <div className="flex items-center">
+              <Field
+                controller={{
+                  name: "REOPEN_ADD",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("REOPEN_ADD", {
+
+                        })}
+                        className=""
+                        label="Add Re-open"
+                        checked={props?.selectedData?.REOPEN_ADD || false}
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+            </div>
+            <div className="flex items-center">
+              <Field
+                controller={{
+                  name: "ISREDIRECT",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ISREDIRECT", {
+
+                        })}
+                        className=""
+                        label="Add Redirect"
+                        checked={props?.selectedData?.ISREDIRECT || false}
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+            </div>
             <div className="flex align-items-center">
               <Field
                 controller={{
@@ -272,7 +335,7 @@ const UserRoleMasterForm = (props: any) => {
                         checked={props?.selectedData?.ACTIVE || false}
                         className=""
                         label="Active"
-                        disabled={isDisabled}
+                        // disabled={isDisabled}
                         setValue={setValue}
                         {...field}
                       />

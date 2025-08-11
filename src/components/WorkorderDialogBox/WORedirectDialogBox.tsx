@@ -8,28 +8,22 @@ import { toast } from "react-toastify";
 import { ENDPOINTS } from "../../utils/APIEndpoints";
 
 const WORedirectDialogBox = ({
-  header,
-  title,
   control,
   setValue,
   register,
-  name,
   REMARK,
   handlingStatus,
   watch,
-  label,
   ASSIGN_TEAM_ID,
   getAPI,
-  STATUS_CODE,
   getOptionDetails,
   subStatus,
   currentStatus,
   errors,
-  isSubmitting,
   eventNotification,
 }: any) => {
   const [visible1, setVisible1] = useState<boolean>(false);
-  const WO_ID = sessionStorage.getItem('WO_ID');
+
   const status: any = [
     {
       code: "1",
@@ -41,9 +35,23 @@ const WORedirectDialogBox = ({
       header: "Collaborate",
       description: "Work together with another technician ",
     },
-    { code: "3", header: "External Vendor Required", description: "Awaiting help from experts" },
-    { code: "4", header: "Cancel Work Order", description: "No work to be done" },
-    { code: "5", header: "Put On Hold", description: "Pausing this work order" },
+
+    {
+      code: "3",
+      header: "External Vendor Required",
+      description: "Awaiting help from experts",
+    },
+    {
+      code: "4",
+      header: "Cancel Work Order",
+      description: "No work to be done",
+    },
+    {
+      code: "5",
+      header: "Put On Hold",
+      description: "Pausing this work order",
+    },
+    // { code: "7", header: "Cancel - Pre Conditional", description: "Cancel this work order due to pre-condition requirements." },
   ];
 
   const [redirectStatus, setRedirecStatus] = useState(false);
@@ -53,7 +61,8 @@ const WORedirectDialogBox = ({
   var tempstatusList: any = [];
   var List: any = [];
 
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
+    setVisible1(false);
     setVisible1(!visible1);
   };
 
@@ -63,19 +72,17 @@ const WORedirectDialogBox = ({
     setRedirecStatus(true);
     setVisible1(false);
   };
-  const handlerWorkOrderStatus = (status: any) => {
-    setVisible1(status);
-  };
+
   const getOptions = async () => {
     try {
       const res = await callPostAPI(ENDPOINTS.GET_SERVICEREQUST_MASTERLIST, {});
 
       if (res?.FLAG === 1) {
-        tempstatusList = res?.STATUSLIST
+        tempstatusList = res?.STATUSLIST;
         if (currentStatus === 1) {
           tempstatusList.forEach((element: any) => {
             if (element.STATUS_CODE === "1" || element.STATUS_CODE === "4") {
-              List.push(element)
+              List.push(element);
               setOptions({
                 statusList: List,
               });
@@ -93,54 +100,63 @@ const WORedirectDialogBox = ({
   };
 
   useEffect(() => {
-    getOptions();
-    setValue("REMARK", "");
-  }, []);
-
+    if (visible1) {
+      (async function () {
+        await getOptions();
+        setValue("REMARK", "");
+      })();
+    }
+  }, [visible1]);
 
   return (
     <>
       <Buttons
         className="Secondary_Button w-20 me-2"
         label={"Redirect"}
-        onClick={() => setDialogVisible(true)}
+        onClick={() => setDialogVisible()}
       />
-      {((redirectStatus === false && visible1 === true) &&
+      {!redirectStatus && visible1 && (
         <Dialog
           header="Redirect"
           visible={visible1}
           style={{ width: "35vw" }}
-          onHide={() => setDialogVisible(false)}
+          onHide={() => setDialogVisible()}
         >
-          {options && options?.statusList?.map((s: any, index: any) => {
-            //  let description: any = status[index]?.description;
-            let description: any = "";
-            for (let i = 0; i < status?.length; i++) {
-              if (status[i].code === s.STATUS_CODE) {
-                description = status[i].description;
+          {options &&
+            options?.statusList?.map((s: any, index: any) => {
+              let description: any = "";
+              for (let i = 0; i < status?.length; i++) {
+                if (status[i].code === s.STATUS_CODE) {
+                  description = status[i].description;
+                }
               }
-            }
-            return (
-              <div
-                onClick={() => setRedirectDialogVisible(s.STATUS_DESC, index, s?.STATUS_CODE)}
-                className="flex  justify-between w-full p-3 h-54 border-2
+              return (
+                <div
+                  onClick={() =>
+                    setRedirectDialogVisible(
+                      s.STATUS_DESC,
+                      index,
+                      s?.STATUS_CODE
+                    )
+                  }
+                  className="flex  justify-between w-full p-3 h-54 border-2
                 border-gray-200 border rounded-lg mb-2 redirectContainer"
-              >
-                <div>
-                  <h6 className=" Text_Primary" style={{ fontSize: "18px" }}>
-                    {s?.STATUS_DESC}
-                  </h6>
-                  <p className="Text_Secondary Helper_Text">{description} </p>
+                >
+                  <div>
+                    <h6 className=" Text_Primary" style={{ fontSize: "18px" }}>
+                      {s?.STATUS_DESC}
+                    </h6>
+                    <p className="Text_Secondary Helper_Text">{description} </p>
+                  </div>
+                  <div>
+                    <i className="pi pi-angle-right mt-3"></i>
+                  </div>
                 </div>
-                <div>
-                  <i className="pi pi-angle-right mt-3"></i>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </Dialog>
       )}
-      {redirectStatus === true && (
+      {redirectStatus && (
         <WorkorderRedirectDialogBox
           header={statusHeader}
           control={control}
@@ -161,7 +177,7 @@ const WORedirectDialogBox = ({
           resonList={options?.reasonList}
           errors={errors}
           currentStatus={currentStatus}
-          isSubmitting={isSubmitting}
+          // isSubmitting={isSubmitting}
           subStatus={subStatus}
           redirectStatus={redirectStatus}
           setVisible1={setVisible1}

@@ -22,9 +22,13 @@ const RequestDescriptionMaster = (props: any) => {
             toast.error(error)
         }
     }
+
+    
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu])
     return (
@@ -39,7 +43,7 @@ const RequestDescriptionMaster = (props: any) => {
                 customHeader={["Request Description", "Equipment Group", "Active", "Action"]}
                 columnData={props?.data}
                 clickableColumnHeader={["REQ_DESC"]}
-                filterFields={["REQ_DESC", "ASSETTYPE_NAME", "SKILL_NAME"]}
+                filterFields={["REQ_DESC", "ASSET_GROUP", "SKILL_NAME"]}
                 setSelectedData
                 isClick={props?.isForm}
                 handelDelete={props?.handelDelete}

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
-import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
@@ -12,6 +11,7 @@ import { InputText } from "primereact/inputtext";
 import FormHeader from "../../../components/FormHeader/FormHeader";
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { saveTracker } from "../../../utils/constants";
+import Checkboxs from '../../../components/Checkbox/Checkbox';
 const WorkOrderForm = (props: any) => {
   const { t } = useTranslation();
   const [color, setColor] = useState("000");
@@ -20,17 +20,28 @@ const WorkOrderForm = (props: any) => {
   const dataId = JSON.parse(getId)
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+  const FACILITY: any = localStorage.getItem("FACILITYID")
+  const FACILITYID: any = JSON.parse(FACILITY)
+
+  if (FACILITYID) {
+    var facility_type: any = FACILITYID?.FACILITY_TYPE
+
+  }
+
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
+      MODE: props?.selectedData || search === '?edit=' ? 'E' : 'A',
       PARA:
         props?.selectedData || search === "?edit="
           ? { para1: `${props?.headerName}`, para2: "Updated" }
@@ -47,31 +58,56 @@ const WorkOrderForm = (props: any) => {
         : search === "?edit="
           ? dataId?.COLORS
           : color,
-      ACTIVE: props?.selectedData?.ACTIVE ? true : false,
-      WO_ID: props?.selectedData ? props?.selectedData?.WO_TYPE_CODE : search === '?edit=' ? dataId?.WO_TYPE_CODE : '',
+      ISPM: props?.selectedData ? props?.selectedData?.ISPM : search === '?edit=' ? dataId?.ISPM : false,
+      ACTIVE: props?.selectedData?.ACTIVE !== undefined ? props.selectedData.ACTIVE : true,
+      WO_CODE: props?.selectedData ? props?.selectedData?.WO_TYPE_CODE : search === '?edit=' ? dataId?.WO_TYPE_CODE : '',
     },
     mode: "onSubmit",
   });
 
-  const onSubmit = async (payload: any) => {
-    payload.ACTIVE = "";
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) {
+      return true
+    }
+    setIsSubmit(true)
+    // payload.ACTIVE = "";
+    payload.COLORS = payload?.COLORS === '000' ? "#000000" : payload?.COLORS
+
+    // return
     try {
-      const res = await callPostAPI(ENDPOINTS?.WORKORDERTYPE_STATUS, payload);
+      // return
+      const res = await callPostAPI(ENDPOINTS?.WORKORDERTYPE_STATUS, payload, currentMenu?.FUNCTION_CODE);
       if (res?.FLAG === true) {
         toast?.success(res?.MSG);
       } else {
         toast?.error(res?.MSG);
       }
       props?.getAPI();
+
       props?.isClick();
     } catch (error: any) {
+
       toast?.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, isSubmitting, callPostAPI, toast, props?.getAPI, props?.isClick]);
 
   useEffect(() => {
-    saveTracker(currentMenu)
+    (async function () {
+      await saveTracker(currentMenu)
+    })();
   }, [])
+
+  useEffect(() => {
+    if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
+      const check: any = Object?.values(errors)[0]?.message;
+      toast?.error(t(check));
+    }
+  }, [isSubmitting]);
+
+
+
   return (
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -79,23 +115,26 @@ const WorkOrderForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
             <div>
               <Field
                 controller={{
-                  name: "WO_ID",
+                  name: "WO_CODE",
                   control: control,
                   render: ({ field }: any) => {
                     return (
                       <InputField
-                        {...register("WO_ID", {
-                          required: "",
+                        {...register("WO_CODE", {
+                          required: "Please fill the required fields",
                         })}
+                        maxLength={7}
                         label={t("Type code")}
-                        disabled={true}
-                        invalid={errors.WO_ID}
+                        disabled={search === "?edit="}
+                        invalid={errors.WO_CODE}
+                        require={true}
                         setValue={setValue}
                         {...field}
                       />
@@ -113,11 +152,12 @@ const WorkOrderForm = (props: any) => {
                     return (
                       <InputField
                         {...register("DESCRIPTION", {
-                          required: "",
+                          required: "Please fill the required fields",
                         })}
-                        disabled={true}
+                        disabled={search === '?edit=' && (facility_type === "I" && props?.selectedData?.FACILITY_ID === 0)}
                         label={t("Description")}
                         invalid={errors?.DESCRIPTION}
+                        require={true}
                         setValue={setValue}
                         {...field}
                       />
@@ -146,6 +186,7 @@ const WorkOrderForm = (props: any) => {
                         onChange={(e: any) => setColor(e.target.value)}
                         className={"colorpicker"}
                         setValue={setValue}
+                        disabled={search === '?edit=' && (facility_type === "I" && props?.selectedData?.FACILITY_ID === 0)}
                         placeholder={t("Please_Enter")}
                         {...field}
                       />
@@ -154,6 +195,46 @@ const WorkOrderForm = (props: any) => {
                 },
               }}
             />
+             <div className="flex align-items-center">
+              <Field
+                controller={{
+                  name: "ISPM",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ISPM")}
+                        className='md:mt-7'
+                        label="Is Show Schedule"
+
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+            </div>
+            <div className="flex align-items-center">
+              <Field
+                controller={{
+                  name: "ACTIVE",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ACTIVE")}
+                        className='md:mt-7'
+                        label="Active"
+
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+            </div>
           </div>
         </Card>
       </form>

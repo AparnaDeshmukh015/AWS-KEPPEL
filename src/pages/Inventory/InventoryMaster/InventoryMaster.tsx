@@ -6,6 +6,8 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import { toast } from "react-toastify";
 import InventoryMasterForm from "./InventoryMasterForm";
+import { onlyDateFormat } from "../../../utils/constants";
+
 const InventoryMaster = (props: any) => {
   let { pathname } = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
@@ -15,23 +17,35 @@ const InventoryMaster = (props: any) => {
   //Changes in API
   const getAPI = async () => {
     try {
-      const payload = {
-        FORM_TYPE: "LIST",
-      };
       const res = await callPostAPI(
         ENDPOINTS.GETINVENTORYMASTERSLIST,
         null,
         currentMenu?.FUNCTION_CODE
       );
-      props?.setData(res?.INVENTORYMASTERSLIST || []);
+      let updatedInventoryMasterList = formatInventoryMasterList(res?.INVENTORYMASTERSLIST)
+      props?.setData(updatedInventoryMasterList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+
+  const formatInventoryMasterList = (list: any) => {
+    let InventoryMasterlist = list;
+    InventoryMasterlist = InventoryMasterlist.map((element: any) => {
+      return {
+        ...element,
+        DOCDATE: onlyDateFormat(element?.DOC_DATE)
+      }
+    })
+    return InventoryMasterlist
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (
@@ -43,7 +57,7 @@ const InventoryMaster = (props: any) => {
       dataKey={currentMenu?.FUNCTION_DESC}
       columnTitle={[
         "DOC_NO",
-        "DOC_DATE",
+        "DOCDATE",
         "STORE_NAME",
         "VENDOR_NAME",
         "BILL_NO",
@@ -59,7 +73,7 @@ const InventoryMaster = (props: any) => {
       ]}
       columnData={props?.data}
       clickableColumnHeader={["DOC_NO"]}
-      filterFields={["DOC_NO", "STORE_NAME", "VENDOR_NAME", "BILL_NO", "CNCL_IND"]}
+      filterFields={["DOC_NO", "DOCDATE", "STORE_NAME", "VENDOR_NAME", "BILL_NO", "CNCL_IND"]}
       setSelectedData={"E"}
       isClick={props?.isForm}
       handelDelete={props?.handelDelete}

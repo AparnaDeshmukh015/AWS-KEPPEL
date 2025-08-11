@@ -7,7 +7,7 @@ import { callPostAPI } from '../../../services/apis';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { toast } from 'react-toastify';
 import Select from "../../../components/Dropdown/Dropdown";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../../../components/FormHeader/FormHeader';
 import { saveTracker } from '../../../utils/constants';
@@ -24,7 +24,7 @@ const AnalyticsPlateformAssetLink = (props: any) => {
     const { search } = useLocation();
     const getId: any = localStorage.getItem("Id")
     const dataId = JSON.parse(getId)
-
+    const [IsSubmit, setIsSubmit] = useState<any | null>(false);
     const {
         register,
         handleSubmit,
@@ -36,17 +36,20 @@ const AnalyticsPlateformAssetLink = (props: any) => {
             MODE: props?.selectedData || search === '?edit=' ? 'E' : 'A',
             PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": t("Updated") }
                 : { "para1": `${props?.headerName}`, "para2": t("Added") },
-            ACTIVE: props?.selectedData?.ACTIVE !== undefined ? props.selectedData.ACTIVE : true,
-            OBEM_ASSET_ID: props?.selectedData ? props?.selectedData?.OBEM_ASSET_ID : '',
-            OBEM_ASSET_NAME: props?.selectedData ? props?.selectedData?.OBEM_ASSET_NAME : '',
-            SPACE_ID: props?.selectedData?.SPACE_ID,
-            SPACE_NAME: props?.selectedData?.SPACE_NAME,
-            ASSET: props?.selectedData ? props?.selectedData?.ASSET_ID : ""
+
+            ACTIVE: search === '?edit=' ? dataId?.ACTIVE  : true,
+            OBEM_ASSET_ID: props?.selectedData ? props?.selectedData?.OBEM_ASSET_ID : search === '?edit=' ? dataId?.OBEM_ASSET_ID : '',
+            OBEM_ASSET_NAME: props?.selectedData ? props?.selectedData?.OBEM_ASSET_NAME : search === '?edit=' ? dataId?.OBEM_ASSET_NAME : '',
+            SPACE_ID: props?.selectedData ? props?.selectedData?.SPACE_ID : search === '?edit=' ? dataId?.SPACE_ID : '',
+            SPACE_NAME: props?.selectedData ? props?.selectedData?.SPACE_NAME : search === '?edit=' ? dataId?.SPACE_NAME : '',
+            ASSET: props?.selectedData ? props?.selectedData?.ASSET_ID : search === '?edit=' ? dataId?.ASSET_ID : '',
 
         },
         mode: "onSubmit",
     });
-    const onSubmit = async (payload: any) => {
+    const onSubmit = useCallback(async (payload: any) => {
+        if (IsSubmit) return;
+        setIsSubmit(true)
         payload.ASSET_ID = payload?.ASSET?.ASSET_ID;
         payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
         try {
@@ -63,7 +66,11 @@ const AnalyticsPlateformAssetLink = (props: any) => {
         } catch (error: any) {
             toast?.error(error)
         }
-    }
+        finally {
+            setIsSubmit(false)
+        }
+    }, [IsSubmit, search, props, toast]);
+
     const getOptions = async () => {
         try {
             const res = await callPostAPI(
@@ -85,18 +92,22 @@ const AnalyticsPlateformAssetLink = (props: any) => {
     }, [isSubmitting]);
 
     useEffect(() => {
-        getOptions()
-        saveTracker(currentMenu)
+        (async function () {
+            await getOptions()
+           await saveTracker(currentMenu)
+           })();
+       
     }, [])
-   
+
     return (
         <>
             <section className="w-full">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <FormHeader
                         headerName={props?.headerName}
-                        isSelected={props?.selectedData ? true : false}
+                        isSelected={search === "?edit=" ? true : false}
                         isClick={props?.isClick}
+                        IsSubmit={IsSubmit}
                     />
                     <Card className='mt-2'>
                         <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -196,7 +207,9 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                                 require={true}
                                                 optionLabel="ASSET_NAME"
                                                 findKey={"ASSET_ID"}
-                                                selectedData={props?.selectedData?.ASSET_ID}
+
+                                                selectedData={search === "?edit=" ? dataId?.ASSET_ID : props?.selectedData?.ASSET_ID}
+
                                                 setValue={setValue}
                                                 invalid={errors.ASSET}
                                                 {...field}
@@ -232,3 +245,4 @@ const AnalyticsPlateformAssetLink = (props: any) => {
     )
 }
 export default AnalyticsPlateformAssetLink;
+

@@ -3,7 +3,7 @@ import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-const TreeTableRight = ({ setNodes, nodes, newHandleChange, type }: any) => {
+const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
   const { t } = useTranslation();
   const [nodeList, setNodeList] = useState<any>([]);
   const [showColumn, setShowColumn] = useState<any>(false);

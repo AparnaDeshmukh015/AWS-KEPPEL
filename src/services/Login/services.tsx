@@ -3,16 +3,16 @@ import { ENDPOINTS } from "../../utils/APIEndpoints";
 import { decryptData, encrypt } from "../../utils/encryption_decryption";
 import { toast } from "react-toastify";
 import axiosPrivate from "../../utils/axiosPrivate";
-import { LOCALSTORAGE } from "../../utils/constants";
+import { enCryptionFlag, LOCALSTORAGE } from "../../utils/constants";
 
 export const loginUser = async (payload: any, token: any) => {
     try {
-         var encryptdata = encrypt(payload);
-        // below for uat build
+      //   var encryptdata = encrypt(payload);
+      //  below for uat build
         //   let data = {
         //     data: payload
         //   }
-        // var encryptdata = data;
+        var encryptdata:any  =enCryptionFlag === true ? JSON.parse(encrypt(payload)): {data: payload};
       
         let loginType = decryptData((localStorage.getItem(LOCALSTORAGE.LOGIN_TYPE)));
         const headers = {
@@ -20,8 +20,8 @@ export const loginUser = async (payload: any, token: any) => {
             'Authorization': `Bearer ${token}`,
             'LoginType': loginType
         }
-        const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.LOGIN}`, JSON.parse(encryptdata), { headers: headers });
-   // const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.LOGIN}`, encryptdata, { headers: headers });//uat build
+        const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.LOGIN}`, encryptdata, { headers: headers })
+          // : await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.LOGIN}`, encryptdata, { headers: headers });//uat build
         if (res?.data?.RESULTLIST[0].FLAG === 1) {
             return res?.data
         } else {
@@ -35,14 +35,13 @@ export const loginUser = async (payload: any, token: any) => {
 
 export const UserCheck = async (payload: any) => {
     try {
-         var encryptdata = encrypt(payload);
-        //  below for uat build 
-        // let data = {
-        //     data: payload
-        //   }
-        // var encryptdata = data;
-        const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.USERCHECK}`, JSON.parse(encryptdata));
-       // const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.USERCHECK}`, encryptdata); // for uat build
+    //      var encryptdata = encrypt(payload);
+    //       let data = {
+    //     data: payload
+    //   }
+    var encryptdata:any = enCryptionFlag === true? JSON.parse(encrypt(payload)) : {data: payload};
+        const res = await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.USERCHECK}`, encryptdata)
+       //  await axiosPrivate.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.USERCHECK}`, encryptdata); // for uat build
         if (res?.data?.USER_DETAILS[0].FLAG === 1) {
             return res?.data
         } else {
@@ -55,13 +54,14 @@ export const UserCheck = async (payload: any) => {
 }
 
 export const getAccessTokenForlogin = async (payload: any) => {
-     var encryptdata = encrypt(payload);
-     //  below for uat build 
-    // let data = {
-    //     data: payload
-    //   }
-    // var encryptdata = data;
-        const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_TOKEN}`, JSON.parse(encryptdata)).then((res1: any) => {
+//   //   var encryptdata = encrypt(payload);
+//      //  below for uat build 
+//     let data = {
+//         data: payload
+//       }
+    var encryptdata = enCryptionFlag === true ? JSON.parse(encrypt(payload)):{data: payload};
+
+        const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_TOKEN}`,encryptdata).then((res1: any) => {
  // below for uat build
      //const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_TOKEN}`, encryptdata).then((res1: any) => {
         if (res1.status === 200) {
@@ -69,7 +69,7 @@ export const getAccessTokenForlogin = async (payload: any) => {
         }
     }, (error: any) => {
         toast.error("Something Went Wrong");
-        console.log(error, "erros")
+       
     })
     return res;
 };
@@ -80,17 +80,17 @@ export const getRefreshTokenForlogin = async (payload: any) => {
     //     data: payload
     //   }
     // var encryptdata = data;
-     var encryptdata = encrypt(payload);
+     var encryptdata = enCryptionFlag === true ? JSON.parse(encrypt(payload)) : {data: payload};
 
-    const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_REFRESH_TOKEN_LOGIN}`, JSON.parse(encryptdata)).then((res1: any) => {
+    //const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_REFRESH_TOKEN_LOGIN}`, JSON.parse(encryptdata)).then((res1: any) => {
     //below for uat build
-    //const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_REFRESH_TOKEN_LOGIN}`, encryptdata).then((res1: any) => {
+    const res = await axios.post(`${process.env.REACT_APP_BASE_URL}${ENDPOINTS.GET_REFRESH_TOKEN_LOGIN}`, encryptdata).then((res1: any) => {
         if (res1.status === 200) {
             return res1;
         }
     }, (error: any) => {
         toast.error("Something Went Wrong");
-        console.log(error, "erros")
+      
         return false;
     })
     return res;

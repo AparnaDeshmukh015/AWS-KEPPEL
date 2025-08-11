@@ -1,5 +1,10 @@
-import { useFieldArray, useForm } from "react-hook-form";
-import React, { useEffect, useState } from "react";
+import {
+  set,
+  SubmitErrorHandler,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -15,140 +20,78 @@ import DocumentUpload from "../../../components/pageComponents/DocumentUpload/Do
 import moment from "moment";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { LOCALSTORAGE, saveTracker } from "../../../utils/constants"
+import { saveTracker } from "../../../utils/constants";
 import {
   eventNotification,
   helperEventNotification,
 } from "../../../utils/eventNotificationParameter";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { helperNullDate } from "../../../utils/constants";
-import IdleTimer from "../../../utils/IdealTimer";
 import { InputTextarea } from "primereact/inputtextarea";
 import MultiSelects from "../../../components/MultiSelects/MultiSelects";
 import { PATH } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
-import LoaderS from "../../../components/Loader/Loader";
+import {
+  clearScheduleTaskList,
+  upsertScheduleTask,
+} from "../../../store/scheduleTaskListStore";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearScheduleGroup,
+  setScheduleGroup,
+} from "../../../store/scheduleGroup";
+import {
+  clearScheduleLocation,
+  setScheduleLocation,
+} from "../../../store/schedulelocation";
+import "../../../components/Calendar/Calendar.css";
 
+import LoaderS from "../../../components/Loader/Loader";
 const AssetMasterForm = (props: any) => {
-  const facilityData: any = JSON.parse(((localStorage.getItem(LOCALSTORAGE.FACILITYID)))!);
+  const dispatch = useDispatch();
+  const scheduleTaskList = useSelector((state: any) => state.scheduleTaskList);
+
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate: any = useNavigate()
+
+  const scheduleGroup = useSelector((state: any) => state.scheduleGroup);
+
+  const [typeError, setTypeError] = useState<any | null>(false);
+  const [groupError, setGroupError] = useState<any | null>(false);
+  const [assetNameError, setAssetNameError] = useState<any | null>(false);
+
   const [options, setOptions] = useState<any>({});
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
-  const [scheduleTaskList, setScheduleTaskList] = useState([]);
-  const [selectedTaskDetailsList, setSelectedTaskDetailsList] = useState([]);
   const [editStatus, setEditStatus] = useState<any | null>(false);
-  const [typeList, setTypeList] = useState<any | null>([])
-  const [assigneeList, setAssigneeList] = useState<any | null>([])
+  const [typeList, setTypeList] = useState<any | null>([]);
+  const [assigneeList, setAssigneeList] = useState<any | null>([]);
   const [Descriptionlength, setDescriptionlength] = useState(0);
-  const [loading, setLoading] = useState<any | null>(false)
-  const [issueList, setIssueList] = useState<any | null>([])
-  const [ppmAssignee, setPPMAssignee] = useState<any | null>([])
-  const [vendorList, setVendorList] = useState<any | null>([])
-  const[assetTypeState, setAssetTypeState]=useState<any|null>(false)
-  const[idSchedule, setIdSchedule]=useState<any|null>(null)
-  // const [s]
+  const [issueList, setIssueList] = useState<any | null>([]);
+  const [ppmAssignee, setPPMAssignee] = useState<any | null>([]);
+  const [vendorList, setVendorList] = useState<any | null>([]);
+  const [assetTypeState, setAssetTypeState] = useState<any | null>(false);
+  const [selectedLocationSchedule, setselectedLocationSchedule] = useState<
+    any | null
+  >();
+  // const [selectedSchedule, setSelectedSchedule] = useState<any | null>(null);
+  const [schedId, setScheId] = useState<any | null>(0);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+  const [scheduleGroupStatus, setScheduleGroupStatus] = useState<any | null>(
+    false
+  );
+  const [selectedscheduleID, setselectedscheduleID] = useState<any | null>();
+  const [selectedAssetId, setselectedAssetId] = useState<any | null>();
+  const [loadig, setLoading] = useState<any | null>(false);
+  const [locationError, setLocationError] = useState<any | null>(false);
+  const FACILITY: any = localStorage.getItem("FACILITYID");
+  const FACILITY_ID: any = JSON.parse(FACILITY);
+  if (FACILITY_ID) {
+    var facility_type: any = FACILITY_ID?.FACILITY_TYPE;
+  }
+
   const [selectedScheduleTaskDetails, setSelectedScheduleTaskDetails] =
     useState<any>();
   const { search } = useLocation();
-  const faults: any = [
-    {
-      "id": 232,
-      "duration": 10.79,
-      "name": "AHU-FD-004 Low Static Pressure",
-      "description": "Detects low static air pressure comparing with set limit"
-    },
-    {
-      "id": 320,
-      "duration": 39.48,
-      "name": "AHU-FD-013 Supply Air Flow Reading During Unit Off",
-      "description": "Detect Supply Air Flow Sensor Calibration Issue /Fault"
-    },
-    {
-      "id": 1913,
-      "duration": 400.41,
-      "name": "AHU-FD-049 CHW Valve-1 Modulation Out of Limits",
-      "description": "Detect if command and CHW valve feedback deviates."
-    },
-    {
-      "id": 2944,
-      "duration": 117.21,
-      "name": "AHU-FD-083 Check if AHU Supply Air Static Pressure Set Point Reset Control Strategy can be Implemented",
-      "description": "This FDD detect if supply sir static pressure set point can be reset based on demand. By automatically resetting the supply air static pressure set point, There will be a reduction in energy consumption resulting from the improved system efficiency. There will also be a greater consistency in supply air static pressure and conditions in a space."
-    },
-    {
-      "id": 9801,
-      "duration": 25.01,
-      "name": "AHU Return Air Temperature is too Cold",
-      "description": "Detect if the return air temperature is too cold while AHU operation."
-    },
-    {
-      "id": 9827,
-      "duration": 10,
-      "name": "AHU Supply Air Temperature Setpoint Set at Lower than Recommended Threshold",
-      "description": "AHU Supply Air Temperature Setpoint Set at Lower than Recommended Threshold"
-    },
-    {
-      "id": 9829,
-      "duration": 53.85,
-      "name": "AHU Supply Fan VFD is Operating at Constant Speed",
-      "description": "AHU Supply Fan VFD is Operating at Constant Speed"
-    },
-    {
-      "id": 9835,
-      "duration": 51.91,
-      "name": "AHU Cooling Valve is not Modulating",
-      "description": "AHU Cooling Valve is not Modulating"
-    },
-    {
-      "id": 9838,
-      "duration": 54.46,
-      "name": "AHU Cooling Valve Output & Feedback Mismatch (Beyond 10%)",
-      "description": "AHU Cooling Valve Output & Feedback Mismatch (Beyond 10%)"
-    },
-    {
-      "id": 9840,
-      "duration": 74.49,
-      "name": "AHU Supply Fan VFD not Operating as per Commanded Speed (Beyond 10%)",
-      "description": "AHU Supply Fan VFD not Operating as per Commanded Speed (Beyond 10%)"
-    },
-    {
-      "id": 9843,
-      "duration": 9.26,
-      "name": "Return Air Temperature Sensor reading outside limit (8 hours)",
-      "description": "Return Air Temperature Sensor reading outside limit (8 hours)"
-    },
-    {
-      "id": 9921,
-      "duration": 228.37,
-      "name": "AHU CHW Valve is Leaking while Equipment Shutdown",
-      "description": "AHU Chilled Water Valve is Leaking while Equipment Shutdown"
-    },
-    {
-      "id": 10075,
-      "duration": 34.83,
-      "name": "AHU Supply Air Duct Static Pressure is Higher than General Threshold",
-      "description": "AHU Supply Air Duct Static Pressure is Higher than General Threshold"
-    }
-  ]
-
-
-  const spaceList: any = [
-    {
-      "spaceid": "ab507e07-3d99-4a8b-872c-0965f52fe927",
-      "spacename": "Roof - Podium",
-      "equipmentid": "cd732376-821b-4c40-8667-f9b70778c945",
-      "	equipmentname": "Alarm Test"
-    },
-    {
-      "spaceid": "ab507e07-3d99-4a8b-872c-0965f52fe9275855",
-      "spacename": "Roof - Podium 2",
-      "equipmentid": "cd732376-821b-4c40-8667-f9b70778c945",
-      "	equipmentname": "Alarm Test"
-    }
-
-  ]
 
   const handleInputChange = (event: any) => {
     const value = event.target.value;
@@ -160,6 +103,8 @@ const AssetMasterForm = (props: any) => {
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+  const getId: any = localStorage.getItem("Id");
+  const dataId = JSON.parse(getId);
   const {
     register,
     resetField,
@@ -175,21 +120,18 @@ const AssetMasterForm = (props: any) => {
       LOCATION: "",
       spaceid: "",
       ASSET_CODE: "",
-      ASSET_NAME: props?.selectedData?.ASSET_NAME || "",
+      ASSET_NAME: "",
       GROUP: "",
       TYPE: null,
       BAR_CODE: "",
       MAKE: "",
       MODEL: "",
       CURRENT_STATE: "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props?.selectedData?.ACTIVE
-          : true,
+      ACTIVE: search === "?edit=" ? dataId?.ACTIVE : true,
       ASSET_DESC: "",
       LINK_OBEM: "",
       ASSET_NONASSET: "A",
-
+      ASSET_FOLDER_ID: "",
       SCHEDULE_ID: 0,
       SCHEDULER: {
         ASSET_NONASSET: "A",
@@ -242,6 +184,7 @@ const AssetMasterForm = (props: any) => {
       ASSET: "",
       CAPACITY_SIZE: 0,
       SERIAL_NUMBER: 0,
+
       ASSET_COST: props?.selectedData?.ASSET_COST || 0,
       BENCHMARK_VALUE: 0,
       MTBF_HOURS: 0,
@@ -260,187 +203,314 @@ const AssetMasterForm = (props: any) => {
     mode: "all",
   });
   const watchAll: any = watch();
+  const TypeWatch = watch("TYPE");
+  const GroupWatch = watch("GROUP");
+  const LocationWatch = watch("LOCATION");
+  const AssetNameWatch = watch("ASSET_NAME");
+  const ASSET_FOLDER_DATA = watch("ASSET_FOLDER_ID");
 
-  const User_Name = decryptData((localStorage.getItem("USER_NAME")));
-  const ROLETYPECODES = decryptData((localStorage.getItem("ROLETYPECODE")))
+  const [type, group, watchedLocation, assetName] = watch([
+    "TYPE",
+    "GROUP",
+    "LOCATION",
+    "ASSET_NAME",
+  ]);
 
+  const allFieldsFilled: any = !!(
+    type &&
+    group &&
+    watchedLocation &&
+    assetName
+  );
 
+  useEffect(() => {
+    // if (search !== "?edit") {
+    const savedData = sessionStorage.getItem("formData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      Object.keys(parsedData).forEach((key: any) => {
+        setValue(key, parsedData[key]);
+      });
+      // }
+    }
+  }, [setValue]);
+  useEffect(() => {
+    sessionStorage.setItem("formData", JSON.stringify(watchAll));
+  }, [watchAll]);
+
+  const User_Name = decryptData(localStorage.getItem("USER_NAME"));
 
   const { fields, append: colAppend } = useFieldArray({
     name: "EXTRA_COL_LIST",
     control,
   });
 
-  const ASSET_DESCWatch: any = watch("ASSET_DESC") || ""
+  const getSelectedScheduleId = (selectedScheduleId: number) =>
+    setselectedscheduleID(selectedScheduleId);
+
+  const ASSET_DESCWatch: any = watch("ASSET_DESC") || "";
   useEffect(() => {
-    if (ASSET_DESCWatch)
-      setDescriptionlength(ASSET_DESCWatch.length);
+    if (ASSET_DESCWatch) setDescriptionlength(ASSET_DESCWatch.length);
   }, [ASSET_DESCWatch]);
 
   const MANINTENANCE: any = watch("UNDERAMC");
+  const scheduleDetails = location.state?.SCHEDULE_DETAILS;
 
-  const onSubmit = async (payload: any) => {
-    try {
-      if (!payload.SCHEDULE_ID || editStatus) {
-        const schedulerData = payload.SCHEDULER;
-        const updatedTaskList: any = payload?.SCHEDULER?.SCHEDULE_TASK_D?.filter((task: any) => task.isChecked === true);
-        const tasksWithoutIsChecked = updatedTaskList.map(({ isChecked, ...rest }: any) => rest);
-        schedulerData.ASSET_NONASSET = "A";
-        schedulerData.MAKE_ID = payload.MAKE?.MAKE_ID;
-        schedulerData.MAKE_ID = payload.MAKE?.MAKE_ID;
-        schedulerData.MODEL_ID = payload?.MODEL?.MODEL_ID;
-        schedulerData.FREQUENCY_TYPE =
-          schedulerData?.PERIOD?.FREQUENCY_TYPE || "";
-        schedulerData.PERIOD = schedulerData?.PERIOD?.VALUE || "";
-        schedulerData.DAILY_ONCE_EVERY =
-          schedulerData?.DAILY_ONCE_EVERY?.key || "";
-        schedulerData.MONTHLY_2_WEEK_NUM =
-          schedulerData?.MONTHLY_2_WEEK_NUM?.MONTHLY_2_WEEK_NUM || "0";
-        schedulerData.MONTHLYONCETWICE = schedulerData?.MONTHLYONCETWICE?.key;
-        schedulerData.MODE = !payload.SCHEDULE_ID === false ? "E" : "A";
-        const timeConvert = [
-          "DAILY_ONCE_AT_TIME",
-          "DAILY_EVERY_STARTAT",
-          "DAILY_EVERY_ENDAT",
-          "WEEKLY_1_PREFERED_TIME",
-          "MONTHLY_1_PREFERED_TIME",
-          "MONTHLY_2_WEEK_PREFERED_TIME",
-          "MONTHLY_2ND_PREFERED_TIME",
-        ];
-        delete schedulerData?.REQ_ID;
-        timeConvert?.forEach((elem: any) => {
-          if (moment(schedulerData[elem])?.isValid()) {
-            schedulerData[elem] = moment(schedulerData[elem]).format("HH:mm");
-          }
-        });
-
-        schedulerData.MONTH_OPTION =
-          schedulerData?.MONTH_OPTION?.MONTH_OPTION || "";
-
-        schedulerData.SCHEDULE_TASK_D = tasksWithoutIsChecked ? tasksWithoutIsChecked : [];
-        const schedulerPayload: any = {
-          ...payload?.SCHEDULER,
-          ASSETTYPE_ID: payload?.TYPE?.ASSETTYPE_ID,
-          REQ_ID: schedulerData?.Record?.REQ_ID
-        };
-        delete payload?.SCHEDULER?.Record
-
-
-
-        if (schedulerData?.SCHEDULE_NAME !== null) {
-          const res1 = await callPostAPI(
-            ENDPOINTS.SCHEDULE_SAVE,
-            schedulerPayload
-          );
-          payload.SCHEDULE_ID = res1?.SCHEDULE_ID;
-        }
-      }
-
-      delete payload?.SCHEDULER;
-      const updateColList: any = payload?.EXTRA_COL_LIST?.filter(
-        (item: any) => item?.VALUE
-      ).map((data: any) => ({
-        [data?.FIELDNAME]: data?.VALUE,
-      }));
-      payload.SCHEDULE_ID = payload?.SCHEDULE_ID !== 0 ? payload?.SCHEDULE_ID : 0;
-      payload.EXTRA_COL_LIST = updateColList || [];
-      payload.ACTIVE = payload?.ACTIVE === true ? 1 : 0;
-      payload.LOCATION_ID = payload?.LOCATION?.LOCATION_ID;
-      payload.ASSETGROUP_ID = payload?.GROUP?.ASSETGROUP_ID;
-      payload.ASSETTYPE_ID = payload?.TYPE?.ASSETTYPE_ID;
-      payload.MAKE_ID = payload?.MAKE?.MAKE_ID;
-      payload.MODEL_ID = payload?.MODEL?.MODEL_ID;
-      payload.UNDERAMC = payload.UNDERAMC === true ? 1 : 0;
-      payload.CS_ID = payload?.CURRENT_STATE?.CS_ID;
-      payload.VENDOR_ID = payload?.VENDOR_NAME?.VENDOR_ID || "";
-      payload.OBEM_ASSET_ID = payload?.LINK_OBEM?.ASSET_ID;
-      payload.OWN_LEASE = payload?.ASSET?.key || "";
-      payload.AMC_VENDOR = payload?.UNDERAMC
-        ? payload?.AMC_VENDOR?.VENDOR_ID
-        : "";
-      payload.AMC_EXPIRY_DATE = payload?.UNDERAMC
-        ? moment(payload.AMC_DATE).format('YYYY-MM-DD')
-        : "";
-      payload.COMMISSIONING_DATE = payload.COMMISSIONING_DATE
-        ? moment(payload.COMMISSIONING_DATE).format('YYYY-MM-DD')
-        : "";
-      payload.WARRANTY_END_DATE = payload.WARREANTY_DATE
-        ? moment(payload.WARREANTY_DATE).format('YYYY-MM-DD')
-        : "1900-01-01T00:00:00";
-      payload.LAST_MAINTANCE_DATE = payload.LAST_DATE
-        ? moment(payload.LAST_DATE).format('YYYY-MM-DD')
-        : "1900-01-01T00:00:00";
-      payload.MODE = search === '?edit=' ? "E" : "A";
-      payload.PARA = search === '?edit='
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") };
-      payload.ASSIGN_LIST = payload?.ASSIGN_TO;
-      payload.ASSET_ID = search === '?edit=' ? selectedDetails?.ASSET_ID : ""
-      delete payload?.LOCATION;
-      delete payload?.GROUP;
-      delete payload?.TYPE;
-      delete payload?.MODEL;
-      delete payload?.MAKE;
-      delete payload?.CURRENT_STATE;
-      delete payload?.VENDOR_NAME;
-      delete payload?.LINK_OBEM;
-      delete payload.LAST_DATE;
-      delete payload?.WARREANTY_DATE;
-      delete payload?.AMC_DATE;
-      delete payload?.ASSET;
-      delete payload?.ASSIGN_TO;
-
-      const res = await callPostAPI(ENDPOINTS.ASSETMASTER_SAVE, payload, "AS007");
-      if (res?.FLAG === true) {
-
-        toast?.success(res?.MSG);
-        const notifcation: any = {
-          "FUNCTION_CODE": currentMenu?.FUNCTION_CODE,
-          "EVENT_TYPE": "M",
-          "STATUS_CODE": search === "?edit=" ? 2 : 1,
-          "PARA1": search === "?edit=" ? User_Name : User_Name,
-          PARA2: payload?.ASSET_CODE,
-          PARA3: payload?.ASSET_NAME,
-          PARA4: payload?.BAR_CODE,
-          PARA5: payload?.ASSET_COST,
-          PARA6: payload?.BENCHMARK_VALUE,
-          PARA7: payload.COMMISSIONING_DATE
-            ? moment(payload.COMMISSIONING_DATE).format('YYYY-MM-DD')
-            : "",
-          PARA8: payload.WARRANTY_END_DATE = payload.WARREANTY_DATE
-            ? moment(payload.WARREANTY_DATE).format('YYYY-MM-DD')
-            : "",
-          PARA9: payload.AMC_EXPIRY_DATE = payload?.UNDERAMC
-            ? moment(payload.AMC_DATE).format('YYYY-MM-DD')
-            : "",
-          PARA10: payload?.ASSET_NONASSET
-        };
-
-        const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
-        if (location?.state === null) {
-          props?.getAPI();
-          props?.isClick();
-        }
-      } else {
-        toast?.error(res?.MSG);
-      }
-
-    } catch (error: any) {
-      toast?.error(error);
+  useEffect(() => {
+    if (scheduleDetails) {
+      dispatch(upsertScheduleTask(scheduleDetails));
     }
-  };
+  }, [scheduleDetails]);
+  console.log(Object.keys(options).length, "Object.keys(options).length");
+  const onError: SubmitErrorHandler<any> = (errors, _) => {};
+
+  const onSubmit = useCallback(
+    async (payload: any) => {
+      try {
+        if (IsSubmit) return true;
+        setIsSubmit(true);
+
+        let schedule_Id: any = "0";
+        let schedulerPayload: any;
+
+        if (!payload.SCHEDULE_ID || editStatus || payload.SCHEDULE_ID === 0) {
+          let schedulerData: any;
+          if (location?.state !== null && facility_type == "I") {
+            // location?.state?.SCHEDULE_DETAILS.MODE="A";
+            schedulerData = location?.state?.SCHEDULE_DETAILS;
+          } else {
+            schedulerData = payload?.SCHEDULER;
+
+            const updatedTaskList: any =
+              payload?.SCHEDULER?.SCHEDULE_TASK_D?.filter(
+                (task: any) => task.isChecked === true
+              );
+            const tasksWithoutIsChecked = updatedTaskList.map(
+              ({ isChecked, ...rest }: any) => rest
+            );
+
+            schedulerData.ASSET_NONASSET = "A";
+
+            schedulerData.MAKE_ID = payload.MAKE?.MAKE_ID;
+            schedulerData.MAKE_ID = payload.MAKE?.MAKE_ID;
+            schedulerData.MODEL_ID = payload?.MODEL?.MODEL_ID;
+            schedulerData.FREQUENCY_TYPE =
+              schedulerData?.PERIOD?.FREQUENCY_TYPE || "";
+            schedulerData.PERIOD = schedulerData?.PERIOD?.VALUE || "";
+            schedulerData.DAILY_ONCE_EVERY =
+              schedulerData?.DAILY_ONCE_EVERY?.key || "";
+            schedulerData.MONTHLY_2_WEEK_NUM =
+              schedulerData?.MONTHLY_2_WEEK_NUM?.MONTHLY_2_WEEK_NUM || "0";
+            schedulerData.MONTHLYONCETWICE =
+              schedulerData?.MONTHLYONCETWICE?.key;
+
+            // schedulerData.MODE = !!payload.SCHEDULE_ID ? "E" : "A";
+
+            // schedulerData.MODE = schedulerData?.SCHEDULE_ID !== 0 ? "E" : "A";
+
+            const timeConvert = [
+              "DAILY_ONCE_AT_TIME",
+              "DAILY_EVERY_STARTAT",
+              "DAILY_EVERY_ENDAT",
+              "WEEKLY_1_PREFERED_TIME",
+              "MONTHLY_1_PREFERED_TIME",
+              "MONTHLY_2_WEEK_PREFERED_TIME",
+              "MONTHLY_2ND_PREFERED_TIME",
+            ];
+
+            delete schedulerData?.REQ_ID;
+            timeConvert?.forEach((elem: any) => {
+              if (moment(schedulerData[elem])?.isValid()) {
+                schedulerData[elem] = moment(schedulerData[elem]).format(
+                  "HH:mm"
+                );
+              }
+            });
+
+            schedulerData.MONTH_OPTION =
+              schedulerData?.MONTH_OPTION?.MONTH_OPTION || "";
+
+            schedulerData.SCHEDULE_TASK_D = tasksWithoutIsChecked
+              ? tasksWithoutIsChecked
+              : [];
+            schedulerPayload = {
+              ...payload?.SCHEDULER,
+              ASSETTYPE_ID: payload?.TYPE?.ASSETTYPE_ID,
+              REQ_ID: schedulerData?.Record?.REQ_ID,
+            };
+            delete payload?.SCHEDULER?.Record;
+          }
+
+          // return
+          if (schedulerData?.SCHEDULE_NAME !== null) {
+            const res1 = await callPostAPI(
+              ENDPOINTS.SCHEDULE_SAVE,
+              facility_type == "I"
+                ? {
+                    ...schedulerData,
+                    MODE:
+                      schedulerData?.SCHEDULE_ID &&
+                      schedulerData?.SCHEDULE_ID !== "0"
+                        ? "E"
+                        : "A",
+                    FUNCTION_CODE: currentMenu?.FUNCTION_CODE,
+                  }
+                : schedulerPayload,
+              "AS067"
+            );
+            schedule_Id = res1?.SCHEDULE_ID;
+          }
+        }
+        delete payload?.SCHEDULER;
+        const updateColList: any = payload?.EXTRA_COL_LIST?.filter(
+          (item: any) => item?.VALUE
+        ).map((data: any) => ({
+          [data?.FIELDNAME]: data?.VALUE,
+        }));
+        // payload.SCHEDULE_ID = payload?.SCHEDULE_ID !== 0 ? payload?.SCHEDULE_ID : 0;
+        payload.SCHEDULE_ID =
+          selectedscheduleID === null ||
+          selectedscheduleID === "0" ||
+          selectedscheduleID === undefined
+            ? schedule_Id
+            : selectedscheduleID;
+        payload.EXTRA_COL_LIST = updateColList || [];
+        payload.ACTIVE = payload?.ACTIVE === true ? 1 : 0;
+        payload.LOCATION_ID = payload?.LOCATION?.LOCATION_ID;
+        payload.ASSETGROUP_ID = payload?.GROUP?.ASSETGROUP_ID;
+        payload.ASSETTYPE_ID = payload?.TYPE?.ASSETTYPE_ID;
+        payload.MAKE_ID = payload?.MAKE?.MAKE_ID ?? "";
+        payload.MODEL_ID = payload?.MODEL?.MODEL_ID ?? "";
+        payload.UNDERAMC = payload.UNDERAMC === true ? 1 : 0;
+        payload.CS_ID = payload?.CURRENT_STATE?.CS_ID;
+        payload.VENDOR_ID = payload?.VENDOR_NAME?.VENDOR_ID || "";
+        payload.OBEM_ASSET_ID = payload?.LINK_OBEM?.ASSET_ID;
+        payload.OWN_LEASE = payload?.ASSET?.key || "";
+        payload.AMC_VENDOR = payload?.UNDERAMC
+          ? payload?.AMC_VENDOR?.VENDOR_ID
+          : "";
+        payload.AMC_EXPIRY_DATE = payload?.UNDERAMC
+          ? moment(payload.AMC_DATE).format("YYYY-MM-DD")
+          : "";
+        payload.COMMISSIONING_DATE = payload.COMMISSIONING_DATE
+          ? moment(payload.COMMISSIONING_DATE).format("YYYY-MM-DD")
+          : "";
+        payload.WARRANTY_END_DATE = payload.WARREANTY_DATE
+          ? moment(payload.WARREANTY_DATE).format("YYYY-MM-DD")
+          : "1900-01-01T00:00:00";
+        payload.LAST_MAINTANCE_DATE = payload.LAST_DATE
+          ? moment(payload.LAST_DATE).format("YYYY-MM-DD")
+          : "1900-01-01T00:00:00";
+        payload.MODE = search === "?edit=" ? "E" : "A";
+        payload.PARA =
+          search === "?edit="
+            ? { para1: `${props?.headerName}`, para2: t("Updated") }
+            : { para1: `${props?.headerName}`, para2: t("Added") };
+        payload.ASSIGN_LIST = payload?.ASSIGN_TO;
+        payload.ASSET_FOLDER_ID =
+          facility_type === "I"
+            ? payload?.ASSET_FOLDER_ID?.ASSET_FOLDER_ID
+            : "";
+
+        payload.ASSET_ID =
+          search === "?edit=" ? sessionStorage.getItem("asset_id") : "";
+
+        delete payload?.LOCATION;
+        delete payload?.GROUP;
+        delete payload?.TYPE;
+        delete payload?.MODEL;
+        delete payload?.MAKE;
+        // delete payload?.CURRENT_STATE;
+        delete payload?.VENDOR_NAME;
+        delete payload?.LINK_OBEM;
+        delete payload.LAST_DATE;
+        delete payload?.WARREANTY_DATE;
+        delete payload?.AMC_DATE;
+        delete payload?.ASSET;
+        delete payload?.ASSIGN_TO;
+
+        const res = await callPostAPI(
+          ENDPOINTS.ASSETMASTER_SAVE,
+          payload,
+          "AS007"
+        );
+        if (res?.FLAG === true) {
+          toast?.success(res?.MSG);
+          const notifcation: any = {
+            FUNCTION_CODE: currentMenu?.FUNCTION_CODE,
+            EVENT_TYPE: "M",
+            STATUS_CODE: search === "?edit=" ? 2 : 1,
+            PARA1: search === "?edit=" ? User_Name : User_Name,
+            PARA2: payload?.ASSET_CODE,
+            PARA3: payload?.ASSET_NAME,
+            PARA4: payload?.BAR_CODE,
+            PARA5: payload?.ASSET_COST,
+            PARA6: payload?.BENCHMARK_VALUE,
+            PARA7: payload.COMMISSIONING_DATE
+              ? moment(payload.COMMISSIONING_DATE).format("YYYY-MM-DD")
+              : "",
+            PARA8: (payload.WARRANTY_END_DATE = payload.WARREANTY_DATE
+              ? moment(payload.WARREANTY_DATE).format("YYYY-MM-DD")
+              : ""),
+            PARA9: (payload.AMC_EXPIRY_DATE = payload?.UNDERAMC
+              ? moment(payload.AMC_DATE).format("YYYY-MM-DD")
+              : ""),
+            PARA10: payload?.ASSET_NONASSET,
+          };
+
+          const eventPayload = { ...eventNotification, ...notifcation };
+          await helperEventNotification(eventPayload);
+          if (location?.state === null || location?.state !== null) {
+            // props?.getAPI();
+            props?.isClick();
+            // }
+          } else {
+            setIsSubmit(false);
+            toast?.error(res?.MSG);
+          }
+        }
+      } catch (error: any) {
+        toast?.error(error);
+      } finally {
+        setIsSubmit(false);
+      }
+    },
+    [
+      IsSubmit,
+      editStatus,
+      selectedDetails,
+      props?.headerName,
+      search,
+      location?.state,
+      currentMenu?.FUNCTION_CODE,
+      User_Name,
+      eventNotification,
+      helperEventNotification,
+      callPostAPI,
+      // selectedSchedule,
+      toast,
+      selectedscheduleID,
+    ]
+  );
 
   const labelAsset: any = [
     { name: "Owned", key: "O" },
     { name: "Leased", key: "L" },
+  ];
+  const labelParent: any = [
+    { name: "Yes", key: "Y" },
+    { name: "No", key: "N" },
   ];
 
   const selectedLocationTemplate = (option: any, props: any) => {
     if (option) {
       return (
         <div className="flex align-items-center">
-          <div>{option.LOCATION_DESCRIPTION}</div>
+          <div>
+            {option.LOCATION_DESCRIPTION == null
+              ? option.LOCATION_NAME
+              : option.LOCATION_DESCRIPTION}
+          </div>
         </div>
       );
     }
@@ -459,72 +529,68 @@ const AssetMasterForm = (props: any) => {
     );
   };
 
-  const getScheduleList = async () => {
+  const getScheduleList = async (assetId: any) => {
     try {
-      if (watchAll?.TYPE !== '' || watchAll?.TYPE !== null) {
-        if (watchAll?.TYPE?.ASSETTYPE_ID) {
-          const payload = {
-            ASSETTYPE_ID: watchAll?.TYPE?.ASSETTYPE_ID,
-          };
-          const res = await callPostAPI(ENDPOINTS.SCHEDULE_LIST, payload, "AS067");
-          setScheduleTaskList(res?.SCHEDULELIST);
-          if (search === "?edit=") {
-            setValue("SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0);
-            setValue("SCHEDULER.SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID)
-          }
-        }
+      const payload = {
+        ASSETTYPE_ID: assetId,
+      };
+      const res = await callPostAPI(ENDPOINTS.SCHEDULE_LIST, payload, "AS067");
+
+      const SCHEDULELISTs = res.SCHEDULELIST;
+
+      for (let i = 0; i < SCHEDULELISTs.length; i++) {
+        dispatch(upsertScheduleTask(SCHEDULELISTs[i]));
       }
-    } catch (error) { }
+
+      if (search === "?edit=") {
+        // const assetTypeList: any = options?.assetType?.filter((f: any) => f.ASSETGROUP_ID === watchAll?.GROUP?.ASSETGROUP_ID)
+        // setTypeList(assetTypeList)
+        getSelectedScheduleId(res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0);
+        setValue("SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID || 0);
+        setValue("SCHEDULER.SCHEDULE_ID", res?.SCHEDULELIST[0]?.SCHEDULE_ID);
+      }
+    } catch (error) {}
   };
 
   const getAssetDetails = async (columnCaptions: any, ASSET_ID?: any) => {
     const getId: any = localStorage.getItem("Id");
     const assetId: any = JSON.parse(getId);
-    setLoading(true)
+
     const payload: any = {
       ASSET_NONASSET: "A",
-      ASSET_ID: location?.state !== null ? ASSET_ID : props?.selectedData === null ? assetId?.ASSET_ID : props?.selectedData?.ASSET_ID,
+      ASSET_ID:
+        location?.state !== null
+          ? ASSET_ID
+          : props?.selectedData === null
+          ? assetId?.ASSET_ID
+          : props?.selectedData?.ASSET_ID,
     };
-
     try {
-      const res = await callPostAPI(
-        ENDPOINTS.ASSETMASTER_DETAILS,
-        payload,
-        "AS067"
-      );
+      const res = await callPostAPI(ENDPOINTS.ASSETMASTER_DETAILS, payload, "");
 
-      if (res?.FLAG === 1) {
-
-        const payload: any = {
-          ASSETGROUP_ID: res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID
-        };
-        const res1 = await callPostAPI(
-          ENDPOINTS.GET_ASSETGROUPTEAMLIST,
-          payload, "HD004"
+      if (res && res.FLAG === 1) {
+        const assetTypeList: any = res?.ASSESTTYPELIST?.filter(
+          (f: any) =>
+            f.ASSETGROUP_ID === res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID
         );
 
-        if (res?.FLAG === 1) {
-          setPPMAssignee(res1?.TECHLIST);
-        }
-        getRequestList(res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID, res?.ASSETDETAILSLIST[0]?.ASSET_NONASSET)
-        setAssigneeList(res?.ASSIGNLIST)
-        const configList = res.CONFIGLIST[0];
-        for (let key in configList) {
-          if (configList[key] === null) {
-            delete configList[key];
-          }
-        }
+        setTypeList(assetTypeList);
+        setSelectedDetails(res?.ASSETDETAILSLIST[0]);
+        setselectedAssetId(res?.ASSETDETAILSLIST[0]?.ASSET_ID);
+        sessionStorage.setItem("asset_id", res?.ASSETDETAILSLIST[0]?.ASSET_ID);
 
-        const previousColumnCaptions: any = columnCaptions.map((item: any) => ({
-          ...item,
-          VALUE: configList[item.FIELDNAME],
-        }));
-
-        colAppend(previousColumnCaptions);
+        setScheId(
+          res?.ASSETDETAILSLIST[0]?.SCHEDULE_ID !== null
+            ? res?.ASSETDETAILSLIST[0]?.SCHEDULE_ID
+            : 0
+        );
+        localStorage.setItem(
+          "SCHEDULE_ID",
+          JSON?.stringify(res?.ASSETDETAILSLIST[0]?.SCHEDULE_ID)
+        );
         const amcDate: any = helperNullDate(
           res?.ASSETDETAILSLIST[0]?.AMC_EXPIRY_DATE
         );
-
         const lastDate: any = helperNullDate(
           res?.ASSETDETAILSLIST[0]?.LAST_MAINTANCE_DATE
         );
@@ -536,10 +602,7 @@ const AssetMasterForm = (props: any) => {
         const warrantyDate: any = helperNullDate(
           res?.ASSETDETAILSLIST[0]?.WARRANTY_END_DATE
         );
-
-        setSelectedDetails(res?.ASSETDETAILSLIST[0]);
-        setSelectedScheduleTaskDetails(res?.SCHEDULELIST[0]);
-        setSelectedTaskDetailsList(res?.SCHEDULETASKLIST);
+        setValue("ASSET_NAME", res?.ASSETDETAILSLIST[0]?.ASSET_NAME);
         setValue("ASSET_CODE", res?.ASSETDETAILSLIST[0]?.ASSET_CODE);
         setValue("BAR_CODE", res?.ASSETDETAILSLIST[0]?.BAR_CODE);
         setValue("ASSET_DESC", res?.ASSETDETAILSLIST[0]?.ASSET_DESC);
@@ -557,16 +620,95 @@ const AssetMasterForm = (props: any) => {
         setValue("DOC_LIST", res?.ASSETDOCLIST);
         setValue("UNDERAMC", res?.ASSETDETAILSLIST[0]?.UNDERAMC);
         setValue("AMC_VENDOR", res?.ASSETDETAILSLIST[0]?.AMC_VENDOR);
+
+        setSelectedScheduleTaskDetails(res?.SCHEDULELIST[0]);
+        const payload: any = {
+          ASSETGROUP_ID: res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID,
+        };
+        const res1 = await callPostAPI(
+          ENDPOINTS.GET_ASSETGROUPTEAMLIST,
+          payload,
+          "AS067"
+        );
+
+        if (res1 && res1.FLAG === 1) {
+          setPPMAssignee(res1?.TECHLIST);
+        }
+        if (facility_type === "R") {
+          const payload1: any = {
+            ASSETGROUP_ID: res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID,
+            ASSET_NONASSET: res?.ASSETDETAILSLIST[0]?.ASSET_NONASSET,
+          };
+
+          const res2 = await callPostAPI(
+            ENDPOINTS.GET_SERVICEREQUEST_WORKORDER,
+            payload1,
+            "AS067"
+          );
+
+          if (res2?.FLAG === 1) {
+            setIssueList(res2?.WOREQLIST);
+          } else {
+            setIssueList([]);
+          }
+        }
+        // await getRequestList(res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID, res?.ASSETDETAILSLIST[0]?.ASSET_NONASSET)
+        setAssigneeList(res?.ASSIGNLIST);
+        const configList = res.CONFIGLIST[0];
+        for (let key in configList) {
+          if (configList[key] === null) {
+            delete configList[key];
+          }
+        }
+        if (res?.ASSETDETAILSLIST[0]?.ASSETTYPE_ID !== null) {
+          if (facility_type === "I" || facility_type === "R") {
+            await getScheduleList(res?.ASSETDETAILSLIST[0]?.ASSETTYPE_ID);
+          }
+        }
+
+        const previousColumnCaptions: any = columnCaptions.map((item: any) => ({
+          ...item,
+          VALUE: configList[item.FIELDNAME],
+        }));
+
+        colAppend(previousColumnCaptions);
+
+        const SCHEDULELIST = res.SCHEDULELIST;
+
+        setScheduleGroupStatus(false);
+
+        if (facility_type === "I") {
+          for (let i = 0; i < SCHEDULELIST.length; i++) {
+            dispatch(upsertScheduleTask(SCHEDULELIST[i]));
+          }
+
+          const Data: any = {
+            ASSETGROUP_ID: res?.ASSETDETAILSLIST[0]?.ASSETGROUP_ID,
+            ASSETTYPE_ID: res?.ASSETDETAILSLIST[0]?.ASSETTYPE_ID,
+          };
+
+          dispatch(setScheduleGroup(Data));
+        }
+        // setValue("LOCATION", res?.ASSETDETAILSLIST[0]?.LOCATION_ID);
       }
     } catch (error: any) {
       toast?.error(error);
     } finally {
-      setLoading(false)
     }
   };
+  console.log(options, "option");
+  useEffect(() => {
+    if (search === "?edit=") {
+      const getScheduleId: any = localStorage.getItem("SCHEDULE_ID");
+      const scheduleId = JSON.parse(getScheduleId);
+      if (scheduleId !== null && scheduleId !== undefined) {
+        setScheId(scheduleId);
+      }
+    }
+  }, [selectedDetails, search]);
 
-  const getRequestList = async (ASSETGROUP_ID: any, ASSET_NONASSET?: any, reqId?: any) => {
-    setValue("TYPE", null)
+  const getRequestList = async (ASSETGROUP_ID: any, ASSET_NONASSET?: any) => {
+    setValue("TYPE", null);
     const payload: any = {
       ASSETGROUP_ID: ASSETGROUP_ID,
       ASSET_NONASSET: ASSET_NONASSET?.key
@@ -576,196 +718,264 @@ const AssetMasterForm = (props: any) => {
 
     const res = await callPostAPI(
       ENDPOINTS.GET_SERVICEREQUEST_WORKORDER,
-      payload, "AS067"
+      payload,
+      "AS067"
     );
 
     if (res?.FLAG === 1) {
-      setIssueList(res?.WOREQLIST)
-      if (search === "?edit=") {
-        // setSelectedIssue(reqId)
-      }
+      setIssueList(res?.WOREQLIST);
     } else {
-      setIssueList([])
+      setIssueList([]);
     }
-    if (search === "?add=") {
-      GET_ASSETGROUPTEAMLIST(ASSETGROUP_ID)
-    }
-  }
+    // if (search === "?add=") {
+    await GET_ASSETGROUPTEAMLIST(ASSETGROUP_ID);
+    // }
+  };
 
   const GET_ASSETGROUPTEAMLIST = async (ASSETGROUP_ID: any) => {
     const payload: any = {
-      ASSETGROUP_ID: ASSETGROUP_ID
+      ASSETGROUP_ID: ASSETGROUP_ID,
     };
     const res = await callPostAPI(
       ENDPOINTS.GET_ASSETGROUPTEAMLIST,
-      payload, "HD004"
+      payload,
+      "HD004"
     );
 
     if (res?.FLAG === 1) {
       setPPMAssignee(res?.TECHLIST);
+      setValue("ASSET_NAME", dataId?.ASSET_NAME);
+    } else {
+      setPPMAssignee([]);
     }
-  }
+  };
 
   const getOptions = async () => {
     const payload = {
       ASSETTYPE: "A",
     };
     try {
-      setLoading(true)
+      let res1 = await callPostAPI(ENDPOINTS.LOCATION_HIERARCHY_LIST, "AS067");
       let res = await callPostAPI(
         ENDPOINTS.GETASSETMASTEROPTIONS,
         payload,
+        "AS067"
       );
-      let res1 = await callPostAPI(ENDPOINTS.LOCATION_HIERARCHY_LIST, "AS067");
-      setOptions({
-        assetGroup: res?.ASSESTGROUPLIST,
-        assetType: res?.ASSESTTYPELIST,
-        assetMake: res?.MAKELIST,
-        assetModel: res?.MODELLIST,
-        unit: res?.UOMLIST,
-        currentState: res?.CURRENTSTATUSLIST,
-        obemList: res?.OBMASSETLIST,
-        vendorList: res?.VENDORELIST,
-        configList: res?.CONFIGLIST,
-        userList: res?.USERLIST,
-        location: res1?.LOCATIONHIERARCHYLIST
-      });
-      setVendorList(res?.VENDORELIST)
-      const columnCaptions = res?.CONFIGLIST.map((item: any) => ({
-        FIELDNAME: item.FIELDNAME,
-        LABEL: item?.COLUMN_CAPTION,
-        VALUE: "",
-      }));
 
-      if (res?.FLAG === 1) {
-        if (search === '?edit=') {
-          getAssetDetails(columnCaptions);
-          if (location?.state !== null) {
-            getAssetDetails(columnCaptions, location?.state?.ASSET_ID);
+      if (res && res1 && res?.FLAG === 1) {
+        setOptions({
+          assetGroup: res?.ASSESTGROUPLIST,
+          assetType: res?.ASSESTTYPELIST,
+          assetMake: res?.MAKELIST,
+          assetModel: res?.MODELLIST,
+          unit: res?.UOMLIST,
+          currentState: res?.CURRENTSTATUSLIST,
+          obemList: res?.OBMASSETLIST,
+          vendorList: res?.VENDORELIST,
+          configList: res?.CONFIGLIST,
+          userList: res?.USERLIST,
+          location: res1?.LOCATIONHIERARCHYLIST,
+          hirarchy: res?.EQUIPMENTHIERARCHYLIST.map((f: any) => ({
+            ASSET_FOLDER_DESCRIPTION:
+              f.ASSET_FOLDER_DESCRIPTION !== null &&
+              f.ASSET_FOLDER_DESCRIPTION.trim() !== ""
+                ? f.ASSET_FOLDER_DESCRIPTION
+                : "no label",
+            ASSET_FOLDER_ID: f.ASSET_FOLDER_ID,
+            ASSETGROUP_ID: f.ASSETGROUP_ID,
+            ASSETTYPE_ID: f.ASSETTYPE_ID,
+          })), // f.ASSET_FOLDER_DESCRIPTION.trim()!==""),
+        });
+
+        setVendorList(res?.VENDORELIST);
+
+        const columnCaptions = res?.CONFIGLIST.map((item: any) => ({
+          FIELDNAME: item.FIELDNAME,
+          LABEL: item?.COLUMN_CAPTION,
+          VALUE: "",
+        }));
+
+        if (search === "?edit=") {
+          if (location?.state !== null && vendorList && options) {
+            await getAssetDetails(columnCaptions, location?.state?.ASSET_ID);
+          } else {
+            await getAssetDetails(columnCaptions);
           }
         } else {
           colAppend(columnCaptions);
         }
+        if (GroupWatch) {
+          const assetTypeList: any = res?.ASSESTTYPELIST?.filter(
+            (f: any) => f.ASSETGROUP_ID === watchAll?.GROUP?.ASSETGROUP_ID
+          );
+          setTypeList(assetTypeList);
+
+          if (typeList && typeList.length !== 0) {
+            setValue("TYPE", TypeWatch);
+          }
+        }
       }
-    } catch (error) { }
-    finally {
-      setLoading(false)
+    } catch (error) {
+    } finally {
     }
   };
- 
-  useEffect(() => {
-    if (watchAll?.TYPE !== null || watchAll?.TYPE !== undefined) {
-      getScheduleList();
-      setValue("SCHEDULER.SCHEDULE_ID", 0)
-      setValue("SCHEDULE_ID", 0)
-      
-    } else {
-      setValue("TYPE", null)
-      setValue("SCHEDULER.SCHEDULE_ID", 0)
-      setValue("SCHEDULE_ID", 0)
-     
-    }
-    const vendor: any = options?.vendorList?.filter((f: any) =>
-      f?.VENDOR_ID === f?.VENDOR_ID)
-    // setValue("AMC_VENDOR", selectedDetails?.AMC_VENDOR)
-    setVendorList(vendor)
-   
-    // getTaskList()
-  }, [watchAll?.TYPE]);
 
   useEffect(() => {
-    const nestedErrors: any = errors?.SCHEDULER || {};
-    const firstError: any = Object?.values(nestedErrors)[0];
-    if (
-      !isSubmitting &&
-      (Object?.values(errors)[0]?.type === "required" ||
-        Object?.values(errors)[0]?.type === "validate")
-    ) {
-      const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
-    } else if (
-      !isSubmitting &&
-      (firstError?.type === "required" || firstError?.type === "validate")
-    ) {
-      const check: any = firstError?.message;
-      toast?.error(t(check));
+    if (allFieldsFilled === true) {
+      const nestedErrors: any = errors?.SCHEDULER || {};
+      const firstError: any = Object?.values(nestedErrors)[0];
+      if (
+        !isSubmitting &&
+        (Object?.values(errors)[0]?.type === "required" ||
+          Object?.values(errors)[0]?.type === "validate")
+      ) {
+        const check: any = Object?.values(errors)[0]?.message;
+        toast?.error(t(check));
+      } else if (
+        !isSubmitting &&
+        (firstError?.type === "required" || firstError?.type === "validate")
+      ) {
+        const check: any = firstError?.message;
+        toast?.error(t(check));
+      }
+    } else {
+      const nestedErrors: any = errors?.SCHEDULER || {};
+      const firstError: any = Object?.values(nestedErrors)[0];
+      if (
+        !isSubmitting &&
+        (Object?.values(errors)[0]?.type === "required" ||
+          Object?.values(errors)[0]?.type === "validate")
+      ) {
+        const check: any = Object?.values(errors)[0]?.message;
+        toast?.error(t(check));
+      } else if (
+        !isSubmitting &&
+        (firstError?.type === "required" || firstError?.type === "validate")
+      ) {
+        const check: any = firstError?.message;
+        toast?.error(t(check));
+      }
     }
-  }, [isSubmitting]);
+  }, [isSubmitting, locationError]);
 
   useEffect(() => {
     if (watchAll?.GROUP) {
-      const assetTypeList: any = options?.assetType?.filter((f: any) => f.ASSETGROUP_ID === watchAll?.GROUP?.ASSETGROUP_ID)
-      setTypeList(assetTypeList)
+      setGroupError(false);
+      const assetTypeList: any = options?.assetType?.filter(
+        (f: any) => f.ASSETGROUP_ID === watchAll?.GROUP?.ASSETGROUP_ID
+      );
 
-      setPPMAssignee(ppmAssignee)
-      setAssigneeList(assigneeList)
-      setValue("SCHEDULER.SCHEDULE_TASK_D", [])
-      setScheduleTaskList([])
-      setValue("SCHEDULER.SCHEDULE_ID", 0)
-    setValue("SCHEDULE_ID", 0)
+      setTypeList(assetTypeList);
+      if (typeList && typeList.length !== 0) {
+        setValue("TYPE", TypeWatch);
+      }
+
+      if (facility_type === "I" && location?.state !== null) {
+        selectedDetails.ASSETTYPE_ID = scheduleGroup[0]?.ASSETTYPE_ID;
+      }
+      setPPMAssignee(ppmAssignee);
+      setAssigneeList(assigneeList);
+      setValue("SCHEDULER.SCHEDULE_TASK_D", []);
+      setValue("SCHEDULER.SCHEDULE_ID", 0);
+      setValue("SCHEDULE_ID", 0);
     }
-
-  }, [watchAll?.GROUP])
+  }, [watchAll?.GROUP, options, facility_type, location?.state]);
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
-  }, [currentMenu]);
+    (async function () {
+      try {
+        if (currentMenu || location.state !== null) {
+          await saveTracker(currentMenu);
+          await getOptions();
+        }
+        if (search === "?add=") {
+        }
+      } catch (error: any) {
+        if (search === "?add=") {
+        }
+        toast?.error(error);
+      } finally {
+        if (search === "?add=") {
+        }
+      }
+    })();
+  }, [currentMenu, location.state, props?.selectedData]);
   useEffect(() => {
-   
     if (MANINTENANCE === false) {
-      setValue("AMC_DATE", "")
-      setValue("AMC_VENDOR", "")
+      setValue("AMC_DATE", "");
+      setValue("AMC_VENDOR", "");
     }
-  }, [MANINTENANCE])
+  }, [MANINTENANCE]);
 
-  const handlerShowService = () => {
-    navigate(PATH.SHOWSERVICEREQEST, { state: location?.state?.WO_ID })
-  }
+  useEffect(() => {
+    if (watchAll?.ASSET_NAME !== "") {
+      setAssetNameError(false);
+    }
+    if (watchAll?.TYPE !== null) {
+      setTypeError(false);
+    }
+  }, [watchAll?.ASSET_NAME, watchAll?.TYPE]);
 
-  if (loading === true) {
-    <LoaderS />
-  }
+  const infraScheduleData = (infraData: any) => {};
+  useEffect(() => {
+    if (options?.location && watchAll?.LOCATION?.LOCATION_ID) {
+      setLocationError(false);
+      const selecetedlocationSchedule: any = options?.location?.filter(
+        (f: any) => f.LOCATION_ID === watchAll?.LOCATION?.LOCATION_ID
+      );
+
+      setselectedLocationSchedule(selecetedlocationSchedule[0]);
+    }
+  }, [options?.location, watchAll?.LOCATION?.LOCATION_ID]);
 
   return (
     <>
-      {/* <IdleTimer /> */}
+      {/* {loadig ? (
+        <LoaderS />
+      ) : ( */}
       <section className="w-full">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
           <div className="flex justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {t(`${search === '?edit=' ? "Edit" : "Add"}`)} {props?.headerName} {" "}
+                {t(`${search === "?edit=" ? "Edit" : "Add"}`)}{" "}
+                {props?.headerName}{" "}
               </h6>
             </div>
             <div className="flex">
-              {location?.state !== null && (<Buttons
-                type="submit"
-                className="Primary_Button   me-2"
-                label={"Show Service Request"}
-                onClick={() => handlerShowService()}
-              />)}
-              {search === '?edit=' ?
+              {search === "?edit=" ? (
                 <>
-
-                  {currentMenu?.UPDATE_RIGHTS === "True" && (<Buttons
-                    type="submit"
-                    className="Primary_Button  w-20 me-2"
-                    label={"Save"}
-                  />)}</> :
+                  {currentMenu?.UPDATE_RIGHTS === "True" && (
+                    <Buttons
+                      type="submit"
+                      disabled={IsSubmit}
+                      className="Primary_Button  w-20 me-2"
+                      label={"Save"}
+                    />
+                  )}
+                </>
+              ) : (
                 <>
-                  {search === '?add=' ? <Buttons
-                    type="submit"
-                    className="Primary_Button  w-20 me-2"
-                    label={"Save"}
-                  /> : ""}</>}
-              {currentMenu?.UPDATE_RIGHTS === "True" && (<Buttons
-                className="Secondary_Button w-20 "
-                label={"List"}
-                onClick={props?.isClick}
-              />)}
+                  {search === "?add=" ? (
+                    <Buttons
+                      type="submit"
+                      disabled={IsSubmit}
+                      className="Primary_Button  w-20 me-2"
+                      label={"Save"}
+                    />
+                  ) : (
+                    ""
+                  )}
+                </>
+              )}
+              {currentMenu?.UPDATE_RIGHTS === "True" && (
+                <Buttons
+                  className="Secondary_Button w-20 "
+                  label={"List"}
+                  onClick={props?.isClick}
+                />
+              )}
             </div>
-
           </div>
 
           <Card className="mt-2">
@@ -783,16 +993,25 @@ const AssetMasterForm = (props: any) => {
                         options={options?.location}
                         {...register("LOCATION", {
                           required: t("Please fill the required fields."),
+                          //This is Aparna Code
+                          onChange: (e: any) => {
+                            dispatch(clearScheduleLocation());
+                            dispatch(setScheduleLocation(e?.target.value));
+                          },
                         })}
                         label="Location"
                         require={true}
                         optionLabel="LOCATION_NAME"
                         valueTemplate={selectedLocationTemplate}
                         itemTemplate={locationOptionTemplate}
-                        invalid={errors.LOCATION}
+                        invalid={locationError ? true : !!errors.LOCATION}
                         filter={true}
                         findKey={"LOCATION_ID"}
-                        selectedData={selectedDetails?.LOCATION_ID}
+                        selectedData={
+                          selectedDetails.LOCATION_ID !== undefined
+                            ? selectedDetails.LOCATION_ID
+                            : ""
+                        }
                         setValue={setValue}
                         {...field}
                       />
@@ -836,20 +1055,105 @@ const AssetMasterForm = (props: any) => {
                       <InputField
                         {...register("ASSET_NAME", {
                           required: "Please fill the required fields",
-                          validate: value => value.trim() !== "" || "Please fill the required fields"
+                          validate: (value) =>
+                            value.trim() !== "" ||
+                            "Please fill the required fields",
                         })}
                         label="Name"
                         require={true}
-                        invalid={errors.ASSET_NAME}
-                        value={selectedDetails?.ASSET_NAME}
-                        {...field}
+                        invalid={assetNameError ? true : !!errors.ASSET_NAME}
                         setValue={setValue}
+                        {...field}
                       />
                     );
                   },
                 }}
               />
+              {facility_type === "R" ? (
+                ""
+              ) : (
+                <>
+                  <div className="col-span-1">
+                    <label className="Text_Secondary Input_Label">
+                      {t("Description")}
+                    </label>
+                    <Field
+                      controller={{
+                        name: "ASSET_DESC",
+                        control: control,
+                        render: ({ field }: any) => {
+                          return (
+                            <InputTextarea
+                              {...register("ASSET_DESC", {
+                                onChange: (e: any) => handleInputChange(e),
+                              })}
+                              maxLength={400}
+                              setValue={setValue}
+                              {...field}
+                            />
+                          );
+                        },
+                      }}
+                    />
+                    <label
+                      className={` ${
+                        Descriptionlength === 400
+                          ? "text-red-600"
+                          : "Text_Secondary"
+                      } Helper_Text`}
+                    >
+                      {t(`Up to ${Descriptionlength}/400 characters.`)}
+                    </label>
+                  </div>
+                </>
+              )}
 
+              {facility_type === "I" && (
+                <>
+                  {Object.keys(options).length === 0 ? (
+                    <>
+                      <LoaderS />
+                    </>
+                  ) : (
+                    <Field
+                      controller={{
+                        name: "ASSET_FOLDER_ID",
+                        control: control,
+                        render: ({ field }: any) => {
+                          return (
+                            <Select
+                              options={
+                                options?.hirarchy?.length > 0
+                                  ? options?.hirarchy
+                                  : []
+                              }
+                              {...register("ASSET_FOLDER_ID", {
+                                required:
+                                  facility_type === "I"
+                                    ? "Please fill the required fields"
+                                    : "",
+                              })}
+                              filter={true}
+                              label="Equipment Hierarchy"
+                              optionLabel="ASSET_FOLDER_DESCRIPTION"
+                              findKey={"ASSET_FOLDER_ID"}
+                              require={facility_type === "I" ? true : false}
+                              selectedData={selectedDetails?.ASSET_FOLDER_ID}
+                              setValue={setValue}
+                              invalid={
+                                facility_type === "I"
+                                  ? errors.ASSET_FOLDER_ID
+                                  : ""
+                              }
+                              {...field}
+                            />
+                          );
+                        },
+                      }}
+                    />
+                  )}
+                </>
+              )}
               <Field
                 controller={{
                   name: "GROUP",
@@ -860,22 +1164,24 @@ const AssetMasterForm = (props: any) => {
                         options={options?.assetGroup}
                         {...register("GROUP", {
                           required: "Please fill the required fields",
-                          onChange: (e: any) => {
-                            setValue("ASSIGN_TO", "")
-                            getRequestList(
+                          onChange: async (e: any) => {
+                            setValue("ASSIGN_TO", "");
+
+                            await getRequestList(
                               e?.target?.value?.ASSETGROUP_ID,
                               e?.target?.value?.ASSETGROUP_TYPE
-
                             );
                           },
                         })}
                         label="Group"
                         require={true}
+                        filter={true}
                         optionLabel="ASSETGROUP_NAME"
                         findKey={"ASSETGROUP_ID"}
                         selectedData={selectedDetails?.ASSETGROUP_ID}
                         setValue={setValue}
-                        invalid={errors.GROUP}
+                        invalid={groupError ? true : !!errors.GROUP}
+                        // invalid={errors.GROUP}
                         {...field}
                       />
                     );
@@ -887,24 +1193,31 @@ const AssetMasterForm = (props: any) => {
                 controller={{
                   name: "TYPE",
                   control: control,
-                  render: ({ field }: any) => {
+                  render: ({ field, fieldState }: any) => {
                     return (
                       <Select
                         options={typeList}
                         {...register("TYPE", {
                           required: "Please fill the required fields",
-                          onChange:(e)=>{
-                            setAssetTypeState(true)
-                            setIdSchedule(0)
-                          }
+                          onChange: async (e: any) => {
+                            dispatch(clearScheduleGroup());
+                            dispatch(setScheduleGroup(e?.target.value));
+                            setAssetTypeState(true);
+                            dispatch(clearScheduleTaskList());
+                            await getScheduleList(
+                              e?.target?.value?.ASSETTYPE_ID
+                            );
+                          },
                         })}
                         label="Type"
                         require={true}
+                        filter={true}
                         optionLabel="ASSETTYPE_NAME"
                         findKey={"ASSETTYPE_ID"}
                         selectedData={selectedDetails?.ASSETTYPE_ID}
                         setValue={setValue}
-                        invalid={errors.TYPE}
+                        invalid={typeError ? true : !!errors.TYPE}
+                        // invalid={errors.TYPE || allFieldsFilled === false ? errors.TYPE : "" }
                         {...field}
                       />
                     );
@@ -940,11 +1253,11 @@ const AssetMasterForm = (props: any) => {
                     return (
                       <Select
                         options={options?.assetMake}
-                        {...register("MAKE", {
-                        })}
+                        {...register("MAKE", {})}
                         label="Make"
                         optionLabel="MAKE_NAME"
                         findKey={"MAKE_ID"}
+                        filter={true}
                         selectedData={selectedDetails?.MAKE_ID}
                         setValue={setValue}
                         {...field}
@@ -966,6 +1279,7 @@ const AssetMasterForm = (props: any) => {
                         label="Model"
                         optionLabel="MODEL_NAME"
                         findKey={"MODEL_ID"}
+                        filter={true}
                         selectedData={selectedDetails?.MODEL_ID}
                         setValue={setValue}
                         {...field}
@@ -983,11 +1297,11 @@ const AssetMasterForm = (props: any) => {
                     return (
                       <Select
                         options={options?.currentState}
-                        {...register("CURRENT_STATE", {
-                        })}
+                        {...register("CURRENT_STATE", {})}
                         label="Current Status"
                         optionLabel="CS_DESC"
                         findKey={"CS_ID"}
+                        filter={true}
                         selectedData={selectedDetails?.CS_ID}
                         setValue={setValue}
                         {...field}
@@ -997,35 +1311,44 @@ const AssetMasterForm = (props: any) => {
                 }}
               />
 
-              <div className="col-span-1">
-                <label className="Text_Secondary Input_Label">{t("Description")}</label>
-                <Field
-                  controller={{
-                    name: "ASSET_DESC",
-                    control: control,
-                    render: ({ field }: any) => {
-                      return (
-                        <InputTextarea
-                          {...register("ASSET_DESC", {
-                            onChange: (e: any) => handleInputChange(e),
-                          })}
-                          maxLength={400}
-                          setValue={setValue}
-                          {...field}
-                        />
-                      );
-                    },
-                  }}
-                />
-                <label className={` ${Descriptionlength === 400 ?
-                  "text-red-600" : "Text_Secondary"} Helper_Text`}>
-                  {t(`Up to ${Descriptionlength}/400 characters.`)}
-                </label>
-              </div>
-
-             
-
-           
+              {facility_type === "R" ? (
+                <>
+                  <div className="col-span-1">
+                    <label className="Text_Secondary Input_Label">
+                      {t("Description")}
+                    </label>
+                    <Field
+                      controller={{
+                        name: "ASSET_DESC",
+                        control: control,
+                        render: ({ field }: any) => {
+                          return (
+                            <InputTextarea
+                              {...register("ASSET_DESC", {
+                                onChange: (e: any) => handleInputChange(e),
+                              })}
+                              maxLength={400}
+                              setValue={setValue}
+                              {...field}
+                            />
+                          );
+                        },
+                      }}
+                    />
+                    <label
+                      className={` ${
+                        Descriptionlength === 400
+                          ? "text-red-600"
+                          : "Text_Secondary"
+                      } Helper_Text`}
+                    >
+                      {t(`Up to ${Descriptionlength}/400 characters.`)}
+                    </label>
+                  </div>
+                </>
+              ) : (
+                ""
+              )}
 
               <Field
                 controller={{
@@ -1035,10 +1358,8 @@ const AssetMasterForm = (props: any) => {
                     return (
                       <MultiSelects
                         options={ppmAssignee}
-                        {...register("ASSIGN_TO", {
-                        })}
+                        {...register("ASSIGN_TO", {})}
                         label="PPM Assignee"
-
                         optionLabel="USER_NAME"
                         findKey={"USER_ID"}
                         selectedData={assigneeList}
@@ -1060,9 +1381,7 @@ const AssetMasterForm = (props: any) => {
                         <Checkboxs
                           {...register("ACTIVE")}
                           checked={
-                            props?.selectedData?.ACTIVE === true
-                              ? true
-                              : false || false
+                            props?.selectedData?.ACTIVE === true ? true : false
                           }
                           className="md:mt-7"
                           label="Active"
@@ -1077,8 +1396,8 @@ const AssetMasterForm = (props: any) => {
               </div>
             </div>
           </Card>
-
           <AssetSchedule
+            ASSET_FOLDER_DATA={ASSET_FOLDER_DATA}
             errors={errors}
             setValue={setValue}
             watchAll={watchAll}
@@ -1087,15 +1406,44 @@ const AssetMasterForm = (props: any) => {
             watch={watch}
             resetField={resetField}
             scheduleTaskList={scheduleTaskList}
-            scheduleId={search === '?edit=' && assetTypeState === true?0:search === '?edit='? selectedDetails?.SCHEDULE_ID : 0}
+            scheduleId={
+              search === "?edit=" && assetTypeState === true
+                ? 0
+                : search === "?edit="
+                ? schedId
+                : 0
+            }
             getValues={getValues}
             setEditStatus={setEditStatus}
             isSubmitting={isSubmitting}
-            AssetSchedule={true}
+            AssetSchedule={
+              TypeWatch == undefined ||
+              TypeWatch == null ||
+              GroupWatch == undefined ||
+              GroupWatch == null ||
+              LocationWatch == undefined ||
+              LocationWatch == null ||
+              AssetNameWatch == undefined ||
+              AssetNameWatch == null
+                ? false
+                : true
+            }
             issueList={issueList}
-            setScheduleTaskList={setScheduleTaskList}
+            setScheduleTaskList={upsertScheduleTask}
             setAssetTypeState={setAssetTypeState}
             assetTypeState={assetTypeState}
+            setSelectedSchedule={setselectedscheduleID}
+            infraScheduleData={infraScheduleData}
+            typewatch={TypeWatch}
+            setScheduleGroupStatus={setScheduleGroupStatus}
+            getSelectedScheduleId={getSelectedScheduleId}
+            selectedLocationSchedule={selectedLocationSchedule}
+            allFieldsFilled={allFieldsFilled}
+            Mode={search === "?edit=" ? "edit" : "add"}
+            setLocationError={setLocationError}
+            setTypeError={setTypeError}
+            setGroupError={setGroupError}
+            setAssetNameError={setAssetNameError}
           />
 
           <Card className="mt-2">
@@ -1143,8 +1491,7 @@ const AssetMasterForm = (props: any) => {
                       render: ({ field }: any) => {
                         return (
                           <Checkboxs
-                            {...register("UNDERAMC", {
-                            })}
+                            {...register("UNDERAMC", {})}
                             className="md:mt-6"
                             label="Maintenance"
                             checked={selectedDetails?.UNDERAMC}
@@ -1160,49 +1507,29 @@ const AssetMasterForm = (props: any) => {
 
               {MANINTENANCE && (
                 <>
-                  {/* <Field
-                    controller={{
-                      name: "AMC_DATE",
-                      control: control,
-                      render: ({ field }: any) => {
-                        return (
-                          <DateCalendar
-                            {...register("AMC_DATE", {
-                              required: MANINTENANCE === true ? "Please Fill the Required Fields." : "",
-                            })}
-                            label="AMC expiry Date"
-                            showIcon
-                            require={MANINTENANCE === true ? true : ""}
-                            setValue={setValue}
-                            invalid={MANINTENANCE === true ? errors?.AMC_DATE : ""}
-                            {...field}
-                          />
-                        );
-                      },
-                    }}
-                  /> */}
                   <Field
                     controller={{
                       name: "AMC_DATE",
                       control: control,
                       rules: {
                         validate: (value: any) => {
-                          return value && value !== '' ? true : "Please fill the required fields";
+                          return value && value !== ""
+                            ? true
+                            : "Please fill the required fields";
                         },
                       },
                       render: ({ field, fieldState }: any) => {
                         return (
                           <DateCalendar
-                            value={field.value} // Ensure the value is synced with react-hook-form
+                            value={field.value}
                             onChange={(e: any) => {
-                              // Explicitly update the value using setValue or field.onChange
                               field.onChange(e.value);
                             }}
                             label={t("AMC expiry Date")}
                             require={true}
-                            invalid={fieldState?.error} // Show error if validation fails
+                            invalid={fieldState?.error}
                             showIcon
-                            setValue={setValue} // Optional: if you need to manually set the value elsewhere
+                            setValue={setValue}
                           />
                         );
                       },
@@ -1218,15 +1545,21 @@ const AssetMasterForm = (props: any) => {
                           <Select
                             options={vendorList}
                             {...register("AMC_VENDOR", {
-                              required: MANINTENANCE === true ? "Please Fill the Required Fields." : "",
+                              required:
+                                MANINTENANCE === true
+                                  ? "Please Fill the Required Fields."
+                                  : "",
                             })}
                             label="AMC Vendor"
                             optionLabel="VENDOR_NAME"
                             require={MANINTENANCE === true ? true : false}
                             findKey={"VENDOR_ID"}
+                            filter={true}
                             selectedData={selectedDetails?.AMC_VENDOR}
                             setValue={setValue}
-                            invalid={MANINTENANCE === true ? errors.AMC_VENDOR : ""}
+                            invalid={
+                              MANINTENANCE === true ? errors.AMC_VENDOR : ""
+                            }
                             {...field}
                           />
                         );
@@ -1370,6 +1703,7 @@ const AssetMasterForm = (props: any) => {
                         optionLabel="VENDOR_NAME"
                         invalid={errors.VENDOR_NAME}
                         findKey={"VENDOR_ID"}
+                        filter={true}
                         selectedData={selectedDetails?.VENDOR_ID}
                         setValue={setValue}
                         {...field}
@@ -1395,35 +1729,36 @@ const AssetMasterForm = (props: any) => {
                   },
                 }}
               />
-             
+
               <Field
                 controller={{
                   name: "COMMISSIONING_DATE",
                   control: control,
                   rules: {
                     validate: (value: any) => {
-                      return value && value !== '' ? true : "Please fill the required fields.";
+                      return value && value !== ""
+                        ? true
+                        : "Please fill the required fields.";
                     },
                   },
                   render: ({ field, fieldState }: any) => {
                     return (
                       <DateCalendar
-                        value={field.value} // Ensure the value is synced with react-hook-form
+                        value={field.value}
                         onChange={(e: any) => {
-                          // Explicitly update the value using setValue or field.onChange
                           field.onChange(e.value);
                         }}
                         label={t("Commissioning Date")}
                         require={true}
-                        invalid={fieldState?.error} // Show error if validation fails
+                        // invalid={errors.COMMISSIONING_DATE}
+                        invalid={fieldState?.error}
                         showIcon
-                        setValue={setValue} // Optional: if you need to manually set the value elsewhere
+                        setValue={setValue}
                       />
                     );
                   },
                 }}
               />
-
 
               <Field
                 controller={{
@@ -1470,6 +1805,7 @@ const AssetMasterForm = (props: any) => {
           </Card>
         </form>
       </section>
+      {/* )} */}
     </>
   );
 };

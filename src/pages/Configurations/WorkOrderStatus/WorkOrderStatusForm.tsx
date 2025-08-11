@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
-import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
@@ -25,12 +24,12 @@ const WorkOrderStatusForm = (props: any) => {
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
   const {
     register,
     handleSubmit,
     control,
-    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -41,34 +40,38 @@ const WorkOrderStatusForm = (props: any) => {
 
       DESCRIPTION: props?.selectedData ? props?.selectedData?.STATUS_DESC : search === '?edit=' ? dataId?.STATUS_DESC : '',
       COLORS: props?.selectedData ? props?.selectedData?.COLORS : search === '?edit=' ? dataId?.COLORS : "",
-      ACTIVE: props?.selectedData?.ACTIVE ? true : false,
+      ACTIVE: search === '?edit=' ? dataId?.ACTIVE : true,
       STATUS: props?.selectedData ? props?.selectedData?.STATUS : search === '?edit=' ? dataId?.STATUS : "",
-      WO_ID: props?.selectedData ? props?.selectedData?.STATUS_CODE : "",
+      WO_CODE: props?.selectedData ? props?.selectedData?.STATUS_CODE : "",
     },
     mode: "onSubmit",
   });
- 
-  const onSubmit = async (payload: any) => {
+
+  const onSubmit = useCallback(async (payload: any) => {
     payload.ACTIVE = "";
-   
+    setIsSubmit(true)
     // return
     try {
-      const res = await callPostAPI(ENDPOINTS?.WORKORDERTYPE_STATUS, payload);
+      const res = await callPostAPI(ENDPOINTS?.WORKORDERTYPE_STATUS, payload, currentMenu?.FUNCTION_CODE);
       if (res?.FLAG === true) {
         toast?.success(res?.MSG);
         props?.getAPI();
+        setIsSubmit(false)
         props?.isClick();
       } else {
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+      setIsSubmit(false)
       toast?.error(error);
     }
-  };
+  }, [IsSubmit, callPostAPI, toast, props?.getAPI, props?.isClick]);
 
   useEffect(() => {
-    saveTracker(currentMenu)
-  }, [])
+    (async function () {
+        await saveTracker(currentMenu)
+       })();
+}, [])
   return (
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -76,10 +79,11 @@ const WorkOrderStatusForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
-            <div className={`${errors?.WO_ID ? "errorBorder" : ""}`}>
+            <div className={`${errors?.WO_CODE ? "errorBorder" : ""}`}>
               <Field
                 controller={{
                   name: "STATUS",

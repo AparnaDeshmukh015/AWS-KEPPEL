@@ -9,9 +9,13 @@
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
+.p-multiselect-panel .p-multiselect-panel {
+    padding: 0;
+}
+
 .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
     margin: 0;
-    padding: 0.15rem 1.25rem;
+    padding: 0.15rem 1.75rem;
     border: 0 none;
     color: #4b5563;
     /* background: #f9fafb; */
@@ -19,7 +23,10 @@
     border-radius: 0;
     border-bottom: 1px solid #ddd;
     font-size: 15px;
-
+    white-space: normal;
+    word-break: break-word;
+    /* text-wrap: wrap; */
+    max-width: 500px;
 }
 
 .p-multiselect-panel .p-multiselect-items .p-multiselect-item:hover {
@@ -34,9 +41,9 @@
     border-top: 1px solid #ddd;
 }
 
-.p-multiselect-panel .p-multiselect-items {
+/* .p-multiselect-panel .p-multiselect-items {
     padding: 0.25rem 0;
-}
+} */
 
 .p-multiselect {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;

@@ -22,7 +22,9 @@ const RectifyCommentMaster = (props: any) => {
     }
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+            })();
         }
     }, [selectedFacility, currentMenu])
     return (

@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import Radio from "../../../components/Radio/Radio";
 import Select from "../../../components/Dropdown/Dropdown";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useOutletContext } from "react-router-dom";
 import FormHeader from "../../../components/FormHeader/FormHeader";
 import { saveTracker } from "../../../utils/constants";
@@ -23,6 +23,7 @@ const RequestDescriptionMasterForm = (props: any) => {
   let { pathname } = useLocation();
   const [selected, menuList]: any = useOutletContext();
   const [assetType, setAssetType] = useState<any | null>([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>()
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -31,6 +32,8 @@ const RequestDescriptionMasterForm = (props: any) => {
     { name: "Equipment ", key: "A" },
     { name: "Soft Services", key: "N" },
   ];
+  const getId: any = localStorage.getItem("Id");
+  const dataId = JSON.parse(getId);
 
   const {
     register,
@@ -41,20 +44,17 @@ const RequestDescriptionMasterForm = (props: any) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      MODE: props?.selectedData ? "E" : "A",
-      PARA: props?.selectedData
+      MODE: search === "?edit="  ? "E" : "A",
+      PARA: search === "?edit=" 
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
-      REQ_DESC: props?.selectedData?.REQ_DESC || "",
+      REQ_DESC:search === "?edit=" ?dataId?.REQ_DESC : "",
       ASSET_NONASSET: "",
       ASSETTYPE: "",
       SKILL: "",
       SOFT_SERVICE: "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
-      REQ_ID: props?.selectedData ? props?.selectedData?.REQ_ID : 0,
+      ACTIVE:search === "?edit=" ?dataId?.ACTIVE : true,
+      REQ_ID:search === "?edit=" ? dataId?.REQ_ID : 0,
     },
     mode: "onSubmit",
   });
@@ -69,7 +69,9 @@ const RequestDescriptionMasterForm = (props: any) => {
 
   }, [ASSET_NONASSET])
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.SKILL_ID = payload?.SKILL?.SKILL_ID;
     payload.ASSETGROUP_LIST = payload?.ASSETTYPE;
@@ -97,22 +99,36 @@ const RequestDescriptionMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
       toast?.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit,
+    setIsSubmit,
+    toast,
+    callPostAPI,
+    ENDPOINTS,
+    watchAll,
+    currentMenu,
+    search,
+    User_Name,
+    eventNotification,
+    helperEventNotification,
+    props]);
 
   const getReqDetailsList = async () => {
     try {
       const res = await callPostAPI(
         ENDPOINTS.GET_REQUEST_DETAILS,
-        { REQ_ID: props?.selectedData?.REQ_ID },
+        { REQ_ID: search === "?edit=" ? dataId?.REQ_ID : 0 },
         currentMenu?.FUNCTION_CODE
       );
       if (res?.FLAG === 1) {
@@ -141,14 +157,16 @@ const RequestDescriptionMasterForm = (props: any) => {
         ),
       });
       if (search === "?edit=") {
-        getReqDetailsList();
+        await getReqDetailsList();
       }
     } catch (error) { }
   };
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, [selected]);
 
   useEffect(() => {
@@ -166,6 +184,7 @@ const RequestDescriptionMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -181,6 +200,9 @@ const RequestDescriptionMasterForm = (props: any) => {
                       })}
                       label="Request Description"
                       require={true}
+                      selectedData={search === "?edit=" ?dataId?.REQ_ID : ""
+                      }
+ 
                       invalid={errors.REQ_DESC}
                       {...field}
                     />
@@ -203,7 +225,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                         require={true}
                         options={assestTypeLabel}
                         selectedData={
-                          props?.selectedData?.ASSET_NONASSET || "A"
+                          search === "?edit=" ? dataId?.ASSET_NONASSET :  "A"
                         }
                         setValue={setValue}
                         {...field}
@@ -262,7 +284,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                       optionLabel="SKILL_NAME"
                       findKey={"SKILL_NAME"}
                       require={true}
-                      selectedData={props?.selectedData?.SKILL_NAME}
+                      selectedData={search === "?edit=" ? dataId?.SKILL_NAME : props?.selectedData?.SKILL_NAME}
                       invalid={errors.SKILL}
                       setValue={setValue}
                       {...field}

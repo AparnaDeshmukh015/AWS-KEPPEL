@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useForm } from "react-hook-form";
@@ -8,7 +8,7 @@ import InputField from "../../../components/Input/Input";
 import { Card } from "primereact/card";
 import Field from "../../../components/Field";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
-import { decryptData, encrypt } from "../../../utils/encryption_decryption";
+import { decryptData} from "../../../utils/encryption_decryption";
 
 import {
   eventNotification,
@@ -21,9 +21,10 @@ import { useLocation, useOutletContext } from "react-router-dom";
 
 
 const SkillsMasterForm = (props: any) => {
-  const { t, i18n } = useTranslation();
+  const { t} = useTranslation();
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false)
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -35,7 +36,6 @@ const SkillsMasterForm = (props: any) => {
     handleSubmit,
     control,
     setValue,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -45,23 +45,22 @@ const SkillsMasterForm = (props: any) => {
         : { para1: `${props?.headerName}`, para2: "Added" },
       SKILL_ID: props?.selectedData ? props?.selectedData?.SKILL_ID : search === '?edit=' ? dataId?.SKILL_ID : 0,
       SKILL_NAME: props?.selectedData ? props?.selectedData?.SKILL_NAME : search === '?edit=' ? dataId?.SKILL_NAME : "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
     },
     mode: "onSubmit",
   });
 
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
 
-  const onSubmit = async (payload: any) => {
-
+  const onSubmit = useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.SKILL_NAME = payload?.SKILL_NAME?.trim();
 
     try {
       const res = await callPostAPI(ENDPOINTS.SAVE_SKILL_MASTER, payload);
+
       if (res?.FLAG === true) {
         toast?.success(res?.MSG);
         const notifcation: any = {
@@ -73,16 +72,22 @@ const SkillsMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
+
+        setIsSubmit(false)
         props?.isClick();
       } else {
         toast?.error(res?.MSG)
+        setIsSubmit(false)
       }
     } catch (error: any) {
+      
       toast?.error(error);
+    }finally{
+      setIsSubmit(false)
     }
-  };
+  },[IsSubmit, search, props, eventNotification, toast]);
 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
@@ -90,10 +95,12 @@ const SkillsMasterForm = (props: any) => {
       toast?.error(t(check));
     }
   }, [isSubmitting]);
+  
   useEffect(() => {
-    saveTracker(currentMenu)
-  }, [])
-
+    (async function () {
+      await saveTracker(currentMenu)
+     })();
+  }, []);
   return (
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -101,6 +108,7 @@ const SkillsMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-4">

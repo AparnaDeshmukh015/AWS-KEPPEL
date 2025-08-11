@@ -18,7 +18,6 @@ const MaterialRequisitionProvision = (props: any) => {
         try {
 
             const res = await callPostAPI(ENDPOINTS.GETINVENTORYMASTERSLIST, null, currentMenu?.FUNCTION_CODE)
-
             props?.setData(res?.INVENTORYMASTERSLIST || [])
             localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
         } catch (error: any) {
@@ -27,7 +26,9 @@ const MaterialRequisitionProvision = (props: any) => {
     }
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu])
     return (
@@ -38,7 +39,7 @@ const MaterialRequisitionProvision = (props: any) => {
                     search: true
                 }}
                 dataKey={currentMenu?.FUNCTION_DESC}
-                columnTitle={["MATREQ_NO", "MATREQ_DATE", "STORE_NAME", "MATREQ_RAISEDBY", "WO_NO", "STATUS_DESC"]}
+                columnTitle={["MATREQ_NO", "MATREQ_DATE", "STORE_NAME", "USER_NAME", "WO_NO", "STATUS_DESC"]}
                 customHeader={["Request No", "MR Date", "Store Name", "Raised By", "Work Order No", "Status"]}
                 columnData={props?.data}
                 clickableColumnHeader={["MATREQ_NO"]}

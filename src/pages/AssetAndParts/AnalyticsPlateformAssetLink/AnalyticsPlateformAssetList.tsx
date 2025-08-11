@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'react-toastify';
 import Table from '../../../components/Table/Table';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
@@ -7,10 +7,9 @@ import { callPostAPI } from '../../../services/apis';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import TableListLayout from '../../../layouts/TableListLayout/TableListLayout'
 import AnalyticsPlateformAssetLink from './AnalyticsPlateformAssetLink';
-import LoaderS from "../../../components/Loader/Loader";
+
 const AnalyticsPlateformAssetList = (props: any) => {
     let { pathname } = useLocation();
-    const [showLoader, setShowLoader] = useState<boolean>(false);
     const [selectedFacility, menuList]: any = useOutletContext();
     const currentMenu = menuList
         ?.flatMap((menu: any) => menu?.DETAIL)
@@ -33,15 +32,15 @@ const AnalyticsPlateformAssetList = (props: any) => {
 
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI();
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu]);
 
     return !props?.search ? (
         <>
-            {showLoader ?
-                <><LoaderS /></>
-                :
+           
                 <Table
                     tableHeader={{
                         headerName: currentMenu?.FUNCTION_DESC,
@@ -60,7 +59,7 @@ const AnalyticsPlateformAssetList = (props: any) => {
                 // deleteURL={ENDPOINTS?.DELETE_USERMASTER}
                 // DELETE_ID="ASSET_ID"
                 />
-            }</>
+            </>
     ) : (
         <AnalyticsPlateformAssetLink
             headerName={currentMenu?.FUNCTION_DESC}

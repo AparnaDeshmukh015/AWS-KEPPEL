@@ -1,4 +1,4 @@
-import { COOKIES, LOCALSTORAGE } from '../../../utils/constants';
+
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { callPostAPI } from '../../../services/apis';
 

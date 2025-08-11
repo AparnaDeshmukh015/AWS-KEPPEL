@@ -1,26 +1,31 @@
 import { Column } from "primereact/column";
 import { FilterMatchMode } from "primereact/api";
 import { memo, useEffect, useState } from "react";
-import { DataTable, DataTableFilterMeta } from "primereact/datatable";
+import { DataTable } from "primereact/datatable";
 import TableHeader from "../Table/TableHeader";
 import { Paginator } from "primereact/paginator";
 import "../Input/Input.css";
 import "./Table.css";
 import { Checkbox } from "primereact/checkbox";
-import { dateFormat, formateDate, LOCALSTORAGE, onlyDateFormat, ROLETYPECODE } from "../../utils/constants";
+import {
+  formateDate,
+  LOCALSTORAGE,
+  onlyDateFormat,
+  ROLETYPECODE,
+} from "../../utils/constants";
 import { toast } from "react-toastify";
 import DialogBox from "../DialogBox/DialogBox";
 import { callPostAPI } from "../../services/apis";
 import { useTranslation } from "react-i18next";
 import { useLocation, useOutletContext } from "react-router-dom";
-import moment from "moment";
-import { Card } from "primereact/card";
+
 import { decryptData } from "../../utils/encryption_decryption";
+import { ENDPOINTS } from "../../utils/APIEndpoints";
 
 const Table = (props: any) => {
   const { t } = useTranslation();
   let { pathname } = useLocation();
-  const [selectedFacility, menuList]: any = useOutletContext();
+  const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     ?.filter((detail: any) => detail?.URL === pathname)[0];
@@ -28,9 +33,6 @@ const Table = (props: any) => {
 
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(15);
-  const defaultFilters: DataTableFilterMeta = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  };
   let customHeader: any = {};
   props?.columnTitle.forEach((head: any, index: number) => {
     customHeader = {
@@ -41,7 +43,7 @@ const Table = (props: any) => {
   const [filters, setFilters] = useState<any>({
     global: { value: "", matchMode: FilterMatchMode.CONTAINS },
   });
-  const [loading, setLoading] = useState<boolean>(false);
+
   const onPageChange = (event: any) => {
     setFirst(event.first);
     setRows(event.rows);
@@ -54,7 +56,6 @@ const Table = (props: any) => {
     fileName: any,
     fileExtension: any
   ) => {
-    // Convert base64 string to a Blob
     const byteCharacters = atob(base64Data);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -62,33 +63,48 @@ const Table = (props: any) => {
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: "application/octet-stream" });
-
-    // Create an object URL from the Blob
     const url = URL.createObjectURL(blob);
 
-    // Create a link element
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${fileName}.${fileExtension}`; // Append the file extension
+    a.download = `${fileName}.${fileExtension}`;
 
-    // Append the link to the body
     document.body.appendChild(a);
-
-    // Trigger the download by simulating a click
     a.click();
 
-    // Clean up
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 0);
   };
 
-  const handelDelete = async (selectedData: any, index: any) => {
-    if (props?.isDocumentDelete) {
+  const handelDelete = async (selectedData: any, index: any, rowData: any) => {
+    let payload = {};
+    if (pathname === "/workordertypelist") {
+      payload = {
+        MODE: "D",
+        PARA: { para1: `Type setup`, para2: "deleted" },
+        FORM_TYPE: "WT",
+        DESCRIPTION: rowData?.WO_TYPE_NAME,
+        COLORS: rowData?.COLORS,
+        ACTIVE: rowData.ACTIVE,
+        WO_CODE: rowData?.WO_TYPE_CODE,
+        FUNCTION_CODE: currentMenu?.FUNCTION_CODE,
+      };
+      try {
+        const res = await callPostAPI(ENDPOINTS?.WORKORDERTYPE_STATUS, payload);
+        if (res?.FLAG === true) {
+          toast?.success(res?.MSG);
+          props?.getAPI();
+        } else {
+          toast?.error(res?.MSG);
+        }
+      } catch (error: any) {
+        toast.error(error);
+      }
+    } else if (props?.isDocumentDelete) {
       props?.handleFileDelete(selectedData, index);
     } else {
-      let payload: any = "";
       if (props?.dataKey === "User Master") {
         payload = {
           NEW_USER_ID: selectedData[props?.DELETE_ID],
@@ -103,10 +119,10 @@ const Table = (props: any) => {
 
       try {
         const res = await callPostAPI(props?.deleteURL, payload);
-        if(res?.FLAG === true) {
-        toast.success(res?.MSG);
-        props?.getAPI();
-        }else {
+        if (res?.FLAG === true) {
+          toast.success(res?.MSG);
+          props?.getAPI();
+        } else {
           toast.error(res?.MSG);
           props?.getAPI();
         }
@@ -148,7 +164,7 @@ const Table = (props: any) => {
         emptyMessage={t("No Data found.")}
         dataKey={props?.dataKey}
         key={props?.dataKey}
-        loading={loading}
+        // loading={loading}
         scrollHeight={props?.scrollHeight}
         header={
           props?.tableHeader && (
@@ -196,12 +212,17 @@ const Table = (props: any) => {
                       ) : (
                         <>
                           {userRole &&
-                            (rowData.FACILITY_GENERIC === "Y" ||
-                              decryptData(localStorage.getItem(LOCALSTORAGE?.ROLETYPECODE)) ===
-                              ROLETYPECODE?.SYSTEM_ADMIN) ? (
+                          (rowData.FACILITY_GENERIC === "Y" ||
+                            decryptData(
+                              localStorage.getItem(LOCALSTORAGE?.ROLETYPECODE)
+                            ) === ROLETYPECODE?.SYSTEM_ADMIN) ? (
                             <p
                               className="cursor-pointer"
                               onClick={() => {
+                                localStorage.setItem(
+                                  "Id",
+                                  JSON.stringify(rowItem)
+                                );
                                 props?.isClick({ rowItem });
                               }}
                             >
@@ -283,11 +304,7 @@ const Table = (props: any) => {
                 field={title}
                 header={t(`${customHeader[title]}`)}
                 body={(rowData: any) => {
-                  return (
-                    <>
-                      {formateDate(rowData?.WO_CREATED_TIME)}
-                    </>
-                  );
+                  return <>{formateDate(rowData?.WO_CREATED_TIME)}</>;
                 }}
               ></Column>
             );
@@ -299,11 +316,7 @@ const Table = (props: any) => {
                 field={title}
                 header={t(`${customHeader[title]}`)}
                 body={(rowData: any) => {
-                  return (
-                    <>
-                      {formateDate(rowData?.WO_CREATED_TIME)}
-                    </>
-                  );
+                  return <>{formateDate(rowData?.WO_CREATED_TIME)}</>;
                 }}
               ></Column>
             );
@@ -348,8 +361,19 @@ const Table = (props: any) => {
                 sortable
                 header={t(`${customHeader[title]}`)}
                 body={(rowData: any) => {
-                  if (rowData[title] === "Y" || rowData[title] === "N" || rowData[title] === "YES" || rowData[title] === "NO") {
-                    return <>{rowData[title] === "Y" || rowData[title] === "YES" ? "Yes" : "No"}</>;
+                  if (
+                    rowData[title] === "Y" ||
+                    rowData[title] === "N" ||
+                    rowData[title] === "YES" ||
+                    rowData[title] === "NO"
+                  ) {
+                    return (
+                      <>
+                        {rowData[title] === "Y" || rowData[title] === "YES"
+                          ? "Yes"
+                          : "No"}
+                      </>
+                    );
                   } else {
                     return <>{rowData[title] ? "Yes" : "No"}</>;
                   }
@@ -431,6 +455,25 @@ const Table = (props: any) => {
                 }}
               ></Column>
             );
+          } else if (title === "ICON_NAME") {
+            return (
+              <Column
+                key={title}
+                field={title}
+                header={t(`${customHeader[title]}`)}
+                body={(rowData: any) => {
+                  return (
+                    <>
+                      <i
+                        className={`${rowData[title]} mr-2 `}
+                        style={{ color: rowData?.COLORS }}
+                      ></i>
+                      {rowData[title]}
+                    </>
+                  );
+                }}
+              ></Column>
+            );
           } else if (
             title === "ACTION" &&
             currentMenu?.DELETE_RIGHTS === "True"
@@ -443,12 +486,17 @@ const Table = (props: any) => {
                 header={"Action"}
                 body={(rowData: any, rowDetails: any) => {
                   const rowItem: any = { ...rowData };
+
                   return (
                     <>
                       <DialogBox
                         data={rowData}
-                        handelDelete={() => {
-                          handelDelete({ ...rowItem }, rowDetails?.rowIndex);
+                        handelDelete={async () => {
+                          await handelDelete(
+                            { ...rowItem },
+                            rowDetails?.rowIndex,
+                            rowData
+                          );
                         }}
                       />
                     </>
@@ -468,16 +516,28 @@ const Table = (props: any) => {
           }
         })}
       </DataTable>
-      <Paginator
-        first={first}
-        rows={rows}
-        totalRecords={filterData?.length}
-        onPageChange={onPageChange}
-        currentPageReportTemplate="Items per Page:-"
-        rowsPerPageOptions={[15, 25, 50]}
-        alwaysShow={false}
-        template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-      ></Paginator>
+      <div className="flex p-4 bg-white flex-row gap-3a justify-between ">
+        {filterData?.length > 0 && (
+          <div className="mt-3 Text_Secondary Input_label">
+            {`Showing ${first + 1} - ${
+              filterData?.slice(first, first + rows).length + first
+            } of ${filterData?.length}`}
+          </div>
+        )}
+
+        <Paginator
+          first={first}
+          rows={rows}
+          totalRecords={filterData?.length}
+          onPageChange={onPageChange}
+          currentPageReportTemplate="Items per Page:-"
+          rowsPerPageOptions={[15, 25, 50, 75].filter(
+            (option) => option <= filterData?.length
+          )}
+          alwaysShow={false}
+          template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+        ></Paginator>
+      </div>
     </>
   );
 };

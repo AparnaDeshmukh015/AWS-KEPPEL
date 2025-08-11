@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -10,13 +10,12 @@ import { Column } from "primereact/column";
 import { useTranslation } from "react-i18next";
 import DateCalendar from "../../../components/Calendar/Calendar";
 import PartDetailsDialogBox from "../../../components/DialogBox/PartDetailsDialogBox";
-import FormHeader from "../../../components/FormHeader/FormHeader";
 import { toast } from "react-toastify";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
 import { useLocation, useOutletContext } from "react-router-dom";
 import moment from "moment";
-import { dateFormat, saveTracker } from "../../../utils/constants";
+import { saveTracker } from "../../../utils/constants";
 import CancelDialogBox from "../../../components/DialogBox/CancelDialogBox";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
 import { decryptData } from "../../../utils/encryption_decryption";
@@ -52,7 +51,7 @@ type FormErrors = {
 
 const StoreToStoreMasterForm = (props: any) => {
   const { t } = useTranslation();
-  const [selectedDetails, setSelectedDetails] = useState<any>([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const [storeList, setStoreList] = useState<any>([]);
   const [SampelStoreList, setSampelStoreList] = useState<any>([]);
   const [selectedParts, setSelectedParts] = useState<any>([]);
@@ -60,7 +59,8 @@ const StoreToStoreMasterForm = (props: any) => {
   const [TostoreList, setTostoreList] = useState<any>([]);
   let [partOptions, setPartOptions] = useState([]);
   let { pathname } = useLocation();
-
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -95,7 +95,7 @@ const StoreToStoreMasterForm = (props: any) => {
 
   const FROM_STOREwatch: any = watch('FROM_STORE')
   const TO_STOREwatch: any = watch('TO_STORE')
-  const storeWatch: any = watch("STORE_ID");
+  //const storeWatch: any = watch("STORE_ID");
   const PART_LIST: any = watch("PART_LIST");
 
   const saveFuc = () => {
@@ -131,73 +131,97 @@ const StoreToStoreMasterForm = (props: any) => {
     setSelectedParts(data);
   }
 
-  const onSubmit = async (payload: any, e: any) => {
+  const onSubmit = useCallback(async (payload: any, e: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     const buttonMode: any = e?.nativeEvent?.submitter?.name;
-    const partList: any = PART_LIST?.map((part: any, index: any) => {
-      if (part?.PART_ID !== '') {
-        return {
+    try {
+      const partList: any = PART_LIST?.map((part: any) => {
+        if (part?.PART_ID !== '') {
+          return {
 
-          PART_ID: part?.PART_ID,
-          UOM_ID: "1",
-          QTY: part?.REQUESTED_QUANTITY,
-
-        };
-      }
-    });
-
-    const isAnyQTYUndefined = PART_LIST.some(
-
-      (item: any) => item.REQUESTED_QUANTITY === undefined
-    );
-
-    payload.TO_STORE_ID = payload?.TO_STORE?.STORE_ID;
-    payload.FROM_STORE_ID = payload?.FROM_STORE?.STORE_ID;
-    payload.PART_LIST = partList
-
-    payload.DOC_DATE = payload.DOC_DATE = payload.DOC_DATE
-      ? moment(payload.DOC_DATE).format("DD-MM-YYYY")
-      : "";
-    payload.MODE = buttonMode === "CANCEL" ? "C" : props?.selectedData ? "E" : "A";
-    payload.PARA = buttonMode === "CANCEL" ? { para1: `${props?.headerName}`, para2: "Cancelled" } : props?.selectedData
-      ? { para1: `${props?.headerName}`, para2: "Updated" }
-      : { para1: `${props?.headerName}`, para2: "Added" }
-    payload.DOC_ID = props?.selectedData ? props?.selectedData?.DOC_ID : 0;
-    delete payload?.FROM_STORE;
-    delete payload?.TO_STORE;
-
-    if (fields?.length > 0) {
-      if (isAnyQTYUndefined === false) {
-
-        const res = await callPostAPI(ENDPOINTS?.SAVE_STORETOSTORE, payload, currentMenu?.FUNCTION_CODE);
-        if (res?.FLAG === true) {
-          toast?.success(res?.MSG);
-          const notifcation: any = {
-            "FUNCTION_CODE": props?.functionCode,
-            "EVENT_TYPE": "I",
-            "STATUS_CODE": buttonMode === "CANCEL" ? 8 : search === "?edit=" ? 2 : 1,
-            "PARA1": search === "?edit=" ? User_Name : User_Name,
-            PARA2: FROM_STOREwatch?.STORE_NAME,
-            PARA3: TO_STOREwatch?.STORE_NAME,
-            PARA4: payload?.DOC_DATE
-
+            PART_ID: part?.PART_ID,
+            UOM_ID: "1",
+            QTY: part?.REQUESTED_QUANTITY,
 
           };
-          const eventPayload = { ...eventNotification, ...notifcation };
-          helperEventNotification(eventPayload);
+        }
+      });
 
-          props?.getAPI();
-          props?.isClick();
+      const isAnyQTYUndefined = PART_LIST.some(
+
+        (item: any) => item.REQUESTED_QUANTITY === undefined
+      );
+
+      payload.TO_STORE_ID = payload?.TO_STORE?.STORE_ID;
+      payload.FROM_STORE_ID = payload?.FROM_STORE?.STORE_ID;
+      payload.PART_LIST = partList
+
+      payload.DOC_DATE = payload.DOC_DATE = payload.DOC_DATE
+        ? moment(payload.DOC_DATE).format("DD-MM-YYYY")
+        : "";
+      payload.MODE = buttonMode === "CANCEL" ? "C" : props?.selectedData ? "E" : "A";
+      payload.PARA = buttonMode === "CANCEL" ? { para1: `${props?.headerName}`, para2: "Cancelled" } : props?.selectedData
+        ? { para1: `${props?.headerName}`, para2: "Updated" }
+        : { para1: `${props?.headerName}`, para2: "Added" }
+      payload.DOC_ID = props?.selectedData ? props?.selectedData?.DOC_ID : 0;
+      delete payload?.FROM_STORE;
+      delete payload?.TO_STORE;
+
+      if (fields?.length > 0) {
+        if (isAnyQTYUndefined === false) {
+
+          const res = await callPostAPI(ENDPOINTS?.SAVE_STORETOSTORE, payload, currentMenu?.FUNCTION_CODE);
+          if (res?.FLAG === true) {
+            toast?.success(res?.MSG);
+            const notifcation: any = {
+              "FUNCTION_CODE": props?.functionCode,
+              "EVENT_TYPE": "I",
+              "STATUS_CODE": buttonMode === "CANCEL" ? 8 : search === "?edit=" ? 2 : 1,
+              "PARA1": search === "?edit=" ? User_Name : User_Name,
+              PARA2: FROM_STOREwatch?.STORE_NAME,
+              PARA3: TO_STOREwatch?.STORE_NAME,
+              PARA4: payload?.DOC_DATE
+
+
+            };
+            const eventPayload = { ...eventNotification, ...notifcation };
+            await helperEventNotification(eventPayload);
+
+            props?.getAPI();
+            // setIsSubmit(false)
+            props?.isClick();
+          } else {
+
+            toast?.error(res?.MSG);
+          }
         } else {
-          toast?.error(res?.MSG);
+          toast.error(t("Please fill the quantity"));
+          setIsSubmit(false)
         }
       } else {
-        toast.error(t("Please fill the quantity"));
-      }
-    } else {
-      toast.error(t("Please select atleast one part list"));
+        toast.error(t("Please select atleast one part list"));
+        setIsSubmit(false)
 
+      }
+    } catch (error: any) {
+      toast.error(error)
+    } finally {
+      setIsSubmit(false)
     }
-  }
+  }, [IsSubmit,
+    PART_LIST,
+    props?.selectedData,
+    props?.functionCode,
+    props?.getAPI,
+    props?.isClick,
+    currentMenu?.FUNCTION_CODE,
+    fields,
+    search,
+    FROM_STOREwatch?.STORE_NAME,
+    TO_STOREwatch?.STORE_NAME,
+    eventNotification,
+    toast, t]);
 
   const getpartlist = async () => {
 
@@ -211,7 +235,10 @@ const StoreToStoreMasterForm = (props: any) => {
 
   useEffect(() => {
     if (FROM_STOREwatch !== '') {
-      getpartlist()
+      (async function () {
+        await getpartlist()
+       })();
+      
       const data: any = SampelStoreList?.filter((f: any) => f?.STORE_ID !== FROM_STOREwatch.STORE_ID)
       if (data?.length > 0) {
         setTostoreList(data);
@@ -219,13 +246,13 @@ const StoreToStoreMasterForm = (props: any) => {
         setTostoreList([]);
       }
     }
- 
+
   }, [FROM_STOREwatch])
 
   const getinventorypartdetails = async () => {
     const payload = {
-      DOC_NO: props?.selectedData.DOC_NO,
-      DOC_ID: props?.selectedData.DOC_ID,
+      DOC_NO: dataId?.DOC_NO,
+      DOC_ID: dataId?.DOC_ID,
     };
     try {
       const res = await callPostAPI(
@@ -236,7 +263,7 @@ const StoreToStoreMasterForm = (props: any) => {
       if (res?.FLAG === 1) {
         setValue("REMARKS", res?.INVENTORYDETAILS[0]?.REMARKS)
         const upDatedPartList: any = res?.PARTLIST?.map(
-          (part: any, index: any) => {
+          (part: any) => {
             return {
               PART_ID: part?.PART_CODE,
               PART_NAME: part?.PART_NAME,
@@ -260,8 +287,8 @@ const StoreToStoreMasterForm = (props: any) => {
 
   const getOptions = async () => {
     const payload = {
-      WO_ID: search === '?add=' ? 0 : props.selectedData?.WO_ID,
-      MATREQ_ID: search === '?add=' ? 0 : props.selectedData?.MATREQ_ID,
+      WO_ID: search === '?add=' ? 0 : dataId?.WO_ID,
+      MATREQ_ID: search === '?add=' ? 0 : dataId?.MATREQ_ID,
       MODE: search === '?add=' ? "A" : "E"
     }
     try {
@@ -270,7 +297,7 @@ const StoreToStoreMasterForm = (props: any) => {
       setSampelStoreList(res?.STORELIST)
       setTostoreList(res?.STORELIST)
       if (search === '?edit=') {
-        getinventorypartdetails();
+       await getinventorypartdetails();
       }
 
     } catch (error: any) {
@@ -301,8 +328,10 @@ const StoreToStoreMasterForm = (props: any) => {
   };
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, [])
 
   return (
@@ -312,8 +341,8 @@ const StoreToStoreMasterForm = (props: any) => {
           <div className="flex justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {t(`${props?.selectedData ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
-                {props?.selectedData ? props?.selectedData?.DOC_NO : ""}
+                {t(`${search === "?edit=" ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
+                {search === "?edit=" ? dataId?.DOC_NO : ""}
               </h6>
             </div>
 
@@ -323,10 +352,11 @@ const StoreToStoreMasterForm = (props: any) => {
                   type="submit"
                   className="Primary_Button  w-20 me-2"
                   label={"Save"}
+                  disabled={IsSubmit}
                 />
               ) : (
                 <>
-                  {(props?.selectedData?.CNCL_IND === false) && (
+                  {(dataId?.CNCL_IND === false) && (
                     <CancelDialogBox
                       header={"Cancel Store to store"}
                       control={control}
@@ -338,6 +368,8 @@ const StoreToStoreMasterForm = (props: any) => {
                       watch={watch}
                       REMARK={"REMARK"}
                       errors={errors}
+                      IsSubmit={IsSubmit} 
+                      setIsSubmit={setIsSubmit}
                     />
                   )}
                 </>
@@ -370,7 +402,7 @@ const StoreToStoreMasterForm = (props: any) => {
                         findKey={"STORE_ID"}
                         require={search === '?add=' ? true : false}
                         disabled={search === '?edit=' ? true : false}
-                        selectedData={props?.selectedData?.STORE_ID}
+                        selectedData={search === "?edit=" ? dataId?.STORE_ID : props?.selectedData?.STORE_ID}
                         setValue={setValue}
                         invalid={search === '?add=' ? errors.FROM_STORE : ""}
                         invalidMessage={search === '?add=' ? errors.FROM_STORE : ""}
@@ -404,7 +436,7 @@ const StoreToStoreMasterForm = (props: any) => {
                         findKey={"STORE_ID"}
                         require={search === '?add=' ? true : false}
                         disabled={search === '?edit=' ? true : false}
-                        selectedData={props?.selectedData?.TO_STORE_ID}
+                        selectedData={search === "?edit=" ? dataId?.TO_STORE_ID : props?.selectedData?.TO_STORE_ID}
 
                         setValue={setValue}
                         invalid={search === '?add=' ? errors.TO_STORE : ""}

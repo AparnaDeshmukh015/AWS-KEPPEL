@@ -21,17 +21,34 @@ const UserMaster = (props: any) => {
         null,
         currentMenu?.FUNCTION_CODE
       );
-      props?.setData(res?.ASSESTMASTERSLIST || []);
+      let updatedInventoryMasterList= formatTaskMasterList(res?.ASSESTMASTERSLIST)
+      props?.setData(updatedInventoryMasterList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+  const formatTaskMasterList = (list: any) => {
+    let taskMasterList = list;
+    taskMasterList = taskMasterList.map((element: any) => {
+      return {
+       ...element,
+       ASSET_TYPE:element?.ASSETTYPE === "A" ? "Equipment" : "Soft Service"
+
+      }
+    })
+   return taskMasterList
+   
+    }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
+
+
   return !props?.search ? (
     <Table
       tableHeader={{
@@ -39,22 +56,18 @@ const UserMaster = (props: any) => {
         search: true,
       }}
       dataKey={currentMenu?.FUNCTION_DESC}
-      // Keep same as it is Coming from Backend
-      columnTitle={["ASSETTYPE_NAME", "ASSETTYPE", "ACTIVE"]}
-      // Change as per requirement
-      customHeader={["Equipment/Soft Service Type", "Equipment/Soft Service", "Active"]}
+      columnTitle={["ASSETTYPE_NAME", "ASSET_TYPE"]}
+      customHeader={["Equipment/Soft Service Type", "Equipment/Soft Service"]}
       columnData={props?.data}
-      // Change as per requirement
       clickableColumnHeader={["ASSETTYPE_NAME"]}
       // Change as per requirement
-      filterFields={["ASSETTYPE_NAME", "ASSETTYPE", "ACTIVE"]}
+      filterFields={["ASSETTYPE_NAME", "ASSET_TYPE"]}
+      
       setSelectedData
       isClick={props?.isForm}
-      // Add this if Delete required
       handelDelete={props?.handelDelete}
       getAPI={getAPI}
       deleteURL={ENDPOINTS.DELETE_TASKMASTER}
-      // Add the ID coming from Backend if Delete required
       DELETE_ID="ASSETTYPE_ID"
     />
   ) : (

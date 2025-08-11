@@ -11,6 +11,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import "../../../components/Checkbox/Checkbox.css";
+import "../../../components/Input/Input.css";
 import Cracker from "../../../assest/images/Text.png";
 import "../../../components/Table/Table.css";
 import { getChildrenValues, convertApiResponse } from "./helperRolesandRight";
@@ -97,9 +98,8 @@ const UserRoleRights = () => {
           }
         }
         const data: any = []
-        const trasactionData: any = []
-        res?.MENU_LIST?.forEach((menu: any, index: any) => {
-          menu.DETAIL?.forEach((m: any, id: any) => {
+        res?.MENU_LIST?.forEach((menu: any) => {
+          menu.DETAIL?.forEach((m: any) => {
             if (m?.NO_ACCESS === "False" && activeIndex === 0 && m.ISTRANSACTION === "False") {
               const payload: any = {
                 ModuleRight: menu?.MODULE_DESCRIPTION,
@@ -115,23 +115,24 @@ const UserRoleRights = () => {
             }
           })
         })
+      
         setExcelData(data)
-        res?.MENU_LIST?.forEach((menu: any, index: any) => {
-          menu.DETAIL?.forEach((m: any, id: any) => {
-            if (m?.NO_ACCESS === "False" && activeIndex === 1 && m.ISTRANSACTION === "True") {
-              const payload: any = {
-                ModuleRight: menu?.MODULE_DESCRIPTION,
-                FUNCTION_DESC: m?.FUNCTION_DESC,
-                FUNCTION_CODE: m?.FUNCTION_CODE,
-                NO_ACCESS: m?.NO_ACCESS,
-                ACCESS: m?.VIEW_RIGHTS,
+        // res?.MENU_LIST?.forEach((menu: any, index: any) => {
+        //   menu.DETAIL?.forEach((m: any, id: any) => {
+        //     if (m?.NO_ACCESS === "False" && activeIndex === 1 && m.ISTRANSACTION === "True") {
+        //       const payload: any = {
+        //         ModuleRight: menu?.MODULE_DESCRIPTION,
+        //         FUNCTION_DESC: m?.FUNCTION_DESC,
+        //         FUNCTION_CODE: m?.FUNCTION_CODE,
+        //         NO_ACCESS: m?.NO_ACCESS,
+        //         ACCESS: m?.VIEW_RIGHTS,
 
-              }
-              trasactionData.push(payload)
-            }
-          })
-        })
-        setExcelData(trasactionData)
+        //       }
+        //       trasactionData.push(payload)
+        //     }
+        //   })
+        // })
+        // setExcelData(trasactionData)
 
       }
     } catch (error: any) {
@@ -160,7 +161,9 @@ const UserRoleRights = () => {
     const res = await callPostAPI(ENDPOINTS?.ROLES_RIGHT_SAVE, payload);
     if (res?.FLAG === true) {
       toast.success(res?.MSG);
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+    }, 5000);
     } else {
       toast.error(res?.MSG);
     }
@@ -283,7 +286,7 @@ const UserRoleRights = () => {
 
       let colonedArray = [...nodes];
 
-      let updateChild: any = colonedArray?.map((cloned: any, index: any) => {
+      let updateChild: any = colonedArray?.map((cloned: any) => {
         let noAccessData: any = cloned?.children?.map(
           (f: any) => f.data?.noAccess === true
         );
@@ -333,7 +336,6 @@ const UserRoleRights = () => {
     const res = await callPostAPI(ENDPOINTS?.Roles_Right, { ROLE_ID: "0", ACTION: "D" });
     if (res?.FLAG === 1) {
       SetRoles(res?.ROLELIST);
-
       setNodes(convertApiResponse(res?.MENU_LIST));
     }
   };
@@ -344,7 +346,11 @@ const UserRoleRights = () => {
       icon: "pi pi-download",
       command: () => {
         if (roleId !== undefined) {
-          ExportCSV(excelData, currentMenu?.FUNCTION_DESC, roleName);
+          const updatedData = excelData?.map((item:any) => {
+            const { FUNCTION_CODE, ...rest } = item;
+            return rest;
+        });
+          ExportCSV(updatedData, currentMenu?.FUNCTION_DESC, roleName);
         } else {
           toast.error(t("Please select Role "))
         }
@@ -355,9 +361,12 @@ const UserRoleRights = () => {
 
   useEffect(() => {
     if (selectedFacility) {
-      showRight();
-      saveTracker(currentMenu)
-    }
+      (async function () {
+
+      await showRight();
+      await saveTracker(currentMenu)
+    })()
+  }
   }, [selectedFacility]);
 
   useEffect(() => {
@@ -369,7 +378,8 @@ const UserRoleRights = () => {
 
   return (
     <section className="w-full">
-      <div className="flex justify-between mt-1">
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-wrap justify-between mt-1">
         <div>
           <h6 className="Text_Primary">{currentMenu?.FUNCTION_DESC}</h6>
         </div>
@@ -378,7 +388,8 @@ const UserRoleRights = () => {
             <Button
               className="Primary_Button  w-20 me-2"
               label={"Save"}
-              onClick={handleSubmit(onSubmit)}
+              type="submit"
+              // onClick={handleSubmit(onSubmit)}
             />
             <SplitButtons label={t("Action")} model={ActionDownloaditems}
             />
@@ -407,8 +418,8 @@ const UserRoleRights = () => {
                         options={roles}
                         {...register("USER_ROLE", {
                           required: t("Please fill the required fields."),
-                          onChange: (e: any) => {
-                            handleChange(e);
+                          onChange: async(e: any) => {
+                           await handleChange(e);
                           },
                         })}
                         label="User Role"
@@ -430,7 +441,6 @@ const UserRoleRights = () => {
         <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
           <TabPanel header={t("Master Rights")}>
             <TreeTableRight
-              setNodes={setNodes}
               nodes={nodes}
               newHandleChange={newHandleChange}
               type="nonWorkForce"
@@ -438,7 +448,6 @@ const UserRoleRights = () => {
           </TabPanel>
          {/* <TabPanel header={t("Transaction Rights")}>
             <TreeTableRight
-              setNodes={setNodes}
               nodes={nodes}
               newHandleChange={newHandleChange}
               type="workFlow"
@@ -446,6 +455,8 @@ const UserRoleRights = () => {
           </TabPanel> */}
         </TabView>
       </div>
+        </form>
+      
     </section>
   );
 };

@@ -11,10 +11,11 @@ const Radio = (props: any) => {
             props?.setValue(props?.name, props?.options?.filter((label: any) => label?.key === props?.selectedData)[0])
         }
     }, [props?.selectedData])
+
     return (
         <>
             <label className='Text_Secondary Input_Label'> {props?.labelHead && t(`${props?.labelHead}`)}</label>
-            <div className='flex flex-wrap gap-3 mt-1'>
+            <div className='flex flex-wrap gap-5 mt-1'>
                 {props?.options?.map((category: any) => {
                     return (
                         <div key={category.key} className="flex align-items-center">

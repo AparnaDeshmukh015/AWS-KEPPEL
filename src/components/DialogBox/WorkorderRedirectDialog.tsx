@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import "../Button/Button.css";
@@ -12,8 +12,9 @@ import Select from "../Dropdown/Dropdown";
 import { useTranslation } from "react-i18next";
 import { helperEventNotification } from "../../utils/eventNotificationParameter";
 import { decryptData } from "../../utils/encryption_decryption";
-import { dateFormat, formateDate } from "../../utils/constants";
-
+import { formateDate } from "../../utils/constants";
+import { useNavigate } from "react-router-dom";
+import MultiSelects from "../../components/MultiSelects/MultiSelects";
 // eslint-disable-next-line react-hooks/rules-of-hooks
 
 const WorkorderRedirectDialogBox = ({
@@ -22,35 +23,39 @@ const WorkorderRedirectDialogBox = ({
   handlingStatus,
   getOptionDetails,
   statusCode,
-  technicianList,
+  // technicianList,
   currentStatus,
-  resonList,
+  // resonList,
   subStatus,
   redirectStatus,
   setRedirecStatus,
   setVisible1,
   eventNotification,
-
-}: any) => {
+}: // getApi,
+  // setIsSubmit,
+  // IsSubmit
+  any) => {
   const { t } = useTranslation();
-  const [visible, setVisible] = useState<boolean>();
+  // const [visible, setVisible] = useState<boolean>();
   const [DuplicateBy, setDuplicateBy] = useState<boolean>(false);
-
-  const [options, setOptions] = useState<any | null>([])
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+  const [options, setOptions] = useState<any | null>([]);
   const [technician, setTechnician] = useState<any | null>([]);
   const [DuplicateList, setDuplicateList] = useState<any | null>([]);
   const [Remarklength, setRemarkLength] = useState(0);
-  const WO_ID = sessionStorage.getItem('WO_ID');
+  const WO_ID = localStorage.getItem("WO_ID");
   const { clearErrors } = useForm();
-  const setInputDialogVisible = (e: any) => {
-    setRedirecStatus(false)
-    setVisible1(false)
-    setVisible(false);
+  const navigate = useNavigate();
+  const setInputDialogVisible = () => {
+    setRedirecStatus(false);
+    setVisible1(false);
+    //setVisible(false);
     setValue("WO_REMARKS", "");
     setValue("WO_REASON", "");
     setValue("WO_NO", "");
     setValue("ASSIGN_TEAM_ID", "");
     setValue("TECH_ID", "");
+    setIsSubmit(false);
   };
   const handleInputChange = (event: any) => {
     const value = event.target.value;
@@ -70,7 +75,7 @@ const WorkorderRedirectDialogBox = ({
       TECH_ID: "",
       WO_REMARKS: "",
       WO_REASON: "",
-      WO_NO: ""
+      WO_NO: "",
     },
 
     mode: "onSubmit",
@@ -83,14 +88,21 @@ const WorkorderRedirectDialogBox = ({
   const WO_NO: any = watch("WO_NO");
   let REASSIGN_TYPE: any = "";
   const getTechnicianListCollbroate = async (teamId: any) => {
-    setTechnician([])
-    const setColab = options.technicianList?.filter((e: any) => e.TEAM_ID === teamId) ?? []
+    setTechnician([]);
+    const setColab =
+      options.technicianList?.filter((e: any) => e.TEAM_ID === teamId) ?? [];
     setTechnician(setColab);
   };
 
+  const getAPIList = async () => {
+    try {
+      await callPostAPI(ENDPOINTS.GET_EVENTMASTER, { FILTER_BY: 100 }, "HD001");
+    } catch (error: any) { }
+  };
 
   const getOptionDetail = async (WO_ID: any) => {
     const payload: any = { WO_ID: WO_ID };
+
     try {
       const res: any = await callPostAPI(
         ENDPOINTS.GET_WORKORDER_DETAILS,
@@ -98,8 +110,10 @@ const WorkorderRedirectDialogBox = ({
       );
 
       if (res?.FLAG === 1) {
-
-        if (res?.WORKORDERDETAILS[0]?.CURRENT_STATUS !== 1 || res?.WORKORDERDETAILS[0]?.CURRENT_STATUS !== "1") {
+        if (
+          res?.WORKORDERDETAILS[0]?.CURRENT_STATUS !== 1 ||
+          res?.WORKORDERDETAILS[0]?.CURRENT_STATUS !== "1"
+        ) {
           const notifcation: any = {
             FUNCTION_CODE: "HD001",
             WO_NO: res?.WORKORDERDETAILS[0]?.WO_NO,
@@ -109,31 +123,38 @@ const WorkorderRedirectDialogBox = ({
             PARA1: decryptData(localStorage.getItem("USER_NAME")),
             PARA2: res?.WORKORDERDETAILS[0]?.WO_NO,
             PARA3:
-              res?.WORKORDERDETAILS[0]?.WO_DATE === null ? ""
+              res?.WORKORDERDETAILS[0]?.WO_DATE === null
+                ? ""
                 : formateDate(res?.WORKORDERDETAILS[0]?.WO_DATE),
-            // : "",
-            // res?.WORKORDERDETAILS[0]?.WO_DATE,
             PARA4: res?.WORKORDERDETAILS[0]?.USER_NAME,
             PARA5: res?.WORKORDERDETAILS[0]?.LOCATION_NAME,
             PARA6: res?.WORKORDERDETAILS[0]?.ASSET_NAME,
-            PARA7: res?.WORKORDERDETAILS[0]?.WO_REMARKS,
+            PARA7: res?.WORKORDERDETAILS[0]?.REQ_DESC,
             PARA8: res?.WORKORDERDETAILS[0]?.SEVERITY_DESC,
-            PARA9: res?.WORKORDERDETAILS[0]?.REPORTED_AT !== null
-              ? formateDate(res?.WORKORDERDETAILS[0]?.REPORTED_AT) : "",
+            PARA9:
+              res?.WORKORDERDETAILS[0]?.REPORTED_AT !== null
+                ? formateDate(res?.WORKORDERDETAILS[0]?.REPORTED_AT)
+                : "",
             PARA10:
               res?.WORKORDERDETAILS[0]?.ACKNOWLEDGED_AT !== null
                 ? formateDate(res?.WORKORDERDETAILS[0]?.ATTEND_AT)
                 : "",
-            PARA11: res?.WORKORDERDETAILS[0]?.ATTEND_AT !== null
-              ? formateDate(res?.WORKORDERDETAILS[0]?.ATTEND_AT)
-              : "",
-            PARA12: res?.WORKORDERDETAILS[0]?.RECTIFIED_AT !== null
-              ? formateDate(res?.WORKORDERDETAILS[0]?.RECTIFIED_AT) : "",
-            PARA13: res?.WORKORDERDETAILS[0]?.COMPLETED_AT !== null
-              ? formateDate(res?.WORKORDERDETAILS[0]?.COMPLETED_AT) : "",
-            PARA14: res?.WORKORDERDETAILS[0]?.CANCELLED_AT !== null
-              ? formateDate(res?.WORKORDERDETAILS[0]?.CANCELLED_AT)
-              : "",
+            PARA11:
+              res?.WORKORDERDETAILS[0]?.ATTEND_AT !== null
+                ? formateDate(res?.WORKORDERDETAILS[0]?.ATTEND_AT)
+                : "",
+            PARA12:
+              res?.WORKORDERDETAILS[0]?.RECTIFIED_AT !== null
+                ? formateDate(res?.WORKORDERDETAILS[0]?.RECTIFIED_AT)
+                : "",
+            PARA13:
+              res?.WORKORDERDETAILS[0]?.COMPLETED_AT !== null
+                ? formateDate(res?.WORKORDERDETAILS[0]?.COMPLETED_AT)
+                : "",
+            PARA14:
+              res?.WORKORDERDETAILS[0]?.CANCELLED_AT !== null
+                ? formateDate(res?.WORKORDERDETAILS[0]?.CANCELLED_AT)
+                : "",
             PARA15: "", //updated
             PARA16: res?.WORKORDERDETAILS[0]?.ACKNOWLEDGED_BY_NAME,
             PARA17: "", //attendBy
@@ -147,119 +168,177 @@ const WorkorderRedirectDialogBox = ({
           };
 
           const eventPayload = { ...eventNotification, ...notifcation };
-          helperEventNotification(eventPayload);
+          await helperEventNotification(eventPayload);
         }
       }
     } catch (error: any) {
-      console.log(error)
-    }
-  }
-
-  const onSubmit = async (e: any) => {
-
-    if (currentStatus === 1) {
-      REASSIGN_TYPE = "B";
-    }
-
-    if (
-      header === "Collaborate" ||
-      header === "External Vendor Required" ||
-      header === "Reassign" ||
-      header === "Cancel Work Order" ||
-      header === "Put On Hold"
-    ) {
-
-      const payload: any = {
-        WO_ID: WO_ID,
-        MODE:
-          header === "Collaborate"
-            ? "COLAB"
-            : header === "External Vendor Required"
-              ? "VENDOR"
-              : header === "Reassign"
-                ? "REDT"
-                : header === "Cancel Work Order"
-                  ? "CANCEL"
-                  : header === "Put On Hold"
-                    ? "HOLD"
-                    : "",
-        TEAM_ID:
-          ASSIGN_TEAM_ID1?.TEAM_ID !== undefined
-            ? ASSIGN_TEAM_ID1?.TEAM_ID
-            : "",
-        TECH_ID: [technicianID],
-        REASON_ID: Reason?.REASON_ID,
-        REMARKS: Remark,
-        REASSIGN_TYPE: REASSIGN_TYPE,
-        DUPLICATE_BY: WO_NO.WO_NO ? WO_NO.WO_NO
-          : null,
-        SUB_STATUS: subStatus,
-        PARA:
-          header === "Collaborate"
-            ? { para1: `Collaborator`, para2: "added" }
-            : header === "External Vendor Required"
-              ? { para1: `External Vednor`, para2: "added" }
-              : header === "Reassign"
-                ? { para1: `Reassign`, para2: "added" }
-                : header === "Cancel Work Order"
-                  ? { para1: `CANCEL`, para2: "added" }
-                  : header === "Put On Hold"
-                    ? { para1: `HOLD`, para2: "added" }
-                    : "",
-      };
-
-      if (
-        Object.keys(errors).length === 0 ||
-        payload?.TEAM_ID !== "" ||
-        payload?.WORK_FROCE_ID !== ""
-      ) {
-
-        try {
-          const res = await callPostAPI(ENDPOINTS?.REDIRECT_WO, payload);
-          if (res?.FLAG === true) {
-            getOptionDetail(WO_ID)
-            getOptionDetails(WO_ID);
-            setInputDialogVisible(false);
-            if (header !== "Reassign" && header !== "Collaborate" && header !== "External Vendor Required" && header !== "Cancel Work Order" && header !== "Put On Hold") {
-              handlingStatus(
-                e,
-                REMARK ?? '',
-                statusCode,
-                "HOLD",
-                payload?.REASON_ID
-              );
-            } else if (header === "Reassign" && header === "Collaborate" && header === "External Vendor Required" && header === "Cancel Work Order" && header === "Put On Hold") {
-              toast.success(res?.MSG);
-            }
-
-          } else {
-            toast.error(res?.MSG);
-          }
-        } catch (error: any) {
-          toast.error(error);
-        }
-      }
-    } else {
-      if (+statusCode === 4) {
-        handlingStatus(
-          e,
-          REMARK,
-          statusCode,
-          "CANCEL",
-          Reason?.REASON_ID
-        );
-        getOptionDetails(WO_ID);
-        setInputDialogVisible(false);
-
-      }
-      if (statusCode === 3) {
-        getOptionDetails(WO_ID);
-
-        handlingStatus(e, REMARK, 5, "HOLD");
-        setInputDialogVisible(false);
-      }
+      toast.error(error);
+    } finally {
     }
   };
+
+  const onSubmit = useCallback(
+
+    async (e: any) => {
+      debugger;
+      if (IsSubmit) return true;
+      setIsSubmit(true);
+
+      if (currentStatus === 1) {
+        REASSIGN_TYPE = "B";
+      }
+
+      if (
+        header === "Collaborate" ||
+        header === "External Vendor Required" ||
+        header === "Reassign" ||
+        header === "Cancel Work Order" ||
+        header === "Put On Hold" ||
+        header === "Cancel - Pre Conditional"
+      ) {
+        const payload: any = {
+          WO_ID: WO_ID,
+          MODE:
+            header === "Collaborate"
+              ? "COLAB"
+              : header === "External Vendor Required"
+                ? "VENDOR"
+                : header === "Reassign"
+                  ? "REDT"
+                  : header === "Cancel Work Order"
+                    ? "CANCEL"
+                    : header === "Put On Hold"
+                      ? "HOLD"
+                      : header === "Cancel - Pre Conditional"
+                        ? "CANCEL"
+                        : "",
+          TEAM_ID: ASSIGN_TEAM_ID1?.TEAM_ID ?? "",
+          TECH_ID: technicianID,
+          REASON_ID: Reason?.REASON_ID,
+          REMARKS: Remark,
+          REASSIGN_TYPE: REASSIGN_TYPE,
+          DUPLICATE_BY: WO_NO.WO_NO ?? null,
+          SUB_STATUS: subStatus,
+          PARA:
+            header === "Collaborate"
+              ? { para1: `Collaborate request has been`, para2: "submitted" }
+              : header === "External Vendor Required"
+                ? { para1: `External Vendor`, para2: "added" }
+                : header === "Reassign"
+                  ? { para1: `Reassign request has been `, para2: "submitted" }
+                  : header === "Cancel Work Order"
+                    ? { para1: `Cancel request has been`, para2: "added" }
+                    : header === "Put On Hold"
+                      ? {
+                        para1: `Put on hold request has been`,
+                        para2: "submitted",
+                      }
+                      : header === "Cancel - Pre Conditional"
+                        ? {
+                          para1: `Cancel - Pre Conditional request has been`,
+                          para2: "submitted",
+                        }
+                        : "",
+        };
+
+        if (
+          Object.keys(errors).length === 0 ||
+          payload?.TEAM_ID !== "" ||
+          payload?.WORK_FROCE_ID !== ""
+        ) {
+          try {
+
+            // return;
+            const res = await callPostAPI(ENDPOINTS?.REDIRECT_WO, payload);
+
+            if (res?.FLAG === true) {
+              const role = decryptData(localStorage.getItem("ROLETYPECODE"));
+              if (header === "Reassign" && role !== "SA" && role !== "S") {
+                await getAPIList();
+                navigate("/workorderlist", { state: true });
+              }
+              await getOptionDetail(WO_ID);
+              await getOptionDetails(WO_ID);
+              setInputDialogVisible();
+
+              if (
+                ![
+                  "Reassign",
+                  "Collaborate",
+                  "External Vendor Required",
+                  "Cancel Work Order",
+                  "Put On Hold",
+                ].includes(header)
+              ) {
+                await handlingStatus(
+                  true,
+                  e,
+                  REMARK ?? "",
+                  statusCode,
+                  "HOLD",
+                  payload?.REASON_ID
+                );
+              } else {
+                toast.success(res?.MSG);
+              }
+            } else {
+              toast.error(res?.MSG);
+            }
+          } catch (error: any) {
+            toast.error(error);
+          } finally {
+            setIsSubmit(false);
+          }
+        }
+      } else {
+        if (+statusCode === 4) {
+          setIsSubmit(false);
+          await handlingStatus(
+            true,
+            e,
+            REMARK,
+            statusCode,
+            "CANCEL",
+            Reason?.REASON_ID
+          );
+          getOptionDetails(WO_ID);
+          setInputDialogVisible();
+        }
+        if (statusCode === 3) {
+          setIsSubmit(false);
+          await getOptionDetails(WO_ID);
+          await handlingStatus(true, e, REMARK, 5, "HOLD");
+          setInputDialogVisible();
+        }
+      }
+    },
+    [
+      IsSubmit,
+      setIsSubmit,
+      currentStatus,
+      header,
+      WO_ID,
+      ASSIGN_TEAM_ID1,
+      technicianID,
+      Reason,
+      Remark,
+      REASSIGN_TYPE,
+      WO_NO,
+      subStatus,
+      errors,
+      callPostAPI,
+      ENDPOINTS,
+      decryptData,
+      getAPIList,
+      navigate,
+      getOptionDetail,
+      getOptionDetails,
+      setInputDialogVisible,
+      handlingStatus,
+      REMARK,
+      statusCode,
+    ]
+  );
 
   useEffect(() => {
     if (
@@ -271,20 +350,20 @@ const WorkorderRedirectDialogBox = ({
     }
   }, [isSubmitting]);
 
-  useEffect(() => {
-    setVisible(redirectStatus)
-  }, [])
-
   const getOptions = async () => {
     try {
-      const res = await callPostAPI(ENDPOINTS.GET_SERVICEREQUST_MASTERLIST, { WO_ID: WO_ID });
+      const res = await callPostAPI(ENDPOINTS.GET_SERVICEREQUST_MASTERLIST, {
+        WO_ID: WO_ID,
+      });
       if (res?.FLAG === 1) {
         setOptions({
-          reason: res?.REASONLIST?.filter((f: any) => f?.STATUS_CODE === +statusCode),
+          reason: res?.REASONLIST?.filter(
+            (f: any) => f?.STATUS_CODE === +statusCode
+          ),
           teamlist: res?.TEAMLIST,
           technicianList: res?.USERLIST,
-          vendorList: res?.VENDORLISTLIST
-        })
+          vendorList: res?.VENDORLISTLIST,
+        });
       }
     } catch (error: any) {
       toast.error(error);
@@ -292,39 +371,44 @@ const WorkorderRedirectDialogBox = ({
   };
 
   useEffect(() => {
-    getOptions();
-  }, [ASSIGN_TEAM_ID1, statusCode])
+    (async function () {
+      await getOptions();
+    })();
+  }, [ASSIGN_TEAM_ID1, statusCode]);
 
-  const getViewWorkOrderList = (data: any) => {
+  const getViewWorkOrderList = async (data: any) => {
     if (data.REASON_ID === 0) {
-      getAPI()
+      await getAPI();
       setValue("WO_NO", "");
-      setDuplicateBy(true)
+      setDuplicateBy(true);
     } else {
-      setDuplicateBy(false)
+      setDuplicateBy(false);
     }
-  }
+  };
 
   const getAPI = async () => {
-    const res = await callPostAPI(ENDPOINTS.GET_EVENTMASTER, null, 'HD001');
-    setDuplicateList([])
-    const DUPLICATE_LIST = res.HELPDESKMASTERSLIST.map((element: any) => ({
-      REQ_DESC: element.WO_NO + " - " + element.REQ_DESC,
-      WO_NO: element.WO_NO
-    }))
-    setDuplicateList(DUPLICATE_LIST)
-  }
+    const payload: any = { WO_ID: WO_ID };
+    try {
+      const res: any = await callPostAPI(
+        ENDPOINTS.GET_WORKORDER_DETAILS,
+        payload
+      );
+      setDuplicateList(res?.DUBLICATEWOLIST);
+    } catch (error: any) {
+      toast.error(error);
+    }
+  };
 
   return (
     <>
       <Dialog
+        // blockScroll={true}
         header={header}
         visible={redirectStatus}
         style={{ width: "30vw" }}
-        onHide={() => setInputDialogVisible(false)}
+        onHide={() => setInputDialogVisible()}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-
           {header === "Collaborate" && (
             <>
               <div className=" grid grid-cols-1 gap-x-3 gap-y-3">
@@ -341,10 +425,11 @@ const WorkorderRedirectDialogBox = ({
                               header === "Collaborate"
                                 ? "Please fill the required fields"
                                 : "",
-                            onChange:
-                              async (e: any) => {
-                                await getTechnicianListCollbroate(e?.target?.value?.TEAM_ID)
-                              }
+                            onChange: async (e: any) => {
+                              await getTechnicianListCollbroate(
+                                e?.target?.value?.TEAM_ID
+                              );
+                            },
                           })}
                           label={"Team"}
                           optionLabel="TEAM_NAME"
@@ -367,7 +452,7 @@ const WorkorderRedirectDialogBox = ({
                     control: control,
                     render: ({ field }: any) => {
                       return (
-                        <Select
+                        <MultiSelects
                           options={technician}
                           {...register("TECH_ID", {
                             required:
@@ -402,7 +487,7 @@ const WorkorderRedirectDialogBox = ({
                     control: control,
                     render: ({ field }: any) => {
                       return (
-                        <Select
+                        <MultiSelects
                           options={options?.technicianList}
                           {...register("TECH_ID", {
                             required:
@@ -461,7 +546,7 @@ const WorkorderRedirectDialogBox = ({
                 control: control,
                 render: ({ field }: any) => {
                   return (
-                    <Select
+                    <MultiSelects
                       options={options?.vendorList}
                       {...register("TECH_ID", {
                         required:
@@ -475,7 +560,9 @@ const WorkorderRedirectDialogBox = ({
                       require={true}
                       setValue={setValue}
                       invalid={
-                        header === "External Vendor Required" ? errors?.TECH_ID : ""
+                        header === "External Vendor Required"
+                          ? errors?.TECH_ID
+                          : ""
                       }
                       {...field}
                     />
@@ -500,9 +587,9 @@ const WorkorderRedirectDialogBox = ({
                             header === "Cancel Work Order"
                               ? "Please fill the required fields"
                               : "",
-                          onChange: ((e: any) => {
-                            getViewWorkOrderList(e?.target?.value);
-                          })
+                          onChange: async (e: any) => {
+                            await getViewWorkOrderList(e?.target?.value);
+                          },
                         })}
                         label={"Reason"}
                         optionLabel="REASON_DESC"
@@ -510,7 +597,9 @@ const WorkorderRedirectDialogBox = ({
                         filter={true}
                         require={true}
                         invalid={
-                          header === "Cancel Work Order" ? errors?.WO_REASON : ""
+                          header === "Cancel Work Order"
+                            ? errors?.WO_REASON
+                            : ""
                         }
                         setValue={setValue}
                         {...field}
@@ -519,7 +608,7 @@ const WorkorderRedirectDialogBox = ({
                   },
                 }}
               />
-              {DuplicateBy === true &&
+              {DuplicateBy && (
                 <Field
                   controller={{
                     name: "WO_NO",
@@ -535,7 +624,9 @@ const WorkorderRedirectDialogBox = ({
                                 : "",
                           })}
                           label={"Duplicate By"}
-                          optionLabel="REQ_DESC"
+                          optionLabel={(option: any) =>
+                            `${option?.WO_NO} - ${option?.REQ_DESC}`
+                          }
                           findKey={"WO_NO"}
                           require={true}
                           invalid={
@@ -547,45 +638,44 @@ const WorkorderRedirectDialogBox = ({
                       );
                     },
                   }}
-                />}
-
+                />
+              )}
             </>
           )}
 
           <div className="mt-2">
             <label className="Text_Secondary Input_Label ">
               Remarks (max 250 characters){" "}
-              {header === "Put On Hold" ?
-                " "
-                // <span className="text-red-600"> *</span>
-                : " "}
+              {header === "Put On Hold" ? " " : " "}
             </label>
             <Field
               controller={{
                 name: "WO_REMARKS",
                 control: control,
                 render: ({ field }: any) => {
-                  return (<InputTextarea
-                    {...register("WO_REMARKS",
-                      {
-                        onChange: (e: any) => handleInputChange(e)
-                      }
-                    )}
-                    rows={4}
-                    require={true}
-                    maxlength={250}
-                    placeholder="Provide additional details (Optional)"
-                    setValue={setValue}
-                    {...field}
-                  />
+                  return (
+                    <InputTextarea
+                      {...register("WO_REMARKS", {
+                        required: header === "Cancel - Pre Conditional" ? "Please fill the required field." : false,
+                        onChange: (e: any) => handleInputChange(e),
+                      })}
+                      rows={4}
+                      require={true}
+                      maxlength={250}
+                      placeholder={header === "Cancel - Pre Conditional" ? `Provide additional details` : "Provide additional details(optional)"}
+                      setValue={setValue}
+                      {...field}
+                    />
                   );
                 },
               }}
             />
-            <label className={` ${Remarklength === 250 ? "text-red-600" : "Text_Secondary"} Helper_Text`}>
-              {t(`Up to ${Remarklength}/250 characters.`)}
+            <label
+              className={` ${Remarklength === 250 ? "text-red-600" : "Text_Secondary"
+                } Helper_Text`}
+            >
+              {t(`${Remarklength}/250 characters.`)}
             </label>
-
           </div>
 
           <div className="flex justify-end mt-5">
@@ -594,15 +684,18 @@ const WorkorderRedirectDialogBox = ({
               type="button"
               label={"Cancel"}
               onClick={() => {
-                setVisible(false);
+                // setVisible(false);
                 clearErrors();
-                setRedirecStatus(false)
-                setVisible1(true)
+                setRedirecStatus(false);
+                setVisible1(true);
+                setIsSubmit(false);
               }}
             />
             <Button
               id="onHold"
               name="Save"
+              type="submit"
+              disabled={IsSubmit}
               className="Primary_Button"
               label={"Submit"}
             />

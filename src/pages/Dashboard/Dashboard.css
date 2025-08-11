@@ -1,4 +1,4 @@
-.dashboardTab .p-tabview-selected .p-tabview-nav-link{
+/* .dashboardTab .p-tabview-selected .p-tabview-nav-link{
     color: #8E724A  !important;
     background: transparent !important;
 }
@@ -7,7 +7,7 @@
     background-color: #8e724a !important;
     position: absolute !important;
     top: 42px !important;
-    display: block !important;
+    display: block ;
 }
 .dashboardTab .p-tabview .p-tabview-nav li .p-tabview-nav-link {
     padding: 1rem !important;
@@ -18,10 +18,9 @@
 .dashboardTab .p-tabview-panels {
     padding: 1rem !important;
    background: transparent !important;
-}
-.dateSelect{
+} */
+.dateSelect {
     background: #fff;
-    width: 230px;
     text-align: left;
     border: 1px solid #32475c38;
 }
@@ -33,59 +32,291 @@
 .apexcharts-canvas {
     margin: auto;
 }
-.Title_Label
-{
-  font-family: 'Lato', sans-serif !important;
-  margin-bottom: 12px;
-  font-size: 20px;
-font-style: normal;
-font-weight: 500;
-line-height: 32px; /* 160% */
-letter-spacing: 0.15px;
+
+.Title_Label {
+    font-family: 'Lato', sans-serif !important;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    /* 160% */
+    letter-spacing: 0.15px;
 }
-.p-selectbutton{
+
+.p-selectbutton {
     padding: 4px;
     background: #e0e0e0;
     border-radius: 4px;
 }
-.p-selectbutton .p-button{
+
+.p-selectbutton .p-button {
     background-color: #E0E0E0;
     padding: 10px 12px;
 }
-.p-selectbutton  .p-highlight{
+
+.p-selectbutton .p-highlight {
     background-color: #fff;
     color: #272B30;
 }
 
-.dateFilterOverlayPanel{
+.dateFilterOverlayPanel {
     width: 360px;
 }
-.dateFilterOverlayPanel li{
+
+.dateFilterOverlayPanel li {
     cursor: pointer;
 }
-.dateFilterOverlayPanel li:hover{
+
+.dateFilterOverlayPanel li:hover {
     background-color: #F7F8F9;
 }
-.dateFilterOverlayPanel .p-overlaypanel-content{
+
+.dateFilterOverlayPanel .p-overlaypanel-content {
     padding: 0;
 }
-.dateText{
+
+.dateText {
     color: #272B30;
     font-size: 16px;
-font-style: normal;
-font-weight: 600;
-line-height: 24px; /* 150% */
-letter-spacing: 0.15px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    /* 150% */
+    letter-spacing: 0.15px;
 }
-.CustomDate{
+
+.CustomDate {
     background-color: #F7F8F9;
 }
-/* .apexcharts-datalabel, .apexcharts-datalabel-label, .apexcharts-datalabel-value, .apexcharts-datalabels, .apexcharts-pie-label {
-font-size: 30px;
-font-style: normal;
-font-weight: 500;
-line-height: 40px; 
-letter-spacing: 0.25px;
-color: #272B30;
-font-family: 'Lato', sans-serif !important;
+
+.totalCase {
+    color: var(--Light-Text-Primary, #272B30);
+    text-align: center;
+    justify-content: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Lato;
+    font-size: 60px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 72px;
+    /* 120% */
+    letter-spacing: -0.5px;
+}
+
+.location-dropdown {
+    display: flex;
+    padding: 0px 12px 0px 16px;
+    align-items: center;
+    gap: 12px;
+}
+
+:where(.date-select) .p-button {
+    line-height: 21px !important;
+}
+
+:where(.date-select-group) .pi {
+    color: #929CA6 !important;
+}
+
+.equipment-button {
+    display: flex;
+    border-width: 1px;
+    color: var(--Light-Text-Disabled, #B3B9C0);
+    height: 38px;
+    padding: 0px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    align-self: stretch;
+}
+
+.equipment-searchbar-row {
+    display: flex;
+    justify-content: space-between;
+    /* gap: 25px; */
+    align-self: stretch;
+}
+
+.hehe {
+    color: var(--Light-Text-Secondary, #7E8083);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Light/Typography/Body 2 */
+    font-family: Lato;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 21px;
+    /* 150% */
+    letter-spacing: 0.15px;
+}
+
+.equipment-scrollbar-text {
+    color: var(--Light-Text-Primary, #272B30);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Dark/Typography/Subtitle 2 */
+    font-family: Lato;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 157%;
+    /* 21.98px */
+    letter-spacing: 0.1px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+
+}
+
+.equipment-scrollbar-text1 {
+    color: var(--Light-Text-Primary, #272B30);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Dark/Typography/Subtitle 2 */
+    font-family: Lato;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 157%;
+    /* 21.98px */
+    letter-spacing: 0.1px;
+    margin-right: 10px;
+}
+
+
+
+.equipment-scrollbar-quantity {
+    color: var(--Light-Text-Primary, #272B30);
+    text-align: right;
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Light/Typography/Body 1 */
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    /* 150% */
+    letter-spacing: 0.15px;
+}
+
+.equipment-color {
+    display: flex;
+    width: 20px;
+    height: 20px;
+    padding: 9px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-width: 1px;
+    border-radius: 4px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+}
+
+.equipment-scrollbar-secondaryText {
+    color: var(--Light-Text-Secondary, #7E8083);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Dark/Typography/Caption */
+    font-family: Lato;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 166%;
+    /* 19.92px */
+    letter-spacing: 0.4px;
+}
+
+.equipment-color :where(.equipment-scrollbar-text) {
+    margin-top: 0.5rem !important;
+}
+
+:where(.without-upper-padding) .p-card-content {
+    padding-top: 0 !important;
+}
+
+.assignee-secondaryText {
+    color: var(--Light-Text-Disabled, #B3B9C0);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Dark/Typography/Body 2 */
+    font-family: Lato;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 143%;
+    /* 20.02px */
+    letter-spacing: 0.15px;
+}
+
+.assignee-primaryText {
+    overflow: hidden;
+    color: var(--Light-Text-Primary, #272B30);
+    font-feature-settings: 'liga' off, 'clig' off;
+    text-overflow: ellipsis;
+
+    /* Dark/Typography/Body 1 */
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+    /* 24px */
+    letter-spacing: 0.15px;
+}
+
+.initials {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 64px;
+    background: var(--Light-States-Outlined-Resting-Border, #C7A19C);
+    margin-right: 12px;
+}
+
+.assigneeNumber {
+    color: var(--Light-Text-Secondary, #7E8083);
+    font-feature-settings: 'liga' off, 'clig' off;
+
+    /* Light/Typography/H6 */
+    font-family: Lato;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    /* 160% */
+    letter-spacing: 0.15px;
+}
+
+.report-initials {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 64px;
+    background: var(--Light-States-Contained-Hover-Background, #0292B1);
+    margin-right: 12px;
+}
+
+.divider {
+    width: 100%;
+    color: #272B30;
+    height: 1px;
+    background-color: #e5dada;
+    margin-top: 0.5rem;
+}
+
+#apexchartsbxfnbgzq{
+    height :215px !important;
+}
+
+/* .p-card {
+    height: 100% !important;
 } */

@@ -1,9 +1,16 @@
 //export const API = "http://103.71.99.94:1902/api/";//JWT token
 // export const API = "http://103.71.99.94:7038/api/" //With AZURE 
 //Azure Dev Api-endpoint
-export const API = "https://kllsg-sgp-dv-klikplusfm-webapi-01.azurewebsites.net/api/";
+// REACT_APP_BASE_URL=https://kllsg-sgp-dv-klikplusfm-webapi-02.azurewebsites.net/api/
+
+
+export const API = "=https://kllsg-sgp-dv-klikplusfm-webapi-02.azurewebsites.net/api/";
+
+
 //Azure UAT API-END point
 //export const API ="https://kllsg-sgp-ut-klikplusfm-webapi-01.azurewebsites.net/api/"
+//export const API = "https://kllsg-sgp-dv-klikplusfm-webapi-02.azurewebsites.net/api/"
+// export const API = "https://oneplace.staging.keppelland.com/apiklikfmdev/api/"
 export const ENDPOINTS = {
   LOGIN: "Authenticate/authenticateUser",
   USERCHECK: "Authenticate/UserCheck",
@@ -40,6 +47,7 @@ export const ENDPOINTS = {
   SAVE_ASSET_GROUP_MASTER: "Asset/saveAssetGroupMaster",
   SAVE_ASSET_TYPE_MASTER: "Asset/saveAssetTypeMaster",
   GET_ASSET_MASTER_LIST: "Asset/getAssestMastersList",
+  // GET_SCHDULE_LIST:  "Asset/getScheduleList",
   getTaskMasterList: "Asset/getTaskMasterList",
   SAVE_UOMMASTER: "Asset/saveUomMaster",
   getUserSkillDetails: "Masters/getUserSkillDetails",
@@ -48,6 +56,7 @@ export const ENDPOINTS = {
   getConfigurationsMastersList: "Configurations/getConfigurationsMastersList",
   getAssestMasterList: "Asset/getAssestMasterList",
   saveSeverityMaster: "Configurations/saveSeverityMaster",
+  updatePasswordConfigMaster: "Configurations/updatePasswordConfigMaster",
   deleteSeverityMaster: "Configurations/deleteSeverityMaster",
   WORKODRDERTYPE_LIST: "Configurations/getConfigurationsMastersList",
   WORKORDERTYPE_STATUS: "Configurations/saveWOTypeStatusMaster",
@@ -67,6 +76,9 @@ export const ENDPOINTS = {
   //DropDown
   GET_REQUEST_DESCRIPTION_MASTERLIST:
     "Maintenance/getRequestDescriptionMasterList",
+  GET_SCHEDULE_MASTERLIST:
+    "Asset/getscheduleMasterListInfra",
+
   MASTERREQUESTDESCRIPTION_SAVE: "Maintenance/saveRequestDescriptionMaster",
   MASTERREQUEST_DELETE: " Maintenance/deleteRequestDescriptionMaster",
   RACKMASTER_SAVE: "Inventory/saveRackMaster",
@@ -165,7 +177,7 @@ export const ENDPOINTS = {
   //Workorder
   SAVE_WORKORDER: "Helpdesk/saveWorkOrder",
   GET_WORKORDER_DETAILS: "Helpdesk/getWorkOrderDetails",
-  UPLOADEXCELDATACOMMON: "Upload/uploadExcelDataCommon",
+  UPLOADEXCELDATACOMMON: "Upload/uploadExcelDataCommonWithoutEncryption",
   SET_WORKSTATUS_Api: "Helpdesk/setWoStatus",
   SAVE_WO_TASK_PART: "Helpdesk/saveWoTaskPartDetails",
   REDIRECT_WO: "Helpdesk/saveRedirectWo",
@@ -189,7 +201,67 @@ export const ENDPOINTS = {
   GET_EXCEL_DOWNLOADDATA: "Masters/MastersDownloadData",
   //RectifyComment
   SAVE_RECTIFIEDMASTER: "Helpdesk/saveRectifiedComment",
-  FILE_SACNNING: "https://api-us1.scanii.com/v2.2/files%22"
+  FILE_SACNNING: "https://api-us1.scanii.com/v2.2/files%22",
+  GET_DOCLIST: "Helpdesk/getdocList",
+  GETLOGSDETAILS: "Configurations/getLogDetails",
+  GETLOGSLIST: "Configurations/getLogList",
+  SAVECONTRACTMASTER: "Inventory/saveContractMaster",
+  GETCONTRACTLIST: "Inventory/getContractList",
+  GETCONTRACTMASTERDETAILS: "Inventory/getcontractMasterDetails",
+  SAVE_VENDOR_SOR: "VendorM/savevendorSOR",
+  VENDORE_SOR_MANAGEMENTLIST: "VendorM/getVendorManagementMastersList",
+  VENDOR_SOR_DETAILS: "VendorM/getVendorSorDetails",
+  VENDOR_SOR_COMPARISION_LIST: "VendorM/getVendorSorComarisionPartList",
+  DOC_UPLOAD_CHECK_old: "Helpdesk/docUploadCheck",
+  DOC_UPLOAD_CHECK: "Helpdesk/docUploadCheckWithOutEncryption",
+  GETACTIONSTATUSDETAILS: "Masters/getActionStatusDetails",
+  // GETACTIONSTATUSDETAILS: "Masters/getActionStatusDetails",
+  UPDATEACTIONSTATUSDETAILS: "Masters/updateActionStatusDesc",
+  //equipment hierarchy
+  SAVE_EQUIPMENT_HIERARCHY: "Equipment/saveEquipmentHierarchy",
+  GET_EQUIPMENT_HIERARCHY: "Equipment/getEquipmentHierarchyMasterList",
+  DELETE_EQUIPMENT_HIERARCHY: "Equipment/deleteEquipmentHierarchy",
 
+  HierarchyList: "Equipment/getEquipmentHierarchylistwithcode",
+  //  "Equipment/getEquipmentHierarchyList",
+  ACCOUNT_DELETE: "Authenticate/userDelete",
 
+  //infra service
+  GET_INFRA_MASTER_SERVICE_REQUEST: "HelpDeskInfra/getServiceRequestMasterListInfra",
+  GET_INFRA_ISSUE_MASTER_SERVICE_REQUEST: "HelpDeskInfra/getIssueDescriptionList",
+  GET_INFRA_ASSET_DETAILS: "HelpDeskInfra/getAssetDetailsList",
+  // SAVE_INFRA_SERVICE_REQUEST: "HelpDeskInfra/saveServiceRequestDetails",
+  SAVE_INFRA_SERVICE_REQUEST: "HelpDeskInfra/saveServiceRequest",
+  GET_HIERARCHY_FOLDER_LIST: "HelpDeskInfra/getEquipmentHierarchyWithFolderList",
+  UPDATE_WO_INFRA: "HelpDeskInfra/updateWOInfra",
+  GET_TEAM_USERLIST_INFRA: "HelpDeskInfra/getTeamUserList",
+  UPDATEWOSTATUSINFRA: "HelpDeskInfra/setWoStatus",
+  GETWOACTIVELISTINFRA: "HelpDeskInfra/getWOActiveListInfra",
+  MASTERREASONLISTINFRA: "MastersInfra/getReasonMasterListInfra",
+  MASTERIINFRAREASONSAVE: "MastersInfra/saveReasonMasterInfra",
+  GETREASONALLLISTINFRA: "MastersInfra/getReasonMastersListInfra",
+  GET_CANCEL_REASON_LIST: "HelpDeskInfra/getReasonlistInfra",
+  //equipment hierarchy
+  // SAVE_EQUIPMENT_HIERARCHY: "Equipment/saveEquipmentHierarchy",
+  // GET_EQUIPMENT_HIERARCHY: "Equipment/getEquipmentHierarchyMasterList",
+  // DELETE_EQUIPMENT_HIERARCHY: "Equipment/deleteEquipmentHierarchy",
+
+  // HierarchyList: "Equipment/getEquipmentHierarchyList",
+  // ACCOUNT_DELETE: "Authenticate/userDelete",
+
+  //salceforce details
+  SALCEFORCE_DETAILS: "Helpdesk/getSalesForceWoContactInfo",
+  GET_ACTION_VIEW_LIST: "MastersInfra/getActionViewList",
+  FILTER_GET_API: "HelpdeskInfra/getfiltermasterlistInfra",
+  FILTER_GET_API_LIST: "HelpdeskInfra/getwofilterdatalist",
+  USER_ACTION_STATUS: "MastersInfra/updateactionviewmaster",
+  UPDATE_HIERARCHY_LIST: "Equipment/UpdateEquipmentHierarchy",
+  GET_COMMON_REPORT_LIST: "Report/getCommonReportList",
+  GET_REPORT_DATA: "Report/getReportData",
+  COMMON_LOCATION_LIST: "Location/UpdateLocationHierarchy",
+  Location_Hierarchy_List: "Equipment/getEquipmentAssetHierarchylistwithcode",
+  DELETE_DOC_LIST: 'Helpdesk/deleteDocument',
+  INFRA_SAVE_SCHEDULE_LIST: "Asset/saveScheduleAssetInfra",
+  REPORT_TEMPLATE_MASTER_LIST: "Report/gettemplatemasterList",
+  SAVE_REPORT_TEMPLATE: "Report/savereportteamplate",
 };

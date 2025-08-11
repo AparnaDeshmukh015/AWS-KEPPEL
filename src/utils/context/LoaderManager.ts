@@ -1,9 +1,10 @@
+
 // LoaderManager.ts
 class LoaderManager {
     private static instance: LoaderManager;
     public isLoading: boolean = false;
-    private listeners: Array<(loading: boolean) => void> = [];
-
+    private listeners: Array<(loading:any) => void> = [];
+   
     private constructor() { }
 
     public static getInstance(): LoaderManager {
@@ -13,7 +14,7 @@ class LoaderManager {
         return LoaderManager.instance;
     }
 
-    public addListener(callback: (loading: boolean) => void) {
+    public addListener(callback: (loading: any) => void) {
         this.listeners.push(callback);
     }
 
@@ -24,6 +25,11 @@ class LoaderManager {
 
     public hide() {
         this.isLoading = false;
+        this.notify();
+    }
+
+    public redirect(code:any){
+        this.isLoading = code;
         this.notify();
     }
 

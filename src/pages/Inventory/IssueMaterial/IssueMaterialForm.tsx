@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -67,9 +67,12 @@ const IssueMaterialForm = (props: any) => {
     { name: "Self", key: "S" },
     { name: "Against Work Order", key: "A" },
   ];
-  
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
+
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -119,8 +122,8 @@ const IssueMaterialForm = (props: any) => {
   const getOptions = async () => {
     try {
       const payload = {
-        WO_ID: search === '?add=' ? 0 : props.selectedData?.WO_ID,
-        MATREQ_ID: search === '?add=' ? 0 : props.selectedData?.MATREQ_ID,
+        WO_ID: search === '?add=' ? 0 : dataId?.WO_ID,
+        MATREQ_ID: search === '?add=' ? 0 : dataId?.MATREQ_ID,
         MODE: search === '?add=' ? "A" : "E"
       }
       const res = await callPostAPI(ENDPOINTS.GET_INVENTORY_MASTER_OPTIONS, payload);
@@ -130,8 +133,8 @@ const IssueMaterialForm = (props: any) => {
           storeList: res?.STORELIST,
           materialList: res?.MRREQLIST,
         });
-        if (props?.selectedData !== undefined) {
-          getOptionDetails();
+        if (search === '?edit=') {
+          await getOptionDetails();
         }
       }
     } catch (error: any) {
@@ -141,15 +144,8 @@ const IssueMaterialForm = (props: any) => {
 
   const getOptionDetails = async () => {
     const payload: any = {
-      MATREQ_ID:
-        localStorage.getItem('MATREQ_ID') ? localStorage.getItem('MATREQ_ID') : props?.selectedData === undefined
-          ? materialWatch?.MATREQ_ID
-          : props?.selectedData?.MATREQ_ID,
-      MATREQ_NO:
-        localStorage.getItem('MATREQ_NO') ? localStorage.getItem('MATREQ_NO') :
-          props?.selectedData === undefined
-            ? materialWatch?.MATREQ_NO
-            : props?.selectedData?.MATREQ_NO,
+      MATREQ_ID: search === "?edit=" ? dataId?.MATREQ_ID : selectedDetails?.MATREQ_ID,
+      MATREQ_NO: search === "?edit=" ? dataId?.MATREQ_NO : selectedDetails?.MATREQ_NO,
     };
 
     if (payload.MATREQ_ID !== "") {
@@ -170,14 +166,16 @@ const IssueMaterialForm = (props: any) => {
         setValue("REMARKS", res?.MATREQUISITIONDETAILS[0]?.REMARKS);
         setValue("WO_NO", res?.MATREQUISITIONDETAILS[0]?.WO_NO);
         setValue("PART_LIST", res?.PARTLIST);
-       
+
       }
     }
   };
 
 
 
-  const onSubmit = async (payload: any, e: any) => {
+  const onSubmit = useCallback(async (payload: any, e: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     try {
       localStorage.removeItem("STORE_ID")
       localStorage.removeItem("MATREQ_NO")
@@ -205,9 +203,9 @@ const IssueMaterialForm = (props: any) => {
       payload.WO_ID = selectedDetails?.WO_ID;
       // payload.PART_LIST = PART_LIST;
 
-      const partList: any = PART_LIST?.map((part: any, index: any) => {
+      const partList: any = PART_LIST?.map((part: any) => {
         if (part?.PART_ID !== "") {
-          
+
           return {
             CLOSE_IND: part?.CLOSE_IND === undefined ? false : true,
             ISSUED_QTY: part?.ISSUED_QTY,
@@ -240,16 +238,21 @@ const IssueMaterialForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
+
         props?.isClick();
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+      setIsSubmit(false)
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, PART_LIST, materialWatch, selectedDetails, props.selectedData, props.functionCode, props.getAPI, props.isClick, callPostAPI, toast, helperEventNotification, dateFormat, search, User_Name,]);
 
   const checkValidateQty = (e: any, rowData: any, rowIndex: number) => {
 
@@ -260,19 +263,28 @@ const IssueMaterialForm = (props: any) => {
   };
 
   useEffect(() => {
-    getOptionDetails();
+    (async function () {
+      await  getOptionDetails();
+     })();
+    
   }, [materialWatch.MATREQ_ID]);
 
   useEffect(() => {
-    if (storeWatch !== null || storeWatch.STORE_ID) {
-      getpartlist();
+    if (storeWatch !== null) {
+      (async function () {
+        await  getpartlist();
+       })();
     }
   }, [storeWatch]);
 
   useEffect(() => {
     const issueDate: any = new Date();
     setValue("ISSUE_DATE", issueDate);
-    getOptions();
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
+    //getOptions();
   }, []);
 
 
@@ -296,7 +308,7 @@ const IssueMaterialForm = (props: any) => {
       STORE_ID: parseInt(STORE_ID),
       MATREQ_ID: parseInt(MATREQ_ID)
     });
-   
+
   }, [localStorage.getItem("STORE_ID")])
 
   useEffect(() => {
@@ -307,9 +319,12 @@ const IssueMaterialForm = (props: any) => {
   }, [isSubmitting]);
 
   useEffect(() => {
-    saveTracker(currentMenu)
+    (async function () {
+     
+      await saveTracker(currentMenu)
+     })();
   }, [])
-  
+
   return (
     <>
       <section className="w-full">
@@ -317,8 +332,8 @@ const IssueMaterialForm = (props: any) => {
           <div className="flex flex-wrap justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {props?.selectedData ? "Cancel" : "Add"} {props?.headerName}-
-                {props?.selectedData ? props?.selectedData?.DOC_NO : ""}
+                {search === "?edit=" ? "Cancel" : "Add"} {props?.headerName}-
+                {search === "?edit=" ? dataId?.DOC_NO : ""}
               </h6>
             </div>
 
@@ -328,10 +343,11 @@ const IssueMaterialForm = (props: any) => {
                   type="submit"
                   className="Primary_Button  w-20 me-2"
                   label={"Save"}
+                  IsSubmit={IsSubmit}
                 />
               ) : (
                 <>
-                  {props?.selectedData?.CNCL_IND === false && (
+                  {dataId?.CNCL_IND === false && (
                     <>
                       <Buttons
                         type="submit"
@@ -390,7 +406,7 @@ const IssueMaterialForm = (props: any) => {
                         findKey={"STORE_ID"}
                         optionLabel="STORE_NAME"
                         selectedData={selectedDetails?.STORE_ID}
-                        disabled={props.selectedData ? true : false}
+                        disabled={search === "?edit=" ? true : false}
                         setValue={setValue}
                         //onChange={getpartlist}
                         invalid={errors.STORE_ID}
@@ -640,7 +656,7 @@ const IssueMaterialForm = (props: any) => {
                                       }
                                     )}
                                     setValue={setValue}
-                                    disabled={props.selectedData ? true : false}
+                                    disabled={search === "?edit="? true : false}
                                     invalid={
                                       errors?.PART_LIST?.[rowIndex]?.ISSUED_QTY
                                         ? true
@@ -678,7 +694,7 @@ const IssueMaterialForm = (props: any) => {
                                       `PART_LIST[${rowIndex}].CLOSE_IND` as any
                                     )}
                                     setValue={setValue}
-                                    disabled={props.selectedData ? true : false}
+                                    disabled={search === "?edit=" ? true : false}
                                     label=""
                                     {...field}
                                   />

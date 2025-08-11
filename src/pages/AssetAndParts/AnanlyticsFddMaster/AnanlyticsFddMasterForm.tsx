@@ -1,6 +1,6 @@
 import InputField from '../../../components/Input/Input'
 import { Card } from 'primereact/card';
-import { SubmitErrorHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import Field from '../../../components/Field';
 import { callPostAPI } from '../../../services/apis';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
@@ -12,13 +12,12 @@ import Select from "../../../components/Dropdown/Dropdown";
 import { useLocation, useOutletContext } from 'react-router-dom';
 import Checkboxs from "../../../components/Checkbox/Checkbox";
 import { saveTracker } from '../../../utils/constants';
-import { validation } from '../../../utils/validation';
 import { InputTextarea } from 'primereact/inputtextarea';
 
 const AnanlyticsFddMasterForm = (props: any) => {
   const { t } = useTranslation();
   let { pathname } = useLocation();
-  const [selectedFacility, menuList]: any = useOutletContext();
+  const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -26,6 +25,7 @@ const AnanlyticsFddMasterForm = (props: any) => {
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id");
   const dataId = JSON.parse(getId);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
   const {
     register,
@@ -60,15 +60,13 @@ const AnanlyticsFddMasterForm = (props: any) => {
         : search === "?edit="
           ? dataId?.FDD_NAME
           : "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
     },
     mode: "all",
   });
 
   const onSubmit = async (payload: any) => {
+    setIsSubmit(true)
     payload.ASSETTYPE_ID = payload?.TYPE?.ASSETTYPE_ID;
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     delete payload?.TYPE;
@@ -77,13 +75,16 @@ const AnanlyticsFddMasterForm = (props: any) => {
       if (res?.FLAG === true) {
         toast?.success(res?.MSG);
         props?.getAPI();
+        setIsSubmit(false)
         props?.isClick();
       }
       else {
         toast.error(res?.MSG)
+        setIsSubmit(false)
       }
 
     } catch (error: any) {
+      setIsSubmit(false)
       toast?.error(error);
     }
   };
@@ -101,9 +102,12 @@ const AnanlyticsFddMasterForm = (props: any) => {
   };
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
-  }, []);
+    (async function () {
+        await getOptions()
+       await saveTracker(currentMenu)
+       })();
+   
+}, [])
 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
@@ -118,8 +122,9 @@ const AnanlyticsFddMasterForm = (props: any) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           headerName={props?.headerName}
-          isSelected={props?.selectedData ? true : false}
+          isSelected={search === "?edit=" ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -214,7 +219,7 @@ const AnanlyticsFddMasterForm = (props: any) => {
                       optionLabel="ASSETTYPE_NAME"
                       findKey={"ASSETTYPE_ID"}
                       disabled={search === '?edit=' ? true : false}
-                      selectedData={props?.selectedData?.ASSETTYPE_ID}
+                      selectedData={search === '?edit=' ? dataId?.ASSETTYPE_ID : props?.selectedData?.ASSETTYPE_ID}
                       setValue={setValue}
                       invalid={errors.TYPE}
                       {...field}

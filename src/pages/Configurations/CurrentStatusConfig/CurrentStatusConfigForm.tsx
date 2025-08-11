@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import { Card } from "primereact/card";
 import { useForm } from "react-hook-form";
@@ -14,13 +14,14 @@ import { useLocation, useOutletContext } from "react-router-dom";
 
 const CurrentStatusConfigForm = (props: any) => {
   const { t } = useTranslation();
-  const [deleteItem, setDeleteItem] = useState(false);
+  //const [deleteItem, setDeleteItem] = useState(false);
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
   const { search } = useLocation();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
   const {
@@ -37,50 +38,54 @@ const CurrentStatusConfigForm = (props: any) => {
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
       CS_DESC: props?.selectedData ? props?.selectedData?.CS_DESC : search === '?edit=' ? dataId?.CS_DESC : "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE: search === '?edit='  ? dataId?.ACTIVE  : true,
     },
     mode: "onSubmit",
   });
-  const onSubmit = async (payload: any) => {
+
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     try {
-      if (!deleteItem) {
+      // if (!deleteItem) {
         const res = await callPostAPI(
           ENDPOINTS.CURRENTCONFIGSTATUSAVE,
           payload
         );
         toast?.success(res?.MSG);
         props?.getAPI();
+
         props?.isClick();
-      }
+      // }
     } catch (error: any) {
+
       toast?.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit,callPostAPI, toast, props])
 
-  const deleteSpecificItem = async () => {
-    setDeleteItem(true);
-    let payLoad: any = {
-      CS_ID: props?.selectedData?.CS_ID,
-      PARA: { para1: `${props?.headerName}`, para2: "deleted" },
-    };
+  // const deleteSpecificItem = async () => {
+  //   setDeleteItem(true);
+  //   let payLoad: any = {
+  //     CS_ID: props?.selectedData?.CS_ID,
+  //     PARA: { para1: `${props?.headerName}`, para2: "deleted" },
+  //   };
 
-    const res = await callPostAPI(
-      ENDPOINTS.CURRENTCONFIGSTATUS_DELETE,
-      payLoad
-    );
-    if (res?.FLAG === true) {
-      toast?.success(res?.MSG);
-      props?.getAPI();
-      props?.isClick();
-      setDeleteItem(false);
-    } else {
-      toast?.error(res?.MSG);
-    }
-  };
+  //   const res = await callPostAPI(
+  //     ENDPOINTS.CURRENTCONFIGSTATUS_DELETE,
+  //     payLoad
+  //   );
+  //   if (res?.FLAG === true) {
+  //     toast?.success(res?.MSG);
+  //     props?.getAPI();
+  //     props?.isClick();
+  //     setDeleteItem(false);
+  //   } else {
+  //     toast?.error(res?.MSG);
+  //   }
+  // };
 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || ((!isSubmitting && Object?.values(errors)[0]?.type === "validate"))) {
@@ -89,9 +94,12 @@ const CurrentStatusConfigForm = (props: any) => {
     } else {
     }
   }, [isSubmitting]);
+
   useEffect(() => {
-    saveTracker(currentMenu)
-  }, []);
+    (async function () {
+        await saveTracker(currentMenu)
+       })();
+}, [])
   return (
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -99,6 +107,7 @@ const CurrentStatusConfigForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-4 lg:grid-cols-4">

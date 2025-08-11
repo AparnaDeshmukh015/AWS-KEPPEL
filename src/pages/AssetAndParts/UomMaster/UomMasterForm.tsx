@@ -6,7 +6,7 @@ import Checkboxs from "../../../components/Checkbox/Checkbox";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   eventNotification,
@@ -27,7 +27,7 @@ const UomMasterForm = (props: any) => {
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
-
+  const[IsSubmit, setIsSubmit] = useState<any|null>(false)
   const {
     register,
     handleSubmit,
@@ -42,16 +42,15 @@ const UomMasterForm = (props: any) => {
         : { para1: `${props?.headerName}`, para2: "Added" },
       UOM_ID: props?.selectedData ? props?.selectedData?.UOM_ID : 0,
       UOM_NAME: props?.selectedData ? props?.selectedData?.UOM_NAME : search === '?edit=' ? dataId?.UOM_NAME : "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
     },
     mode: "onSubmit",
   });
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     try {
       const res = await callPostAPI(ENDPOINTS.SAVE_UOMMASTER, payload);
@@ -66,16 +65,19 @@ const UomMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
       toast?.error(error);
+    }finally{
+      setIsSubmit(false)
     }
-  };
+  },[props?.functionCode, props?.getAPI, props?.isClick, search, User_Name, eventNotification, toast]);
 
 
   useEffect(() => {
@@ -86,7 +88,8 @@ const UomMasterForm = (props: any) => {
   }, [isSubmitting]);
 
   useEffect(() => {
-    saveTracker(currentMenu)
+    (async function () {
+      await saveTracker(currentMenu)})();
   }, [])
 
   return (
@@ -96,6 +99,7 @@ const UomMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">

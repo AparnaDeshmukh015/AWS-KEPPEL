@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Card } from 'primereact/card';
-import { COOKIES, LOCALSTORAGE } from '../../../utils/constants';
+import { LOCALSTORAGE } from '../../../utils/constants';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { callPostAPI } from '../../../services/apis';
 import { useTranslation } from "react-i18next";
-
 import { Button } from 'primereact/button';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-const LanguageChange = () => {
 
-    const naviagate: any = useNavigate();
+const LanguageChange = () => {
     const [selectedLanguage, setSelectedLanguage] = useState();
     const [languageData, setLanguageData] = useState()
     const [code, setCode] = useState();
@@ -25,7 +22,7 @@ const LanguageChange = () => {
     }
 
 
-    const handlerSubmit = async (e: any) => {
+    const handlerSubmit = async () => {
         const Payload: any =
         {
             "LANGUAGE_CODE": code,
@@ -37,26 +34,26 @@ const LanguageChange = () => {
         const languageValue: any = code
         localStorage.setItem(`${LOCALSTORAGE?.LANGUAGE}`, languageValue)
         i18n.changeLanguage(languageValue);
-        window.location.reload();
+        // window.location.reload();
 
     }
 
     useEffect(() => {
-        getLanguageList()
-
+      
+        (async function () {
+            await getLanguageList()
+           })();
     }, [])
     return (
         <>
-
-
-            <section className="w-full">
+        <section className="w-full">
 
                 <div className="flex justify-between mt-1">
                     <div>
                         <h6 className="Text_Primary">Language Change</h6>
                     </div>
                     <div className='flex'>
-                        <Button className='Primary_Button  w-20 me-2' label={t('Save')} onClick={(e: any) => handlerSubmit(e)} />
+                        <Button className='Primary_Button  w-20 me-2' label={t('Save')} onClick={() => handlerSubmit()} />
                     </div>
                 </div>
                 <Card className='mt-2'>

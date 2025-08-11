@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 import { toast } from 'react-toastify'
 import Table from "../../../components/Table/Table";
 import { callPostAPI } from "../../../services/apis";
@@ -6,12 +6,12 @@ import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import AnanlyticsFddMasterForm from "./AnanlyticsFddMasterForm";
-import LoaderS from "../../../components/Loader/Loader";
+
 const AnanlyticsFddMaster = (props: any) => {
     let { pathname } = useLocation();
     const [selectedFacility, menuList]: any = useOutletContext();
     const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL).filter((detail: any) => detail.URL === pathname)[0];
-    const [showLoader, setShowLoader] = useState<boolean>(false);
+    //const [showLoader, setShowLoader] = useState<boolean>(false);
 
     const getAPI = async () => {
         try {
@@ -25,14 +25,14 @@ const AnanlyticsFddMaster = (props: any) => {
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
             //API Calling Done here
-            getAPI();
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu]);
     return !props?.search ? (
         <>
-            {showLoader ?
-                <><LoaderS /></>
-                :
+           
                 <Table
                     tableHeader={{
                         headerName: currentMenu?.FUNCTION_DESC,
@@ -50,7 +50,7 @@ const AnanlyticsFddMaster = (props: any) => {
                     getAPI={getAPI}
                     // deleteURL={ENDPOINTS.DELETE_ASSETGROUPMASTER}
                     DELETE_ID="FDD_ID"
-                />}</>
+                /></>
     ) : (
         <AnanlyticsFddMasterForm
             headerName={currentMenu?.FUNCTION_DESC}

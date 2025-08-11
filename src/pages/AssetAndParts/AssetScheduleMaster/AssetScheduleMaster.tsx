@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import Table from "../../../components/Table/Table";
 import { callPostAPI } from "../../../services/apis";
@@ -6,6 +6,8 @@ import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import AssetScheduleMasterForm from "./AssetScheduleMasterForm";
+import InfraAssetSchedule from "../../../components/pageComponents/AssetSchedule/InfraAssetSchedule";
+import NewInfraScheduleMaster from "./NewInfraScheduleMaster";
 
 const AssetScheduleMaster = (props: any) => {
   let { pathname } = useLocation();
@@ -23,44 +25,65 @@ const AssetScheduleMaster = (props: any) => {
         currentMenu?.FUNCTION_CODE
       );
       props?.setData(res?.ASSESTMASTERSLIST || []);
+
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+  const FACILITY: any = localStorage.getItem("FACILITYID");
+  const FACILITYID: any = JSON.parse(FACILITY);
+  if (FACILITYID) {
+    var facility_type: any = FACILITYID?.FACILITY_TYPE;
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+      })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (
-    <Table
-      tableHeader={{
-        headerName: currentMenu?.FUNCTION_DESC,
-        search: true,
-      }}
-      dataKey={currentMenu?.FUNCTION_DESC}
-      columnTitle={["SCHEDULE_NAME", "ACTION"]}
-      customHeader={["Schedule Name", "Action"]}
-      columnData={props?.data}
-      clickableColumnHeader={["SCHEDULE_NAME"]}
-      filterFields={["SCHEDULE_NAME"]}
-      isClick={props?.isForm}
-      handelDelete={props?.handelDelete}
-      getAPI={getAPI}
-      deleteURL={ENDPOINTS.DELETE_ASSETTASKANDSCHEDULE}
-      DELETE_ID="SCHEDULE_ID"
-    />
-  ) : (
-    <AssetScheduleMasterForm
-      headerName={currentMenu?.FUNCTION_DESC}
-      setData={props?.setData}
-      getAPI={getAPI}
-      selectedData={props?.selectedData}
-      isClick={props?.isForm}
-      functionCode={currentMenu?.FUNCTION_CODE}
-    />
-  );
+    facility_type == "R" ? (
+      <Table
+        tableHeader={{
+          headerName: currentMenu?.FUNCTION_DESC,
+          search: true,
+        }}
+        dataKey={currentMenu?.FUNCTION_DESC}
+        columnTitle={["SCHEDULE_NAME", "ACTION"]}
+        customHeader={["Schedule Name", "Action"]}
+        columnData={props?.data}
+        clickableColumnHeader={[""]}
+        filterFields={facility_type === "I" ? [""] : ["SCHEDULE_NAME"]}
+        isClick={props?.isForm}
+        handelDelete={props?.handelDelete}
+        getAPI={getAPI}
+        deleteURL={ENDPOINTS.DELETE_ASSETTASKANDSCHEDULE}
+        DELETE_ID="SCHEDULE_ID"
+      />) : (<><NewInfraScheduleMaster /></>)
+  )
+
+    : (facility_type === "I" ?
+      <InfraAssetSchedule
+
+        headerName={currentMenu?.FUNCTION_DESC}
+        setData={props?.setData}
+        getAPI={getAPI}
+        selectedData={props?.selectedData}
+        isClick={props?.isForm}
+        functionCode={currentMenu?.FUNCTION_CODE} /> :
+      <AssetScheduleMasterForm
+        headerName={currentMenu?.FUNCTION_DESC}
+        setData={props?.setData}
+        getAPI={getAPI}
+        selectedData={props?.selectedData}
+        isClick={props?.isForm}
+        functionCode={currentMenu?.FUNCTION_CODE}
+
+      />
+    );
 };
 
 const Index: React.FC = () => {

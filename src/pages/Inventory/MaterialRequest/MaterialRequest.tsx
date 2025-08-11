@@ -6,6 +6,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import { toast } from "react-toastify";
 import MaterialRequestForm from "./MaterialRequestForm";
+import { onlyDateFormat } from "../../../utils/constants";
 
 const MaterialRequest = (props: any) => {
   let { pathname } = useLocation();
@@ -23,15 +24,30 @@ const MaterialRequest = (props: any) => {
         currentMenu?.FUNCTION_CODE
       );
 
-      props?.setData(res?.INVENTORYMASTERSLIST || []);
+
+      let updatedMaterialRequestList = formatMaterialRequestList(res?.INVENTORYMASTERSLIST)
+      props?.setData(updatedMaterialRequestList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+  const formatMaterialRequestList = (list: any) => {
+    let MaterialRequestList = list;
+    MaterialRequestList = MaterialRequestList.map((element: any) => {
+      return {
+        ...element,
+        MATREQS_DATE: onlyDateFormat(element?.MATREQ_DATE)
+      }
+    })
+    return MaterialRequestList
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (
@@ -43,7 +59,7 @@ const MaterialRequest = (props: any) => {
       dataKey={currentMenu?.FUNCTION_DESC}
       columnTitle={[
         "MATREQ_NO",
-        "MATREQ_DATE",
+        "MATREQS_DATE",
         "STORE_NAME",
         "USER_NAME",
         "WO_NO",
@@ -61,7 +77,7 @@ const MaterialRequest = (props: any) => {
       ]}
       columnData={props?.data}
       clickableColumnHeader={["MATREQ_NO"]}
-      filterFields={["MATREQ_NO", "MATREQ_DATE", "STORE_NAME", "USER_NAME", "WO_NO", "STATUS_DESC"]}
+      filterFields={["MATREQ_NO", "MATREQS_DATE", "STORE_NAME", "USER_NAME", "WO_NO", "STATUS_DESC"]}
       setSelectedData
       isClick={props?.isForm}
       handelDelete={props?.handelDelete}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "../../../components/Button/Button.css";
 import { Button } from "primereact/button";
@@ -15,14 +15,14 @@ import Field from "../../../components/Field";
 import Select from "../../../components/Dropdown/Dropdown";
 import HolidayList from "./HolidayList";
 import moment from "moment";
-import { dateFormat, saveTracker } from "../../../utils/constants";
+import { saveTracker } from "../../../utils/constants";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
 import { appName } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
 
-const AddLocation = (props: any) => {
+const AddLocation = () => {
   const { t } = useTranslation();
-  const [selectedFacility, menuList]: any = useOutletContext();
+  const [, menuList]: any = useOutletContext();
   const { search } = useLocation();
   const [locationList, setLocationList] = useState([]);
   const [weekList, setWeekList] = useState([]);
@@ -37,6 +37,7 @@ const AddLocation = (props: any) => {
     .filter((detail: any) => detail.URL === location?.pathname)[0];
   const [sameParent, setSameParent] = useState(true);
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const {
     register,
     handleSubmit,
@@ -93,7 +94,9 @@ const AddLocation = (props: any) => {
   };
 
   const watchLocation: any = watch('LOCATION')
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     const updateColList: any = payload?.EXTRA_COL_LIST?.filter(
       (item: any) => item?.VALUE
     ).map((data: any) => ({
@@ -111,7 +114,7 @@ const AddLocation = (props: any) => {
     payload.WEEKOFF_ID = payload?.WEEKOFF?.WEEKOFF_ID;
     payload.INHERIT_HOLIDAY = sameParent;
     payload.INHERIT_WORKING = sameParent;
-    payload.PPM_SCHEDULAR = sameParent === false ? PPM_SCHEDULAR : "S";
+    payload.PPM_SCHEDULAR = !sameParent ? PPM_SCHEDULAR : "S";
     payload.LOCATION_HOLIDAY_D = holiday;
     delete payload?.LOCATION;
     delete payload?.WEEKOFF;
@@ -119,6 +122,7 @@ const AddLocation = (props: any) => {
     try {
       const res = await callPostAPI(ENDPOINTS?.LOCATION_SAVE, payload);
       if (res?.FLAG === true) {
+         const response = await callPostAPI(ENDPOINTS?.COMMON_LOCATION_LIST, {});
         toast.success(res?.MSG);
         const notifcation: any = {
           "FUNCTION_CODE": currentMenu?.FUNCTION_CODE,
@@ -134,15 +138,20 @@ const AddLocation = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
+        // setIsSubmit(false)
         navigate(`${appName}/facilitydetail`);
       } else {
+        setIsSubmit(false)
         toast.error(res?.MSG);
       }
     } catch (error: any) {
+      setIsSubmit(false)
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, HOLIDAYLIST, callPostAPI, toast, parentId, sameParent, PPM_SCHEDULAR, currentMenu, search, eventNotification, navigate,]);
 
   const handlerChange = (e: any) => {
     setSameParent(e.target.checked);
@@ -169,7 +178,7 @@ const AddLocation = (props: any) => {
       setWeekList(res?.WEEKOFFLIST);
       if (res?.FLAG === 1) {
         if (mode === "E") {
-          locationDetails(columnCaptions);
+          await locationDetails(columnCaptions);
         } else {
           colAppend(columnCaptions);
         }
@@ -178,17 +187,18 @@ const AddLocation = (props: any) => {
   };
 
   useEffect(() => {
-    if (location?.state?.addHeaderName === "Add Location") {
-      getCommonLocation("A", location?.state?.locationTypeId);
+    (async function () {
+      if (location?.state?.addHeaderName === "Add Location") {
+      await getCommonLocation("A", location?.state?.locationTypeId);
       if (location?.state?.parentId !== undefined) {
         setParentId(localStorage.getItem('parentId'))
       } else {
         setParentId(localStorage.getItem('parentId'))
       }
     } else {
-      getCommonLocation("E", location?.state?.locationTypeId);
+      await getCommonLocation("E", location?.state?.locationTypeId);
     }
-    saveTracker(currentMenu)
+    await saveTracker(currentMenu)})()
 
   }, [location?.state]);
 
@@ -265,6 +275,7 @@ const AddLocation = (props: any) => {
                 className="Primary_Button  w-20 me-2"
                 label={t("Save")}
                 onClick={handleSubmit(onSubmit)}
+                disabled={IsSubmit}
               />
               <Button
                 className="Secondary_Button  w-20"
@@ -459,16 +470,16 @@ const AddLocation = (props: any) => {
                                 options={weekList}
                                 optionLabel="WEEKOFF_DESC"
                                 {...register("WEEKOFF", {
-                                  required: sameParent === false ? t("Please fill the required fields.") : "",
+                                  required: !sameParent ? t("Please fill the required fields.") : "",
                                 })}
                                 // placeholder={t("Please_Enter")}
                                 disabled={sameParent}
                                 findKey={"WEEKOFF_ID"}
-                                require={sameParent === false ? true : false}
+                                require={!sameParent ? true : false}
                                 label={"Weekoff"}
                                 selectedData={selectedDetails?.WEEKOFF_ID}
                                 setValue={setValue}
-                                invalid={sameParent === false ? errors?.WEEKOFF : ""}
+                                invalid={!sameParent ? errors?.WEEKOFF : ""}
                                 {...field}
                               />
                             );

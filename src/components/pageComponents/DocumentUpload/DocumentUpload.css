@@ -12,12 +12,12 @@
   /* position: relative; */
   top: 0px;
   z-index: 1;
-  margin-left: 80px;
+  margin-left: 100px;
   background: #212121;
   padding: 3px;
   color: #fff;
   border-radius: 50%;
-  width: 27px;
+  width: 27px !important;
 }
 
 .imageContainer .closeBtn .p-button-icon {

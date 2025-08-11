@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
 import Select from "../../../components/Dropdown/Dropdown";
 import InputField from "../../../components/Input/Input";
-import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
@@ -12,15 +11,15 @@ import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { Dropdown } from "primereact/dropdown";
 import FormHeader from "../../../components/FormHeader/FormHeader";
 import { saveTracker } from "../../../utils/constants";
 
 const StoreListForm = (props: any) => {
   const { t } = useTranslation();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+
   let [locationtypeOptions, setlocationtypeOptions] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
-  const [locationName, setLocationName] = useState();
+  //const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
@@ -41,10 +40,10 @@ const StoreListForm = (props: any) => {
       PARA: props?.selectedData || search === '?edit='
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
-      STORE_ID: props?.selectedData ? props?.selectedData?.STORE_ID : search === '?edit=' ? dataId?.STORE_ID : 0,
+      STORE_ID: search === "?edit=" ? props?.selectedData?.STORE_ID : search === '?edit=' ? dataId?.STORE_ID : 0,
       ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
+       search === "?edit="
+          ? dataId.ACTIVE
           : true,
       STORE_NAME: props?.selectedData ? props?.selectedData?.STORE_NAME : search === '?edit=' ? dataId?.STORE_NAME : '',
       LOCATION_ID: props?.selectedData ? props?.selectedData?.LOCATION_ID : search === '?edit=' ? dataId?.LOCATION_ID : 0,
@@ -58,7 +57,9 @@ const StoreListForm = (props: any) => {
     mode: "onSubmit",
   });
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     try {
       payload.LOCATION_ID = payload?.LOCATION?.LOCATION_ID;
       payload.ACTIVE = payload?.ACTIVE === true ? "1" : "0";
@@ -68,25 +69,32 @@ const StoreListForm = (props: any) => {
       if (res?.FLAG === true) {
         toast?.success(res?.MSG);
         props?.getAPI();
+
         props?.isClick();
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+      setIsSubmit(false)
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, callPostAPI, toast, props?.getAPI, props?.isClick]);
 
   const getOptions = async () => {
     const res = await callPostAPI(ENDPOINTS.LOCATION_HIERARCHY_LIST, null);
     setlocationtypeOptions(res?.LOCATIONHIERARCHYLIST);
-    setValue(
-      "LOCATION",
-      res?.LOCATIONHIERARCHYLIST?.find(
-        (location: any) =>
-          location?.LOCATION_ID === props?.selectedData?.LOCATION_ID || 0
-      )
-    );
+    if (search === "?edit=") {
+      setValue(
+        "LOCATION",
+        res?.LOCATIONHIERARCHYLIST?.find(
+          (location: any) =>
+            location?.LOCATION_ID === dataId?.LOCATION_ID || 0
+        )
+      );
+    }
   };
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
@@ -96,8 +104,10 @@ const StoreListForm = (props: any) => {
   }, [isSubmitting]);
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, []);
   const selectedLocationTemplate = (option: any, props: any) => {
     if (option) {
@@ -122,29 +132,15 @@ const StoreListForm = (props: any) => {
     );
   };
 
-  const panelFooterTemplate = () => {
-    return (
-      <div className="py-2 px-3">
-        {selectedLocation ? (
-          <span>
-            <b>{selectedLocation.LOCATIONTYPE_NAME}</b> selected.
-          </span>
-        ) : (
-          "No country selected."
-        )}
-      </div>
-    );
-  };
-  // useEffect(() => {
-  //   saveTracker(props?.headerName)
-  // }, [])
+  
   return (
     <section className="w-full">
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormHeader
           headerName={props?.headerName}
-          isSelected={props?.selectedData ? true : false}
+          isSelected={search === "?edit=" ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -210,9 +206,9 @@ const StoreListForm = (props: any) => {
                       <Checkboxs
                         {...register("ACTIVE")}
                         checked={
-                          props?.selectedData?.ACTIVE === true
+                          dataId?.ACTIVE === true
                             ? true
-                            : false || false
+                            : false 
                         }
                         className="md:mt-7"
                         label="Active"

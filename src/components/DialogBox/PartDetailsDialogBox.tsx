@@ -7,18 +7,12 @@ import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import "../../components/Checkbox/Checkbox.css";
 
-//   partList?: never[]
-//   getpartlist?: () => Promise<void>
-//   saveFuc?: () => Promise<void>
-//   selectedParts?: any
-//   getSelec?: any
-// }
 const PartDetailsDialogBox = ({
   partList,
   getpartlist,
   saveFuc,
-  getSelec,
   selectedParts,
   setSelectedParts,
 }: any) => {
@@ -46,21 +40,19 @@ const PartDetailsDialogBox = ({
   const { t } = useTranslation();
   const [cancleSelectedData, setCancelSelectedData] = useState<any | null>()
   const [visible, setVisible] = useState<boolean>(false);
-  const [rowClick, setRowClick] = useState<boolean>(false);
+  //const [rowClick, setRowClick] = useState<boolean>(false);
   const [part, setPart] = useState<any | null>([]);
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
 
-  // const defaultFilters: DataTableFilterMeta = {
-  //   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  // };
+ 
   const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
 
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
     setVisible(!visible);
     setCancelSelectedData(selectedParts)
     setSelectedParts(selectedParts)
   };
-  const handleCancel = (e: any) => {
+  const handleCancel = () => {
     setVisible(!visible);
     setSelectedParts(cancleSelectedData)
   }
@@ -75,14 +67,11 @@ const PartDetailsDialogBox = ({
     setGlobalFilterValue(value);
   };
 
-  const initFilters = () => {
-    setFilters(defaultFilters);
-    setGlobalFilterValue('');
-  };
+  // const initFilters = () => {
+  //   setFilters(defaultFilters);
+  //   setGlobalFilterValue('');
+  // };
 
-  const clearFilter = () => {
-    initFilters();
-  };
 
   const handlerPartSave = (e: any) => {
     e.preventDefault()
@@ -108,13 +97,14 @@ const PartDetailsDialogBox = ({
           type="button"
           className="Primary_Button "
           label={t("Add Part")}
-          onClick={() => setDialogVisible(true)}
+          onClick={() => setDialogVisible()}
         />
       </div>
       <Dialog
+      // blockScroll={true}
         visible={visible}
         style={{ width: "50vw" }}
-        onHide={() => setDialogVisible(false)}
+        onHide={() => setDialogVisible()}
       >
         <div className="">
           <div className="">
@@ -137,7 +127,7 @@ const PartDetailsDialogBox = ({
                 value={part}
                 showGridlines
                 emptyMessage={t("No Data found.")}
-                selectionMode={rowClick ? null : "multiple"}
+                // selectionMode={rowClick ? null : "multiple"}
                 selection={selectedParts}
                 onSelectionChange={(e: any) => setSelectedParts(e.value)}
                 dataKey="PART_ID"

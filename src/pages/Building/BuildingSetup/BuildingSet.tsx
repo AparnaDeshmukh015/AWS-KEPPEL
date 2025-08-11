@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { useTranslation } from "react-i18next";
 import { SplitButton } from "primereact/splitbutton";
 import { Menu } from "primereact/menu";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
 import { getCommonLocationMasterList } from "../LocationType/getLocationCommonHelper";
@@ -15,12 +15,9 @@ import { toast } from "react-toastify";
 import { OverlayPanel } from "primereact/overlaypanel";
 import {
   TemplateBuildingDownload,
-  TemplateDownload,
   readUploadFile,
-  upploadexceljson,
 } from "../../../components/TemplateDownload/TemplateDownload";
 import { Dialog } from "primereact/dialog";
-import { ExportCSV } from "../../../utils/helper";
 import { FileUpload } from "primereact/fileupload";
 import { saveTracker } from "../../../utils/constants";
 import { appName } from "../../../utils/pagePath";
@@ -35,12 +32,36 @@ function RecursiveNode({
   handleCopyCut,
   pasteData,
   setPasteData,
+  collapseLastLevel,
+  toggleCollapse,
+  searchText,
 }: any) {
   const menuRef: any = useRef(null);
   const [visibleNodes, setVisibleNodes] = useState<{ [key: number]: boolean }>(
     {}
   );
 
+  const filterNodes = (nodes: any[]): any[] => {
+    return nodes
+      .map((node: any) => {
+        const childMatches = filterNodes(node.node_child || []);
+        const selfMatches = node.node_name
+          ?.toLowerCase()
+          .includes(searchText?.toLowerCase());
+
+        if (selfMatches || childMatches.length > 0) {
+          return {
+            ...node,
+            node_child: childMatches,
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  const filteredNodes = searchText ? filterNodes(nodes) : nodes;
   const toggleVisibility = (nodeId: number) => {
     setVisibleNodes({
       ...visibleNodes,
@@ -48,13 +69,12 @@ function RecursiveNode({
     });
   };
   const handleMenu = (e: any, node: any) => {
-    localStorage.setItem('parentId', node.node_id)
+    localStorage.setItem("parentId", node.node_id);
     menuRef?.current?.toggle(e);
     if (handleCopyCut) {
       setPasteData(node);
       if (selectedNode?.node_type_id > node?.node_type_id) {
         setSelectedMenu(MenuList?.Paste);
-
       } else {
         setSelectedMenu(MenuList?.Cancel);
       }
@@ -69,55 +89,111 @@ function RecursiveNode({
     }
   };
 
-  return nodes.map((node: any) => {
-    // setVisibleNodes({
-    //   ...visibleNodes,
-    //   [node.nodeId] : false
-    // })
+  const getExpandedNodeIds = (
+    nodes: any[],
+    searchText: string,
+    parentChain: number[] = []
+  ): number[] => {
+    let matchedIds: number[] = [];
+
+    for (const node of nodes) {
+      const nodeMatches = node.node_name
+        ?.toLowerCase()
+        .includes(searchText.toLowerCase());
+      const childMatches = getExpandedNodeIds(
+        node.node_child || [],
+        searchText,
+        [...parentChain, node.node_id]
+      );
+
+      if (nodeMatches || childMatches.length > 0) {
+        matchedIds.push(...parentChain, node.node_id, ...childMatches);
+      }
+    }
+
+    return Array.from(new Set(matchedIds));
+  };
+
+  useEffect(() => {
+    const expandAllNodes = (nodes: any[]): { [key: number]: boolean } => {
+      return nodes.reduce((acc: any, node: any) => {
+        acc[node.node_id] = true;
+        if (node.node_child?.length) {
+          Object.assign(acc, expandAllNodes(node.node_child));
+        }
+        return acc;
+      }, {});
+    };
+
+    const collapseAll = () => setVisibleNodes({});
+
+    if (searchText) {
+      const idsToExpand = getExpandedNodeIds(nodes, searchText);
+      const expandedMap = idsToExpand.reduce((acc: any, id: number) => {
+        acc[id] = true;
+        return acc;
+      }, {});
+      setVisibleNodes(expandedMap);
+    } else if (collapseLastLevel) {
+      collapseAll();
+    } else {
+      const expanded = expandAllNodes(nodes);
+      setVisibleNodes(expanded);
+    }
+  }, [collapseLastLevel, nodes, searchText]);
+
+  return filteredNodes?.map((node: any) => {
+    const isLastLevel = node?.node_child?.length === 0;
     return (
-      <ul className="sm:w-full md:w-60 border-slate-400" key={node.node_id}>
-        <Menu model={selectedMenu} popup ref={menuRef} />
-        <li className="">
-          <span className=" flex mt-2">
-            <span
-              className={`pi pi-angle-${visibleNodes[node.node_id] ? "down" : "left"
+      <>
+        <div></div>
+        <ul className="sm:w-full md:w-60 border-slate-400" key={node.node_id}>
+          <Menu model={selectedMenu} popup ref={menuRef} />
+          <li className="">
+            <span className=" flex mt-2">
+              <span
+                className={`pi pi-angle-${
+                  visibleNodes[node.node_id] ? "down" : "left"
                 } mt-2 mr-2 cursor-pointer duration-300`}
-              onClick={() => {
-                toggleVisibility(node.node_id)
-              }
-              }
-            ></span>
-            <a
-              aria-controls="popup_menu_left"
-              key={node.node_id}
-              onClick={(e: any) => {
-                handleMenu(e, node);
-              }}
-              aria-haspopup
-              className="text-white child-node"
-              title={node?.node_name}
-              style={{ backgroundColor: `${node.node_color}` }}
-            >
-              {node?.node_name}
-            </a>
-          </span>
-          {visibleNodes[node.node_id] &&
-            node.node_child &&
-            node.node_child.length > 0 && (
-              <RecursiveNode
-                nodes={node.node_child}
-                selectedNode={selectedNode}
-                setSelectedNode={setSelectedNode}
-                selectedMenu={selectedMenu}
-                setSelectedMenu={setSelectedMenu}
-                MenuList={MenuList}
-                handleCopyCut={handleCopyCut}
-                pasteData={pasteData}
-                setPasteData={setPasteData}
-              />
-            )}
-        </li>
-      </ul>
+                onClick={() => {
+                  toggleVisibility(node.node_id);
+                }}
+              ></span>
+              <a
+                aria-controls="popup_menu_left"
+                key={node.node_id}
+                onClick={(e: any) => {
+                  handleMenu(e, node);
+                }}
+                aria-haspopup
+                className="text-white child-node"
+                title={node?.node_name}
+                style={{ backgroundColor: `${node.node_color}` }}
+              >
+                {node?.node_name}
+              </a>
+            </span>
+
+            {visibleNodes[node.node_id] &&
+              node.node_child &&
+              node.node_child.length > 0 && (
+                <RecursiveNode
+                  nodes={node.node_child}
+                  selectedNode={selectedNode}
+                  setSelectedNode={setSelectedNode}
+                  selectedMenu={selectedMenu}
+                  setSelectedMenu={setSelectedMenu}
+                  MenuList={MenuList}
+                  handleCopyCut={handleCopyCut}
+                  pasteData={pasteData}
+                  setPasteData={setPasteData}
+                  collapseLastLevel={collapseLastLevel} // Pass the collapseLastLevel prop
+                  toggleCollapse={toggleCollapse}
+                />
+              )}
+          </li>
+        </ul>
+      </>
     );
   });
 }
@@ -130,6 +206,14 @@ const BuildingSet = (props: any) => {
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
   const { t } = useTranslation();
+  const FACILITY: any = localStorage.getItem("FACILITYID");
+  const FACILITYID: any = JSON.parse(FACILITY);
+
+  if (FACILITYID) {
+    var facility_type: any = FACILITYID?.FACILITY_TYPE;
+  }
+  const scrollTopRef = useRef<HTMLDivElement | null>(null);
+  const scrollContentRef = useRef<HTMLDivElement | null>(null);
   const menuLeft: any = useRef(null);
   const navigate: any = useNavigate();
   const [handleCopyCut, setHandleCopyCut] = useState<any>();
@@ -139,7 +223,12 @@ const BuildingSet = (props: any) => {
   const [selectedNode, setSelectedNode] = useState<any>([]);
   const [isClickOn, setIsClickOn] = useState<string>("");
   const [pasteData, setPasteData] = useState<any>(null);
-
+  const [visibleNodes, setVisibleNodes] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const [collapseLastLevel, setCollapseLastLevel] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [contentWidth, setContentWidth] = useState(0);
   const Actionitems = [
     {
       label: "Upload Data",
@@ -152,33 +241,23 @@ const BuildingSet = (props: any) => {
     {
       label: "Download Template",
       icon: "pi pi-download",
-      command: () => {
-        getAPI();
-
-
+      command: async () => {
+        await getAPI();
       },
     },
-    // {
-    //   label: "Download Data",
-    //   icon: "pi pi-download",
-    //   command: () => {
-    //     ExportCSV(props?.columnData, currentMenu?.FUNCTION_DESC+new Date());
-    //   },
-    // },
   ];
-
+  const toggleCollapseAll = () => {
+    setCollapseLastLevel(!collapseLastLevel);
+  };
   const getAPI = async () => {
     try {
       const res = await callPostAPI(
         ENDPOINTS.GETEXCELTEMPLATECOMMON,
         null,
         currentMenu?.FUNCTION_CODE
-
       );
       if (res) {
-       
       }
-
 
       TemplateBuildingDownload(res?.DATALIST, res?.JDATALIST, "Building Setup");
     } catch (error: any) {
@@ -186,9 +265,8 @@ const BuildingSet = (props: any) => {
     }
   };
 
-
   const [visible, setVisible] = useState<boolean>(false);
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
     setVisible(!visible);
   };
   const isUploadData = () => {
@@ -205,10 +283,9 @@ const BuildingSet = (props: any) => {
           facilityId: facilityDetails?.facilityId,
           locationId: facilityDetails?.locationId,
           locationTypeId: facilityDetails?.typeId,
-          //  parentId:facilityDetails?.locationId,
           mode: "A",
         };
-        //  localStorage.setItem('parentId',  facilityDetails?.locationId)
+
         navigate(`${appName}/location?add=`, { state: payload });
       },
     },
@@ -302,11 +379,51 @@ const BuildingSet = (props: any) => {
     const payload: any = {
       LOCATION_ID: locationId,
     };
+
     const res = await callPostAPI(ENDPOINTS?.GETHIRARCHY_LIST, payload);
     if (res?.FLAG === 1) {
       setBuildingNode(res?.LOCATIONHIERARCHYLIST);
     }
   };
+
+  useEffect(() => {
+    if (scrollContentRef.current) {
+      setContentWidth(scrollContentRef.current.scrollWidth);
+    }
+  }, [buildingNode, searchText]);
+
+  useEffect(() => {
+    const handleScroll = (e: any) => {
+      if (scrollTopRef.current && scrollContentRef.current) {
+        scrollTopRef.current.scrollLeft = scrollContentRef.current.scrollLeft;
+      }
+    };
+
+    const handleTopScroll = (e: any) => {
+      if (scrollContentRef.current && scrollTopRef.current) {
+        scrollContentRef.current.scrollLeft = scrollTopRef.current.scrollLeft;
+      }
+    };
+
+    const content = scrollContentRef.current;
+    const top = scrollTopRef.current;
+
+    if (content) {
+      content.addEventListener("scroll", handleScroll);
+    }
+    if (top) {
+      top.addEventListener("scroll", handleTopScroll);
+    }
+
+    return () => {
+      if (content) {
+        content.removeEventListener("scroll", handleScroll);
+      }
+      if (top) {
+        top.removeEventListener("scroll", handleTopScroll);
+      }
+    };
+  }, []);
 
   const buildingSetUp = async () => {
     try {
@@ -320,16 +437,15 @@ const BuildingSet = (props: any) => {
         locationId: res?.FACILITYDETAILS[0]?.LOCATION_ID,
         facilityId: res?.FACILITYDETAILS[0]?.FACILITY_ID,
         requestApproval: res?.FACILITYDETAILS[0]?.REDIRECT_APPROVAL,
-        materialApproval: res?.FACILITYDETAILS[0]?.MATREQ_APPROVAL
+        materialApproval: res?.FACILITYDETAILS[0]?.MATREQ_APPROVAL,
       });
 
-      getHierarchyList(res?.FACILITYDETAILS[0]?.LOCATION_ID);
+      await getHierarchyList(res?.FACILITYDETAILS[0]?.LOCATION_ID);
     } catch (error: any) {
       toast.error(error);
     }
   };
   //
-
 
   const onClickAction = async () => {
     const payload: any = {
@@ -344,7 +460,8 @@ const BuildingSet = (props: any) => {
     const res = await callPostAPI(ENDPOINTS?.PASTE_LOCATION, payload);
     if (res?.FLAG) {
       setHandleCopyCut(null);
-      getHierarchyList(facilityDetails?.locationId);
+      await getHierarchyList(facilityDetails?.locationId);
+      const response = await callPostAPI(ENDPOINTS?.COMMON_LOCATION_LIST, {});
     } else {
       toast?.error(res?.MSG);
     }
@@ -357,8 +474,9 @@ const BuildingSet = (props: any) => {
     };
     const res = await callPostAPI(ENDPOINTS?.DELETE_LOCATION, payload);
     if (res?.FLAG === true) {
+      const response = await callPostAPI(ENDPOINTS?.COMMON_LOCATION_LIST, {});
       toast.success(res?.MSG);
-      getHierarchyList(facilityDetails?.locationId);
+      await getHierarchyList(facilityDetails?.locationId);
     } else {
       toast.error(res?.MSG);
     }
@@ -381,25 +499,29 @@ const BuildingSet = (props: any) => {
   };
 
   useEffect(() => {
-    buildingSetUp();
-    getCommonLocationMasterList().then((res) =>
-      setLocationList(res?.LOCATIONTYPELIST)
-    );
-    saveTracker(currentMenu)
+    (async function () {
+      await buildingSetUp();
+      getCommonLocationMasterList().then((res) =>
+        setLocationList(res?.LOCATIONTYPELIST)
+      );
+      await saveTracker(currentMenu);
+    })();
   }, [selectedFacility]);
   useEffect(() => {
-    if (isClickOn === "D") {
-      onDelete();
-    }
-    if (isClickOn === "P") {
-      onClickAction();
-    }
-    if (isClickOn === "A") {
-      onClickAddLocation("A", "Add Location");
-    }
-    if (isClickOn === "E") {
-      onClickAddLocation("E", "Edit Location");
-    }
+    (async function () {
+      if (isClickOn === "D") {
+        await onDelete();
+      }
+      if (isClickOn === "P") {
+        await onClickAction();
+      }
+      if (isClickOn === "A") {
+        onClickAddLocation("A", "Add Location");
+      }
+      if (isClickOn === "E") {
+        onClickAddLocation("E", "Edit Location");
+      }
+    })();
   }, [isClickOn]);
 
   return (
@@ -413,7 +535,16 @@ const BuildingSet = (props: any) => {
                   {currentMenu?.FUNCTION_DESC}
                 </h6>
               </div>
+
+              <div></div>
               <div>
+                <input
+                  type="text"
+                  placeholder="Search nodes"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className=" border rounded  h-10  mr-2 border-gray-300 p-2"
+                />
                 <SplitButton
                   label={t("Action")}
                   className="Primary_SplitButton mr-2"
@@ -423,9 +554,10 @@ const BuildingSet = (props: any) => {
                   type="button"
                   icon="pi pi-map"
                   label="Legends"
-                  className="Secondary_Button "
+                  className="Secondary_Button mr-2 "
                   onClick={(e) => buildingOverlay.current.toggle(e)}
                 />
+
                 <OverlayPanel ref={buildingOverlay} showCloseIcon>
                   <div className="px-4">
                     <label className="Text_Secondary">Legend</label>
@@ -446,6 +578,22 @@ const BuildingSet = (props: any) => {
                     })}
                   </div>
                 </OverlayPanel>
+
+                <Button
+                  type="button"
+                  label={collapseLastLevel ? "Expand All " : "Collapse All "}
+                  className="Secondary_Button"
+                  onClick={toggleCollapseAll}
+                />
+              </div>
+            </div>
+
+            <div className=" tree-scroll-wrapper relative w-full">
+              <div
+                ref={scrollTopRef}
+                className="absolute top-9 left-0 right-0 h-4 overflow-x-auto overflow-y-hidden z-10"
+              >
+                <div style={{ width: contentWidth }} />
               </div>
             </div>
             <div className="">
@@ -466,7 +614,10 @@ const BuildingSet = (props: any) => {
                       width: "auto",
                     }}
                     onClick={(event) => {
-                      localStorage.setItem('parentId', facilityDetails?.locationId)
+                      localStorage.setItem(
+                        "parentId",
+                        facilityDetails?.locationId
+                      );
                       if (selectedNode && handleCopyCut) {
                         setPasteData({
                           node_id: facilityDetails?.locationId,
@@ -481,19 +632,30 @@ const BuildingSet = (props: any) => {
                     {facilityDetails?.name}
                   </Button>
                 </div>
-                {/* <Menu model={AllList} popup ref={menu} id="popup_menu_left" /> */}
-                <div className="flex sm:flex-wrap md:flex-nowrap tree-container border-t-2 border-slate-400 m-1 ">
-                  <RecursiveNode
-                    nodes={buildingNode}
-                    selectedNode={selectedNode}
-                    setSelectedNode={setSelectedNode}
-                    selectedMenu={selectedMenu}
-                    setSelectedMenu={setSelectedMenu}
-                    MenuList={{ AllList, Paste, Delete, Cancel }}
-                    handleCopyCut={handleCopyCut}
-                    pasteData={pasteData}
-                    setPasteData={setPasteData}
-                  />
+
+                <div
+                  ref={scrollContentRef}
+                  className={`flex tree-container border-t-2  border-slate-400 ${
+                    contentWidth > 1860 ? "m-5 p-2" : "m-2 p-1"
+                  }`}
+                  style={{ maxWidth: "99%" }}
+                >
+                  <div className="flex">
+                    <RecursiveNode
+                      nodes={buildingNode}
+                      selectedNode={selectedNode}
+                      setSelectedNode={setSelectedNode}
+                      selectedMenu={selectedMenu}
+                      setSelectedMenu={setSelectedMenu}
+                      MenuList={{ AllList, Paste, Delete, Cancel }}
+                      handleCopyCut={handleCopyCut}
+                      pasteData={pasteData}
+                      setPasteData={setPasteData}
+                      collapseLastLevel={collapseLastLevel}
+                      toggleCollapse={collapseLastLevel}
+                      searchText={searchText}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -505,7 +667,7 @@ const BuildingSet = (props: any) => {
         header="Bulk Upload"
         visible={visible}
         style={{ width: "30vw" }}
-        onHide={() => setDialogVisible(false)}
+        onHide={() => setDialogVisible()}
       >
         <div className="">
           <FileUpload
@@ -522,14 +684,18 @@ const BuildingSet = (props: any) => {
                   setVisible
                 );
                 if (response?.flag || response?.FLAG) {
-                  getHierarchyList(facilityDetails?.locationId);
-                  toast?.success(response?.MSG);
-                  props?.getAPI()
-
+                  const response = await callPostAPI(
+                    ENDPOINTS?.COMMON_LOCATION_LIST,
+                    {}
+                  );
+                  await getHierarchyList(facilityDetails?.locationId);
+                  // toast?.success(response?.MSG);
+                  toast?.success("Location uploaded successfully");
+                  props?.getAPI();
                 } else {
                   toast?.error(response?.MSG);
                 }
-              } catch (error) { }
+              } catch (error) {}
               // readUploadFile(e,currentMenu?.FUNCTION_CODE ,setVisible);
             }}
           />

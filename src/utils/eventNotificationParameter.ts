@@ -1,15 +1,19 @@
-import { toast } from "react-toastify";
+
 import { callPostAPI } from "../services/apis";
 import { ENDPOINTS } from "./APIEndpoints";
 import { LOCALSTORAGE } from "./constants";
 import { decryptData } from "./encryption_decryption";
+
 const userId: any = decryptData(localStorage.getItem("USER_ID"));
-const facilityID = JSON.parse(
-  localStorage.getItem(`${LOCALSTORAGE.FACILITYID}`)!
-)?.FACILITY_ID;
+function f() {
+  return JSON.parse(
+    localStorage.getItem(`${LOCALSTORAGE.FACILITYID}`)!
+  )?.FACILITY_ID
+}
+
 export const eventNotification: any = {
   USER_ID: parseInt(userId),
-  FACILITY_ID: facilityID,
+  FACILITY_ID: "",
   EVENT_TYPE: "",
   FUNCTION_CODE: "",
   STATUS_CODE: "",
@@ -43,17 +47,18 @@ export const eventNotification: any = {
 };
 
 export const helperEventNotification = async (eventPayload: any) => {
+ 
+  const fd = f()
+  eventPayload.FACILITY_ID = fd;
+ 
   try {
     const res: any = await callPostAPI(
       ENDPOINTS.EVENT_NOTIFICATION,
       eventPayload
     );
     if (res?.FLAG === true) {
-      // toast?.success(res?.MSG);
     } else {
-      // toast?.error(res?.MSG)
     }
   } catch (error: any) {
-    // toast?.error(error)
   }
 };

@@ -15,17 +15,32 @@ const PartMaster = (props: any) => {
     const getAPI = async () => {
         try {
             const res = await callPostAPI(ENDPOINTS.GET_ASSET_MASTER_LIST, null, currentMenu?.FUNCTION_CODE)
+            let updatedPartMasterList = formatPartMasterList(res?.ASSESTMASTERSLIST)
             localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
-            props?.setData(res?.ASSESTMASTERSLIST || []);
+            props?.setData(updatedPartMasterList || []);
         } catch (error: any) {
             toast.error(error)
         }
 
     }
 
+    const formatPartMasterList = (list: any) => {
+        let PartMasterList = list;
+        PartMasterList = PartMasterList.map((element: any) => {
+            return {
+                ...element,
+                MAINTAIN_INVENTORY1: element?.MAINTAIN_INVENTORY === false ? "No" : "Yes"
+            }
+        })
+        return PartMasterList
+ 
+    }
+
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu])
     return (
@@ -36,11 +51,11 @@ const PartMaster = (props: any) => {
                     search: true
                 }}
                 dataKey={currentMenu?.FUNCTION_DESC}
-                columnTitle={["PART_NAME", "ASSETGROUP_NAME", "ASSETTYPE_NAME","CURRUNT_STOCK",  "MAINTAIN_INVENTORY", "ACTIVE", "ACTION"]}
-                customHeader={["Part Name", "Equipment/Soft Service Group", "Equipment/Soft Service Type","Current Stock",  "Maintain Inventory", "Active", "Action"]}
+                columnTitle={["PART_NAME", "ASSETGROUP_NAME", "ASSETTYPE_NAME", "CURRUNT_STOCK", "MAINTAIN_INVENTORY1", "ACTIVE", "ACTION"]}
+                customHeader={["Part Name", "Equipment/Soft Service Group", "Equipment/Soft Service Type", "Current Stock", "Maintain Inventory", "Active", "Action"]}
                 columnData={props?.data}
                 clickableColumnHeader={["PART_NAME"]}
-                filterFields={['PART_NAME', "MAINTAIN_INVENTORY"]}
+                filterFields={['PART_NAME', "ASSETGROUP_NAME", "ASSETTYPE_NAME", "CURRUNT_STOCK", "MAINTAIN_INVENTORY1"]}
                 isClick={props?.isForm}
                 handelDelete={props?.handelDelete}
                 getAPI={getAPI}

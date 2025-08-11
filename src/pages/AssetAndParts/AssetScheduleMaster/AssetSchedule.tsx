@@ -7,15 +7,14 @@ import Buttons from "../../../components/Button/Button";
 import "../../../components/pageComponents/AssetSchedule/AssetScheduleForm";
 import { validation } from "../../../utils/validation";
 import { LABELS, OPTIONS, convertTime } from "../../../utils/constants";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import TimeCalendar from "../../../components/Calendar/TimeCalendar";
 import { Card } from "primereact/card";
 import TaskAndDoc from "../../../components/pageComponents/TaskAndDoc/TaskAndDoc";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { callPostAPI } from "../../../services/apis";
-import { toast } from "react-toastify";
 import noDataIcon from "../../../assest/images/nodatafound.png";
-import { validate } from "uuid";
+
 const AssetSchedule = ({
   register,
   control,
@@ -23,18 +22,8 @@ const AssetSchedule = ({
   watch,
   errors,
   setValue,
-  isValueCheck,
-  invalid,
-  require,
-  resetField,
-  scheduleTaskList,
-  scheduleId,
   getValues,
   setStartEndDate,
-  setEditStatus,
-  isSubmitting,
-  AssetSchedule,
-  scheduleData,
   setisValueCheck,
   task,
   setWeek,
@@ -44,18 +33,15 @@ const AssetSchedule = ({
   let scheduleWatch: any = watchAll?.SCHEDULE_ID;
   const [taskList, setTaskList] = useState<any | null>(task);
   const [selectedData, setSelectedData] = useState<any | null>([]);
-  const [editSelectedData, setEditSelectedData] = useState<any | null>([]);
-  const [selectedTask, setSelectedTask] = useState<any | null>([]);
-  const [errorData, setError] = useState<any | null>(false);
-  const [errorName, setErrorName] = useState<any | null>(false);
+  const [, setEditSelectedData] = useState<any | null>([]);
+  const [, setError] = useState<any | null>(false);
+  const [, setErrorName] = useState<any | null>(false);
   const [data, setData] = useState<{ DAY_CODE: number; DAY_DESC: string }>();
 
-  const [options, setOptions] = useState<any>({});
   const handleSelectWeekChange = (week: any, fieldName: any) => {
     setValue(fieldName, week?.DAY_CODE);
   };
-  const [visible, setVisible] = useState<boolean>(false);
-  const [disabled, setDisabled] = useState<boolean>(true);
+
 
   var SCHEDULER_WEEKLY_1_EVERY_WEEK = watch("SCHEDULER.WEEKLY_1_EVERY_WEEK");
   const SCHEDULER_PERIOD = watch("SCHEDULER.PERIOD");
@@ -95,16 +81,11 @@ const AssetSchedule = ({
     );
   };
 
-  const dailytHours = useRef(null)
-
-
-
   const inputElement = (
     labelName: any,
     registerName: any,
     lastLabel: any = null,
-    validationType: any,
-    label?: any
+    validationType: any
   ) => {
 
 
@@ -208,7 +189,6 @@ const AssetSchedule = ({
                     require={true}
                     setValue={setValue}
                     invalid={errors?.["SCHEDULER"]?.[register_split]}
-                    // invalidMessage={errors?.registerName?.message}
                     {...field}
                   />
                 );
@@ -233,7 +213,7 @@ const AssetSchedule = ({
       SCHEDULER_WEEKLY_1_EVERY_WEEK: SCHEDULER_WEEKLY_1_EVERY_WEEK,
       SCHEDULER_PERIOD: SCHEDULER_PERIOD.PERIOD,
     });
-    LABELS.weekDataLabel?.map((week: any, dayIndex: any) => {
+    LABELS.weekDataLabel?.map((week: any) => {
       if (watchScheduler?.WEEKLY_1_WEEKDAY === week?.DAY_CODE) {
         setWeek({
           week: week,
@@ -486,11 +466,13 @@ const AssetSchedule = ({
         getScheduleOption(res?.SCHEDULEDETAILS[0]);
         setSelectedData(res?.SCHEDULEDETAILS[0]);
         setEditSelectedData(res?.SCHEDULEDETAILS);
-        getTaskList(res?.TASkDETAILS);
-        getTaskList(res?.TASkDETAILS);
+        await getTaskList(res?.TASkDETAILS);
+        // getTaskList(res?.TASkDETAILS);
       }
     }
   };
+
+
 
   const getTaskList = async (taskDetails: any) => {
     try {
@@ -529,7 +511,9 @@ const AssetSchedule = ({
 
   useEffect(() => {
     if (watchAll?.SCHEDULE_ID !== 0 && watchAll?.TYPE !== null) {
-      getScheduleDetails();
+      (async function () {
+        await getScheduleDetails()
+      })();
     }
   }, [watchAll?.TYPE, watchAll?.SCHEDULE_ID]);
 
@@ -588,7 +572,7 @@ const AssetSchedule = ({
                         <Select
                           options={OPTIONS?.scheduleList}
                           {...register("SCHEDULER.PERIOD", {
-                            validate: (fieldValue: any) => {
+                            validate: () => {
                               if (
                                 !watchAll?.SCHEDULE_ID &&
                                 !watchScheduler?.PERIOD
@@ -602,9 +586,8 @@ const AssetSchedule = ({
                           findKey={"PERIOD"}
                           selectedData={selectedData?.PERIOD}
                           setValue={setValue}
-                          // require={true}
                           invalid={errors?.SCHEDULER?.PERIOD}
-                          // invalid={errorData === true ? "error" : ""}
+
                           {...field}
                           value={
                             OPTIONS?.scheduleList?.filter(
@@ -645,7 +628,7 @@ const AssetSchedule = ({
                       "SCHEDULER.DAILY_ONCE_EVERY_DAYS",
                       "Day(s)",
                       "onlyDay",
-                      "DAILY_ONCE_EVERY_DAYS"
+                      // "DAILY_ONCE_EVERY_DAYS"
                     )}
                   </div>
                 )}
@@ -659,7 +642,7 @@ const AssetSchedule = ({
                       "SCHEDULER.DAILY_EVERY_PERIOD",
                       "Hr(s)",
                       "onlyHours",
-                      "DAILY_EVERY_PERIOD"
+                      // "DAILY_EVERY_PERIOD"
                     )}
 
                     {/* SCHEDULER.DAILY_EVERY_STARTAT */}
@@ -694,7 +677,7 @@ const AssetSchedule = ({
                     className="w-80"
                     {...register("SCHEDULER.WEEKLY_1_WEEKDAY", {})}
                   >
-                    {LABELS.weekDataLabel?.map((week: any, dayIndex: any) => {
+                    {LABELS.weekDataLabel?.map((week: any) => {
                       return (
                         <Buttons
                           className={`Secondary_Button mr-1 ${watchScheduler?.WEEKLY_1_WEEKDAY ===
@@ -890,7 +873,7 @@ const AssetSchedule = ({
                         >
                           {/* This is WEEK DAY */}
                           {LABELS?.weekDataLabel?.map(
-                            (week: any, dayIndex: any) => {
+                            (week: any) => {
                               return (
                                 <Buttons
                                   className={`Secondary_Button weekButton mr-1 ${watchScheduler?.MONTHLY_2_WEEKDAY ===
@@ -1005,7 +988,7 @@ const AssetSchedule = ({
                                   );
                                 }
                               })}
-                             
+
                               invalid={errors?.SCHEDULER?.RUN_AVG_DAILY}
                               {...field}
                             />

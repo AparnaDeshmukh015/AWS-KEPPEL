@@ -1,5 +1,4 @@
-.p-inputtext 
-{
+.p-inputtext {
     background-color: #fff;
     border-radius: 6px;
     color: #272B30;
@@ -12,8 +11,9 @@
     border: 1px solid #32475c38;
     font-family: 'Lato', sans-serif !important;
 }
-.p-calendar{
-    border: 1px solid #32475c38;
+
+.p-calendar {
+    border: 1px solid #32475c38 !important;
     border-radius: 6px;
 }
 
@@ -22,46 +22,65 @@
     box-shadow: none !important;
     border-color: #8E724A !important;
 }
-.errorBorder .p-inputtext,.errorBorder .p-calendar {
-    border: 1px solid #dc2020;
+
+.errorBorder .p-inputtext
+/* .errorBorder .p-calendar  */
+{
+    border: 1px solid #dc2020 ;
 }
 
 .p-inputtext:enabled:hover {
     border-color: #b7b8ba;
 }
-.Search-Input{
+
+.Search-Input {
     padding-left: 2rem !important;
+  
 }
+.p-placeholder {
+    color: #6b7280 !important
+}
+
 /* calender */
 .p-calendar,
 .p-colorpicker-overlay {
     width: 100%;
 }
- 
+
 .p-button.p-button-icon-only {
     width: 3rem;
-   
+
 }
+
 .p-card .p-card-content {
     padding: 0;
 }
+
 .p-card {
     background-clip: padding-box;
     background: #fff;
     border-radius: 6px;
     box-shadow: 0 2px 6px 0 #4359711f;
+
 }
+
 .colorpicker {
     height: 34px;
     padding: 8px 12px;
 }
 
-.p-calendar .p-inputtext{
+.p-calendar .p-inputtext {
     border: none;
 }
-.p-disabled{
+
+.p-disabled {
     background-color: #b3b9c059 !important;
 }
-.p-disabled .p-inputtext{
+
+.p-disabled .p-inputtext {
     background-color: transparent !important;
+}
+
+.p_inputtext_Color{
+color:#b7b8ba !important
 }

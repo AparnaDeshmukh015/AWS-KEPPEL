@@ -1,0 +1,258 @@
+.p-datepicker-title {
+    gap: 7px !important;
+    display: flex;
+    font-family: "Lato", sans-serif !important;
+
+}
+
+:where(.calendar-component) .p-datepicker-today {
+    background-color: #8e724a !important;
+    color: white !important;
+    border-radius: 0.5rem !important;
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+
+.calendar-component .p-datepicker {
+    /* font-size: 1rem;
+  width: 100% !important; */
+    font-size: 1rem;
+    width: 100% !important;
+}
+
+/* .p-datepicker-calendar-container {
+    size: 12px;
+    font-size: 12px;
+    /* height: 300px;  
+    border-width: 0 !important;
+} */
+
+:where(.main-component) .p-card-body {
+    padding: 0;
+}
+
+:where(.main-component) .p-card-content {
+    padding: 0;
+}
+
+
+.rbc-active {
+    background-color: #8e724a !important;
+    color: white !important;
+}
+
+.rbc-btn-group button {
+    color: #8e724a;
+    border: 1px solid #c4baa6;
+    background: transparent;
+}
+
+.rbc-toolbar-label {
+    align-items: start;
+    display: flex;
+    font-family: "Lato", sans-serif !important;
+    letter-spacing: 0.15px;
+
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.rbc-toolbar {
+    margin-bottom: 0 !important;
+}
+
+/* Shrink the input field */
+.p-calendar .p-inputtext {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    height: auto !important;
+    width: 100% !important;
+    border-width: 0 !important;
+
+}
+
+/* Shrink the calendar popup */
+/* .p-datepicker {
+    /* transform: scale(0.75) !important; 
+    transform-origin: top left !important;
+    font-size: 1.2rem !important;
+    height: auto !important;
+    border-width: 0 !important;
+
+
+} */
+
+.thin-line {
+    width: 100%;
+    /* Full width of container */
+    height: 1px;
+    /* Thin line - adjust thickness as needed */
+    background-color: rgb(229 231 235);
+    /* Line color - change as desired */
+    margin: 8px 0;
+    /* Optional spacing above/below */
+    border: none;
+    /* Remove any default borders */
+}
+
+.thin-line1 {
+    width: 100%;
+    /* Full width of container */
+    height: 1px;
+    /* Thin line - adjust thickness as needed */
+    background-color: rgb(229 231 235);
+    /* Line color - change as desired */
+    margin-top: 8px;
+    /* Optional spacing above/below */
+    border: none;
+    /* Remove any default borders */
+}
+
+search-keyword {
+    border-width: 0 !important;
+    display: flex;
+
+}
+
+.navigate-btn {
+    border-width: 0 !important;
+    color: black !important;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.rbc-date-subheader {
+    width: 100%;
+    text-align: left;
+
+    background-color: rgb(248, 248, 248);
+    font-family: Lato;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    /* 150% */
+    letter-spacing: 0.15px;
+    height: 40px;
+    padding-top: 10px;
+}
+
+.rbc-timeslot-group {
+    background-color: rgb(255, 255, 255);
+
+}
+
+.rbc-time-header-gutter {
+    font-family: Lato;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    /* 116.667% */
+    letter-spacing: 0.4px;
+    padding-top: 4px;
+    color: var(--Light-Text-Disabled, #A7ACB2);
+    text-align: center;
+}
+
+.rbc-time-slot {
+    align-self: stretch;
+    border-bottom: 0 !important;
+    color: var(--Light-Text-Primary, #272B30);
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: Lato;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    /* 116.667% */
+    letter-spacing: 0.4px;
+    padding-top: 2px;
+}
+
+/* .rbc-addons-dnd-row-body .rbc-row {
+    background-color: rgb(255, 255, 255);
+} */
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+    background-color: white !important;
+}
+
+.calendar-component .p-component {
+    border-width: 0px !important;
+}
+
+.rbc-date-cell {
+    flex: 1 1;
+    min-width: 0;
+    padding-top: 5px;
+    padding-top: 10px;
+    padding-left: 10px;
+    text-align: left;
+}
+
+.rbc-today {
+    background-color: #f1f1f1 !important;
+}
+
+:where(.rbc-now) .rbc-button-link {
+    background-color: #8E724A !important;
+    color: white;
+    height: 25px;
+    width: 30px;
+    border-radius: 0.4rem;
+}
+
+.rbc-month-header {
+    height: 42px;
+}
+
+.rbc-header {
+    padding-top: 8px;
+}
+
+.dialog {
+    gap: 10rem !important;
+}
+
+.x-button {
+    margin-bottom: 0.3rem;
+}
+
+td:has(.week.styled-parent) {
+    background-color: #F1EEE9;
+
+}
+
+.p-highlight-today span {
+    border-width: 0 !important;
+}
+
+.rbc-agenda-table tr {
+    background-color: transparent !important;
+}
+
+.rbc-agenda-event-cell {
+    width: 100% !important;
+}
+
+.p-card-content {
+    padding: 0 !important;
+}
+
+.hehe {
+    max-height: 50px !important;
+    min-width: 20% !important;
+}
+
+.rbc-agenda-empty {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #8e724a;
+}

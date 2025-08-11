@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
 import Buttons from "../../../components/Button/Button";
@@ -17,14 +17,14 @@ import {
   eventNotification,
   helperEventNotification,
 } from "../../../utils/eventNotificationParameter";
-import { dateFormat, saveTracker } from "../../../utils/constants";
-import { appName, PATH } from "../../../utils/pagePath";
+import { saveTracker } from "../../../utils/constants";
+import { PATH } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const PPMAddForm = (props: any) => {
   let { pathname } = useLocation();
   const { t } = useTranslation();
-  const [selectedFacility, menuList]: any = useOutletContext();
+  const [, menuList]: any = useOutletContext();
   const[selectedDetails, setSelectedDetails]=useState<any|null>()
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
@@ -35,9 +35,10 @@ const PPMAddForm = (props: any) => {
   ];
 
   const location: any = useLocation();
+  const[IsSubmit, setIsSubmit] = useState<any|null>(false)
   const navigate: any = useNavigate();
   const [options, setOptions] = useState<any | null>([]);
-  let [locationtypeOptions, setlocationtypeOptions] = useState([]);
+  //let [locationtypeOptions, setlocationtypeOptions] = useState([]);
   const {
     register,
     handleSubmit,
@@ -58,9 +59,13 @@ const PPMAddForm = (props: any) => {
   });
   const ASSET_NONASSET: any = watch("ASSET_NONASSET");
   const watchAll: any = watch()
-  const onSubmit = async (payload: any, e: any) => {
+  console.log(errors, 'error')
+  const onSubmit = useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
+    try{
     payload.SCHEDULE_DATE = moment(payload.DATE).format("DD-MM-YYYY");
-    payload.SCHEDULE_TIME = moment(payload.TIME).format("hh:mm");
+    payload.SCHEDULE_TIME = moment(payload.TIME).format("HH:mm");
     payload.ASSET_ID = payload.ASSET_ID?.ASSET_ID;
     payload.PARA = { para1: `${currentMenu?.FUNCTION_DESC}`, para2: "created" };
     delete payload.LOCATION_ID;
@@ -83,7 +88,7 @@ const PPMAddForm = (props: any) => {
       };
 
       const eventPayload = { ...eventNotification, ...notifcation };
-      helperEventNotification(eventPayload);
+      await helperEventNotification(eventPayload);
 
       props?.setShowForm(false);
       let month: any = moment(new Date()).format("MM");
@@ -96,8 +101,22 @@ const PPMAddForm = (props: any) => {
       );
       props?.getOptions(firstDate, lastDate);
       navigate(PATH.PPMSCHEDULE);
+    }else {
+      toast.error(res?.MSG);
     }
-  };
+  }catch(error:any){
+    toast.error(error)
+  }finally{
+ setIsSubmit(false)
+  }
+  },[ IsSubmit,
+    currentMenu,
+    eventNotification,
+    props,
+    watchAll,
+    setIsSubmit,  
+    navigate,]);
+
   const selectedLocationTemplate = (option: any, props: any) => {
     if (option) {
       return (
@@ -126,7 +145,7 @@ const PPMAddForm = (props: any) => {
       const res = await callPostAPI(ENDPOINTS.GET_SERVICEREQUST_MASTERLIST, {});
       const res1 = await callPostAPI(ENDPOINTS.LOCATION_HIERARCHY_LIST, null);
       if (res?.FLAG === 1) {
-        setlocationtypeOptions(res1?.LOCATIONHIERARCHYLIST);
+       // setlocationtypeOptions(res1?.LOCATIONHIERARCHYLIST);
       
         setOptions({
           assestOptions: res?.ASSETLIST.filter(
@@ -144,8 +163,10 @@ const PPMAddForm = (props: any) => {
   };
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
+    (async function () {
+         await  getOptions();
+         await saveTracker(currentMenu)
+        })();
   }, [location?.state]);
 
   useEffect(() => {
@@ -169,6 +190,7 @@ const PPMAddForm = (props: any) => {
               type="submit"
               className="Primary_Button  w-20 me-2"
               label={"Save"}
+              disabled={IsSubmit}
             />
             <Buttons
               className="Secondary_Button w-20 "

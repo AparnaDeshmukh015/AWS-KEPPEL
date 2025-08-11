@@ -3,11 +3,8 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Field from "../../../components/Field";
 import InputField from "../../../components/Input/Input";
-import DateCalendar from "../../../components/Calendar/Calendar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import DialogBox from "../../../components/DialogBox/DialogBox";
-import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -19,21 +16,21 @@ import "../../../components/Checkbox/Checkbox.css";
 import "../../../components/Button/Button.css";
 import { saveAs } from "file-saver";
 import SplitButtons from "../../../components/SplitButton/SplitButton";
-import { dateFormat, LOCALSTORAGE } from "../../../utils/constants";
+import { dateFormat } from "../../../utils/constants";
 const HolidayList = ({
   setHolidayList,
   disabled,
-  HOLIDAYLIST,
-  sameParent,
+  HOLIDAYLIST
+
 }: any) => {
   const { t } = useTranslation();
   const [visible, setVisible] = useState<boolean>(false);
   const [date, setDate] = useState<any | null>();
   const [excelFile, setExcelFile] = useState<any | null>(null);
-  const [typeError, setTypeError] = useState<any | null>(null);
+  //const [typeError, setTypeError] = useState<any | null>(null);
 
   // submit state
-  const [excelData, setExcelData] = useState<any | null>(null);
+  // const [excelData, setExcelData] = useState<any | null>(null);
   const [HolidayData, setHolidayData] = useState<any | null>(
     HOLIDAYLIST ? HOLIDAYLIST : []
   );
@@ -41,7 +38,6 @@ const HolidayList = ({
     register,
     handleSubmit,
     control,
-    setValue,
     reset,
     formState: { errors },
   } = useForm({
@@ -69,13 +65,15 @@ const HolidayList = ({
         downloadExcel()
       },
     }]
- 
+
   const onSubmit = (payload: any) => {
-    const itemDate = new Date(payload.HOLIDAY_DATE).getTime(); 
+
+
+    const itemDate = new Date(payload.HOLIDAY_DATE).getTime();
     const isDuplicate = HolidayData.some((existing: any) => {
-    const existingDate = new Date(existing.HOLIDAY_DATE).getTime();
-    return existingDate === itemDate;
-  });
+      const existingDate = new Date(existing.HOLIDAY_DATE).getTime();
+      return existingDate === itemDate;
+    });
 
     if (!isDuplicate) {
       setHolidayData((prevTableData: any) => [...prevTableData, payload]);
@@ -91,7 +89,7 @@ const HolidayList = ({
       HOLIDAY_NAME: "",
     });
   };
-  const setDialogVisible = (e: any) => {
+  const setDialogVisible = () => {
     setVisible(!visible);
     //props?.setValue(props?.visible)
   };
@@ -107,10 +105,7 @@ const HolidayList = ({
     setHolidayList(removeData);
   };
 
-  const handlerShow = (e: any) => {
-    e.preventDefault();
-    setVisible(true);
-  };
+
   const downloadExcel = () => {
 
     const data: any = [["HOLIDAY_DATE", "HOLIDAY_NAME"], ["", ""]];
@@ -142,14 +137,14 @@ const HolidayList = ({
     let selectedFile = e.target.files[0];
     if (selectedFile) {
       if (selectedFile && fileTypes.includes(selectedFile.type)) {
-        setTypeError(null);
+        // setTypeError(null);
         let reader = new FileReader();
         reader.readAsArrayBuffer(selectedFile);
         reader.onload = (e: any) => {
           setExcelFile(e.target.result);
         };
       } else {
-        setTypeError("Please select only excel file types");
+        //setTypeError("Please select only excel file types");
         toast.error("Please select only excel file types");
         setExcelFile(null);
       }
@@ -168,7 +163,24 @@ const HolidayList = ({
       const worksheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[worksheetName];
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: false });
-      setExcelData(data.slice(0, 10));
+
+
+      // Check if there are any missing or invalid dates in the Excel file
+      const invalidData = data.find((item: any) => {
+
+        if (!item.HOLIDAY_DATE || item.HOLIDAY_DATE === "" || item.HOLIDAY_DATE === undefined || item.HOLIDAY_NAME
+          === '' || item.HOLIDAY_NAME === undefined || !item.HOLIDAY_NAME) {
+          return true;  // Found an entry with invalid or missing date
+        }
+        return false;
+      });
+      if (invalidData) {
+        // If any date is missing or invalid, show an error and stop the upload process
+        toast?.error("Invaid Data entered in excel.");
+        setVisible(false);
+        return;
+      }
+      // Proceed with filtering and uploading the data if all dates are valid
       const newHolidays = data.filter((item: any) => {
         const itemDate = new Date(item.HOLIDAY_DATE).getTime(); // Format as YYYY-MM-DD
         return !HolidayData.some((existing: any) => {
@@ -176,9 +188,8 @@ const HolidayList = ({
           return existingDate === itemDate;
         });
       });
-     
-      setVisible(false)
-     
+
+      setVisible(false);
       if (newHolidays.length > 0) {
         setVisible(false);
         setHolidayList((prevState: any) => [...prevState, ...newHolidays]);
@@ -192,10 +203,6 @@ const HolidayList = ({
 
   return (
     <>
-      {/* <div className="mb-2 border-b">
-        <h6>{t("Working Schedule")}</h6>
-      </div> */}
-
       <div className=" grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3">
         <div className={`${errors?.HOLIDAY_DATE ? "errorBorder" : ""}`}>
           <label className="Text_Secondary Input_Label" htmlFor="buttondisplay">
@@ -217,6 +224,7 @@ const HolidayList = ({
                     })}
                     disabled={disabled}
                     value={new Date(date)}
+                    minDate={new Date()}
                     label="Holiday Date"
                     showIcon
                     {...field}
@@ -224,7 +232,7 @@ const HolidayList = ({
                 );
               },
             }}
-          // error={errors?.HOLIDAY_DATE?.message}
+
           />
         </div>
 
@@ -261,14 +269,7 @@ const HolidayList = ({
             label={t("Add")}
             onClick={handleSubmit(onSubmit)}
           />
-          {/* <Button
-            className="Secondary_Button md:mt-5 ml-2"
-            label="Upload List"
-            type="button"
-            disabled={disabled}
-            icon="pi pi-external-link"
-            onClick={(e) => handlerShow(e)}
-          />   */}
+
           <SplitButtons
             className="Secondary_Button md:mt-5 ml-2"
             disabled={disabled}

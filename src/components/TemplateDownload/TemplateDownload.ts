@@ -5,12 +5,14 @@ import { callPostAPI } from "../../services/apis";
 import { ENDPOINTS } from "../../utils/APIEndpoints";
 import { toast } from "react-toastify";
 
+
+
 const TemplateDownload = (
   headerdata: any,
   dropdowndata: any,
   fileName: string,
   noOfRows?: number,
-  downloadData?: boolean
+  // downloadData?: boolean
 ) => {
   let excelkey = [
     { key: 1, value: "A" },
@@ -99,8 +101,8 @@ const TemplateDownload = (
 
   var sendjsondata = headerdata;
   var j_data = dropdowndata;
-  convert_excel_base64(sendjsondata, noOfRows ?? 10000, j_data);
-  function convert_excel_base64(data: any, generate_rows = 10000, j_data: any) {
+  convert_excel_base64(sendjsondata, noOfRows ?? 20000, j_data);
+  function convert_excel_base64(data: any, generate_rows = 20000, j_data: any) {
     var workbook = new excelJs.Workbook();
     var worksheet = workbook.addWorksheet("Sheet1");
 
@@ -108,16 +110,14 @@ const TemplateDownload = (
 
     var arrData = typeof data != "object" ? JSON.parse(data) : data;
 
-    let dropdown = [];
-
-    for (var i = 0; i < generate_rows; i++) {
-      if (i == 0) {
-        var array = [];
-        var ary = {};
-        for (var index in arrData[0]) {
+    for (let i = 0; i < generate_rows; i++) {
+      if (i === 0) {
+        let array = [];
+        let ary = {};
+        for (var arrDataIndex in arrData[0]) {
           ary = {
-            header: index,
-            key: index,
+            header: arrDataIndex,
+            key: arrDataIndex,
           };
           array.push(ary);
           headercount++;
@@ -125,33 +125,31 @@ const TemplateDownload = (
         worksheet.columns = array;
       }
 
-      var arrayDetail = [];
-      var j = 1;
-      for (var index in arrData[0]) {
-        if (typeof arrData[0][index] == "object") {
-          dropdown = arrData[0][index];
-          arrayDetail[j] = "";
+      let arrayDetail = [];
+      let j1 = 1;
+      for (let indexArrData in arrData[0]) {
+        if (typeof arrData[0][indexArrData] == "object") {
+          arrayDetail[j1] = "";
         } else {
-          arrayDetail[j] = arrData[0][index];
+          arrayDetail[j1] = arrData[0][indexArrData];
         }
 
-        j++;
+        j1++;
       }
 
       worksheet.addRow(arrayDetail);
     }
 
-    for (var i = 0; i < generate_rows; i++) {
-      var arrayDetail = [];
-      var j = 1;
+    for (let i = 0; i < generate_rows; i++) {
+      let j2 = 1;
 
-      for (var index in arrData[0]) {
-        if (typeof arrData[0][index] == "object") {
+      for (var index_arrData in arrData[0]) {
+        if (typeof arrData[0][index_arrData] == "object") {
           var c = [];
 
-          c.push(arrData[0][index][0]);
+          c.push(arrData[0][index_arrData][0]);
 
-          var a = excelkey[j - 1].value + (i + 2);
+          var a = excelkey[j2 - 1].value + (i + 2);
 
           worksheet.getCell(a).dataValidation = {
             type: "list",
@@ -159,7 +157,7 @@ const TemplateDownload = (
             formulae: c,
           };
         }
-        j++;
+        j2++;
       }
     }
 
@@ -170,24 +168,24 @@ const TemplateDownload = (
       to: toval,
     };
 
-    for (var i = 0; i < j_data.length; i++) {
+    for (let i = 0; i < j_data.length; i++) {
       var worksheet_new = workbook.addWorksheet(j_data[i].sheet);
       worksheet_new.state = "hidden";
       let headercount = 0;
-      var arrData =
+      let arrData =
         typeof j_data[i].data != "object"
           ? JSON.parse(j_data[i].data)
           : j_data[i].data;
       for (var k = 0; k < arrData.length; k++) {
-        if (k == 0) {
-          var array = [];
-          var ary = {};
-          for (var index in arrData[0]) {
+        if (k === 0) {
+          let array = [];
+          let ary = {};
+          for (var index2 in arrData[0]) {
             ary = {
-              header: index,
-              key: index,
+              header: index2,
+              key: index2,
             };
-            //worksheet.getColumn(index).outlineLevel = 0;
+
             array.push(ary);
             headercount++;
           }
@@ -195,9 +193,9 @@ const TemplateDownload = (
         }
 
         var array_Detail = [];
-        var j = 1;
-        for (var index in arrData[k]) {
-          array_Detail[j] = arrData[k][index];
+        let j = 1;
+        for (var index4 in arrData[k]) {
+          array_Detail[j] = arrData[k][index4];
           j++;
         }
         worksheet_new.addRow(array_Detail);
@@ -214,52 +212,7 @@ const TemplateDownload = (
     });
   }
 };
-// const upploadexceljson: any = async (
-//   jsonarray: any,
-//   columnheader: string,
-//   columnlength: number,
-//   function_code: string
-// ) => {
-//   try {
-//     const payload = {
-//       data: jsonarray,
-//       col_length: columnlength,
-//       col_headers: columnheader,
-//       verify_type: "upload",
-//     };
-//     const res = await callPostAPI(
-//       ENDPOINTS.UPLOADEXCELDATACOMMON,
-//       payload,
-//       function_code
-//     );
-//     return res;
-//   } catch (error: any) {
-//     toast.error(error);
-//   }
-// };
 
-// const readUploadFile = (e: any, function_code: any, setVisible: any) => {
-//   if (e.files) {
-//     const reader = new FileReader();
-//     reader.onload = (e) => {
-//       const data = e.target?.result;
-//       const workbook = xlsx.read(data, { type: "array" });
-//       const sheetName = workbook.SheetNames[0];
-//       const worksheet = workbook.Sheets[sheetName];
-//       const json = xlsx.utils.sheet_to_json(worksheet);
-//       const columnheader = Object.keys(json[0]!);
-//       columnheader.join();
-//       upploadexceljson(
-//         json,
-//         columnheader.join(),
-//         columnheader.length,
-//         function_code
-//       );
-//       setVisible(false);
-//     };
-//     reader.readAsArrayBuffer(e.files[0]);
-//   }
-// };
 
 const upploadexceljson: any = async (
   jsonarray: any,
@@ -272,13 +225,14 @@ const upploadexceljson: any = async (
 
     for (const obj of jsonarray) {
       for (const key in obj) {
-        if (obj[key] != "") {
+        if (obj[key] !== "") {
           blankProperties.push(obj);
           break;
         }
       }
     }
     const payload = {
+      isExcelUpload: 1,
       data: blankProperties,
       col_length: columnlength,
       col_headers: columnheader,
@@ -292,12 +246,20 @@ const upploadexceljson: any = async (
       payload,
       function_code
     );
+
+    if (res) {
+      if (function_code === "AS0015") {
+        await callPostAPI(ENDPOINTS.UPDATE_HIERARCHY_LIST)
+      }
+    }
     return res;
   } catch (error: any) {
     toast.error(error);
   }
 };
 const readUploadFile = (e: any, function_code: any, setVisible: any) => {
+
+
   return new Promise(async (resolve, reject) => {
     if (e.files) {
       const reader = new FileReader();
@@ -307,14 +269,36 @@ const readUploadFile = (e: any, function_code: any, setVisible: any) => {
         const workbook = xlsx.read(data, { type: "binary", cellText: false, cellDates: true });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const json = xlsx.utils.sheet_to_json(worksheet, { header: 0, raw: false, dateNF: 'DD-MM-YYYY' });
 
-        const columnheader = Object.keys(json[0]!);
+        const json = xlsx.utils.sheet_to_json(worksheet, { header: 0, raw: false, dateNF: 'DD-MM-YYYY', defval: " " });
+        const cleanedJson = json.map((row: any) => {
+          const cleanRow: any = {};
+          for (const [key, value] of Object.entries(row)) {
+            // Skip __EMPTY columns and keep only columns with real names
+            if (!key.startsWith('__EMPTY')) {
+              cleanRow[key] = value;
+            }
+          }
+          return cleanRow;
+        });
+
+        // Then filter rows that have at least one non-empty value
+        const filteredJson = cleanedJson.filter(row =>
+          Object.values(row).some(val => val?.toString().trim() !== "")
+        );
+
+        if (filteredJson.length === 0) {
+          toast.error("Excel file has no valid data.")
+          reject(new Error("Excel file has no valid data."));
+          return;
+        }
+
+        const columnheader = Object.keys(filteredJson[0]!);
         columnheader.join();
 
         try {
           const response = await upploadexceljson(
-            json,
+            filteredJson,
             columnheader.join(),
             columnheader.length,
             function_code
@@ -427,22 +411,22 @@ const TemplateBuildingDownload = (
 
   var sendjsondata = headerdata;
   var j_data = dropdowndata;
-  convert_excel_base64(sendjsondata, 10000, j_data);
-  function convert_excel_base64(data: any, generate_rows = 10000, j_data: any) {
+  convert_excel_base64(sendjsondata, 20000, j_data);
+  function convert_excel_base64(data: any, generate_rows = 20000, j_data: any) {
     var workbook = new excelJs.Workbook();
     var worksheet = workbook.addWorksheet("Sheet1");
     let headercount = 0;
     var arrData = typeof data != "object" ? JSON.parse(data) : data;
-    let dropdown = [];
+    //let dropdown = [];
 
-    for (var i = 0; i < generate_rows; i++) {
-      if (i == 0) {
-        var array = [];
-        var ary = {};
-        for (var index in arrData[0]) {
+    for (let i = 0; i < generate_rows; i++) {
+      if (i === 0) {
+        let array = [];
+        let ary = {};
+        for (var index5 in arrData[0]) {
           ary = {
-            header: index,
-            key: index,
+            header: index5,
+            key: index5,
           };
           array.push(ary);
           headercount++;
@@ -450,11 +434,11 @@ const TemplateBuildingDownload = (
         worksheet.columns = array;
       }
 
-      var arrayDetail = [];
-      var j = 1;
-      for (var index in arrData[0]) {
-        if (typeof arrData[0][index] == "object") {
-          dropdown = arrData[0][index];
+      let arrayDetail = [];
+      let j = 1;
+      for (let index6 in arrData[0]) {
+        if (typeof arrData[0][index6] == "object") {
+          //dropdown = arrData[0][index6];
           arrayDetail[j] = "";
         } else {
           arrayDetail[j] = ""; //arrData[0][index];
@@ -464,15 +448,15 @@ const TemplateBuildingDownload = (
       worksheet.addRow(arrayDetail);
     }
 
-    for (var i = 0; i < generate_rows; i++) {
-      var arrayDetail = [];
-      var j = 1;
+    for (let i = 0; i < generate_rows; i++) {
+      //var arrayDetail = [];
+      let j = 1;
 
-      for (var index in arrData[0]) {
-        if (typeof arrData[0][index] == "object") {
+      for (var index1 in arrData[0]) {
+        if (typeof arrData[0][index1] == "object") {
           var c = [];
 
-          c.push(arrData[0][index][0]);
+          c.push(arrData[0][index1][0]);
 
           var a = excelkey[j - 1].value + (i + 2);
 
@@ -481,14 +465,18 @@ const TemplateBuildingDownload = (
             allowBlank: true,
             formulae: c,
           };
-          worksheet.getColumn(1).hidden = true;
+
         }
-        if (i != 0 && i < arrData.length) {
+
+        //added by Anand
+        if (i !== 0 && i < arrData.length) {
           var a1 = excelkey[j - 1].value + (i + 1);
           if (i <= arrData.length) {
-            // worksheet.getCell(a1).style.protection = { locked: true }; // .setCellLocked(true );
-            //worksheet.getCell(a1).protection(true); // = { locked: true };
-            worksheet.getCell(a1).value = arrData[i][index];
+            if ((index1 !== "Asset Folder ID") && (index1 !== "Location ID")) {
+              worksheet.getCell(a1).value = arrData[i][index1];
+            } else {
+              worksheet.getCell(a1).value = "";
+            }
           }
         }
         j++;
@@ -502,41 +490,34 @@ const TemplateBuildingDownload = (
       to: toval,
     };
 
-    for (var i = 0; i < j_data.length; i++) {
+    for (let i = 0; i < j_data.length; i++) {
       var worksheet_new = workbook.addWorksheet(j_data[i].sheet);
       worksheet_new.state = "hidden";
-      let headercount = 0;
-      var arrData =
+      //let headercount = 0;
+      let arrData =
         typeof j_data[i].data != "object"
           ? JSON.parse(j_data[i].data)
           : j_data[i].data;
       for (var k = 0; k < arrData.length; k++) {
-        if (k == 0) {
-          var array = [];
-          var ary = {};
+        if (k === 0) {
+          let array = [];
+          let ary = {};
           for (var index in arrData[0]) {
             ary = {
               header: index,
               key: index,
             };
-            //worksheet.getColumn(index).outlineLevel = 0;
+
             array.push(ary);
-            headercount++;
+
           }
           worksheet_new.columns = array;
         }
-        // for (var row = 0; row < arrData.length; row++) {
-        //   var arrayDetail1 = [];
-        //   for (var index1 in arrData[row]) {
-        //     arrayDetail1[0] = arrData[row][index1];
-        //   }
 
-        //   worksheet.addRow(arrayDetail1);
-        // }
         var array_Detail = [];
         var j = 1;
-        for (var index in arrData[k]) {
-          array_Detail[j] = arrData[k][index];
+        for (var index3 in arrData[k]) {
+          array_Detail[j] = arrData[k][index3];
           j++;
         }
         worksheet_new.addRow(array_Detail);

@@ -29,7 +29,9 @@ const UserMaster = (props: any) => {
 
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
 
@@ -45,9 +47,11 @@ const UserMaster = (props: any) => {
         "ROLE_NAME",
         "USER_EMAILID",
         "USER_MOBILENO",
-        "ACTION",
+         "ACTION",
       ]}
-      customHeader={["User Name", "User Role", "Email Id", "Mobile", "Action"]}
+      customHeader={["User Name", "User Role", "Email Id", "Mobile",
+         "Action"
+      ]}
       columnData={props?.data}
       clickableColumnHeader={["USER_NAME"]}
       filterFields={["USER_NAME", "ROLE_NAME", "USER_EMAILID", "USER_MOBILENO",]}

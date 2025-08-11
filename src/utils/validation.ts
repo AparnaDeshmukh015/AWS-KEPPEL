@@ -2,7 +2,7 @@ export const validation: any = {
   NonZeroNumber: (fieldValue: any, fieldName: any, setValue: any) => {
     var msgtext = "";
     const sanitizedValue = fieldValue?.toString()?.replace(/[^0]/g, "");
-    if (sanitizedValue == 0) {
+    if (sanitizedValue === 0) {
       msgtext = "Please fill the required fields";
       setValue(fieldName, 0);
     } else {
@@ -52,7 +52,7 @@ export const validation: any = {
     return true;
   },
   phoneNumber: (fieldValue: any, fieldName: any, setValue: any) => {
-    const sanitizedValue = fieldValue?.toString()?.replace(/^[+]{1}(?:[0-9\-\\(\\)\\/.]\s?){6,20}[0-9]{1}$/, "");
+    const sanitizedValue = fieldValue?.toString()?.replace(/^[+]{1}(?:[0-9\-\\/.]\s?){6,20}[0-9]{1}$/, "");
     setValue(fieldName, sanitizedValue);
 
     if (sanitizedValue > 6 && sanitizedValue < 16) {
@@ -64,7 +64,7 @@ export const validation: any = {
     // const sanitizedValue = fieldValue.trim();
 
     const sanitizedValue = fieldValue?.toString()?.replace(/[^\d+]/g, "");
-     setValue(fieldName, sanitizedValue);
+    setValue(fieldName, sanitizedValue);
 
     // if (sanitizedValue?.length < 6 || sanitizedValue?.length > 16) {
     //   return "Invalid Phone Number";
@@ -76,7 +76,7 @@ export const validation: any = {
     // const sanitizedValue = fieldValue.trim();
     if (fieldValue === undefined || fieldValue === null) return true;
     const sanitizedValue = fieldValue?.toString()?.replace(/[^\d+]/g, "");
-     setValue(fieldName, sanitizedValue);
+    setValue(fieldName, sanitizedValue);
 
     // if (sanitizedValue?.length < 6 || sanitizedValue?.length > 16) {
     //   return "Invalid Phone Number";
@@ -108,11 +108,33 @@ export const validation: any = {
   },
 
 
+  //input accept only like xyz123 this format
+  onlyfirstAlphaNumeric: (fieldValue: any, fieldName: any, setValue: any) => {
+    if (fieldValue === undefined || fieldValue === null) return true;
+    const strValue = fieldValue.toString();
+    const startsWithAlphaRegex = /^[a-zA-Z]/;
+
+    const validFormatRegex = /^[a-zA-Z]\d*$/;
+    if (!startsWithAlphaRegex.test(strValue)) {
+      const sanitizedValue = strValue.replace(/[^a-zA-Z]/g, "");
+      setValue(fieldName, sanitizedValue);
+      return "Input must start with a letter.";
+    }
+    if (validFormatRegex.test(strValue)) {
+      return true;
+    } else {
+      const sanitizedValue = strValue.replace(/[^a-zA-Z0-9]/g, "");
+      setValue(fieldName, sanitizedValue);
+      return "Only alphabetic and numeric values allowed, starting with a letter.";
+    }
+  },
+
+
   onlyAlphaNumeric: (fieldValue: any, fieldName: any, setValue: any) => {
     if (fieldValue === undefined || fieldValue === null) return true;
 
     const strValue = fieldValue.toString();
-    const sanitizedValue = strValue.replace(/[^a-zA-Z0-9]/, "");
+    const sanitizedValue = strValue.replace(/[^a-zA-Z0-9 ]/g, "");
     if (sanitizedValue !== strValue) {
       setValue(fieldName, sanitizedValue);
     }
@@ -120,6 +142,22 @@ export const validation: any = {
       ? true
       : "Only alphabetic & Numeric value allowed.";
   },
+
+  onlyAlphaNumericWhiteSpace: (fieldValue: any, fieldName: any, setValue: any) => {
+    if (fieldValue === undefined || fieldValue === null) return true;
+
+    const strValue = fieldValue.toString();
+    // Update the regex to allow spaces as well
+    const sanitizedValue = strValue.replace(/[^a-zA-Z0-9 ]/g, ""); // note the added space in the regex
+    if (sanitizedValue !== strValue) {
+      setValue(fieldName, sanitizedValue);
+    }
+
+    return sanitizedValue === strValue
+      ? true
+      : "Only alphabetic, numeric, and space characters are allowed.";
+  },
+
 
   onlyPhoneNumber: (fieldValue: any, fieldName: any, setValue: any) => {
     if (fieldValue === undefined || fieldValue === null) return true;

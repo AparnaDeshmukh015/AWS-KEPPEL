@@ -1,13 +1,21 @@
-.noteContainer{
+.noteContainer {
     padding: 12px;
     letter-spacing: 0.15px;
     border-radius: 6px;
     color: #272B30;
     background-color: #FDF6E7;
 }
-.noteContainer label{
+
+.noteContainer label {
     font-size: 18px;
 }
-.noteContainer p{
+
+.noteContainer p {
     font-size: 14px;
+}
+
+.errorEditor {
+    border: 0.5px solid red;
+    /* or your preferred border style */
+    border-radius: 7px;
 }

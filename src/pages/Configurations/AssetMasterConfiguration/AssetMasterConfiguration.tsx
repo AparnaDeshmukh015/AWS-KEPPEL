@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useOutletContext } from "react-router-dom";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -13,15 +13,14 @@ import { Checkbox } from "primereact/checkbox";
 import "../../../components/Radio/Radio.css";
 import { useTranslation } from "react-i18next";
 import { saveTracker } from "../../../utils/constants";
-import { validate } from "uuid";
 
 const AssetMasterConfiguration = () => {
   const { t } = useTranslation();
   let { pathname } = useLocation();
-  const [selectedFacility, menuList] = useOutletContext<any | null>();
-  const [apiResponse, setApiResponse] = useState<any | null>([]);
-  const [checked, setChecked] = useState(false);
-  const [type, setType] = useState<any | null>();
+  const [, menuList] = useOutletContext<any | null>();
+  
+  const [IsSubmit, setIsSubmit] = useState<any|null>(false);
+ 
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     ?.filter((detail: any) => detail.URL === pathname)[0];
@@ -47,7 +46,7 @@ const AssetMasterConfiguration = () => {
     setValue,
     trigger,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       ASSET_NONASSET: "",
@@ -65,24 +64,21 @@ const AssetMasterConfiguration = () => {
   });
 
   const ASSET_NONASSET: any = watch("ASSET_NONASSET");
-  useEffect(() => {
-    getAPI();
-  }, [ASSET_NONASSET]);
+ 
+  // const radioHandlerChange = (e: any) => {
+  //   setType(e.target.value);
 
-  const radioHandlerChange = (e: any) => {
-    setType(e.target.value);
+  //   const filterData: any = apiResponse?.filter(
+  //     (res: any) => res?.ASSET_NONASSET === e.target.value
+  //   );
+  //   const updatedArray = filterData.map((obj: any) => {
+  //     const { ASSET_NONASSET, ...rest } = obj;
+  //     return rest;
+  //   });
 
-    const filterData: any = apiResponse?.filter(
-      (res: any) => res?.ASSET_NONASSET === e.target.value
-    );
-    const updatedArray = filterData.map((obj: any) => {
-      const { ASSET_NONASSET, ...rest } = obj;
-      return rest;
-    });
-
-    setValue("CONFIGLIST", updatedArray);
-    setConfigList(updatedArray);
-  };
+  //   setValue("CONFIGLIST", updatedArray);
+  //   setConfigList(updatedArray);
+  // };
 
   const handlerChange = (e: any, index: any) => {
     const updatedData: any = configList?.map((config: any, id: any) => {
@@ -139,8 +135,9 @@ const AssetMasterConfiguration = () => {
     });
   };
 
-  const onSubmit = async (payload: any) => {
-    
+  const onSubmit =  useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
     payload.FUNCTION_CODE = ASSET_NONASSET?.key;
     delete payload.ASSET_NONASSET;
     const updatedList: any = payload?.CONFIGLIST?.map((config: any) => ({
@@ -149,6 +146,8 @@ const AssetMasterConfiguration = () => {
       ACTIVE: config?.ACTIVE,
     }));
     payload.CONFIGLIST = updatedList;
+   
+    
     try {
       const res = await callPostAPI(
         ENDPOINTS.ASSETMASTERCONFIGURATION_SAVE,
@@ -157,17 +156,21 @@ const AssetMasterConfiguration = () => {
       );
       if (res?.FLAG === true) {
         toast.success(res?.MSG);
-        getAPI();
+      
+       await getAPI()
       } else {
         toast.error(res?.MSG);
+        
       }
 
     } catch (error: any) {
-
+      
       toast.error(error);
+    }finally{
+      setIsSubmit(false)
     }
 
-  };
+  },  [IsSubmit, currentMenu?.FUNCTION_CODE, ASSET_NONASSET]);
 
   const getAPI = async () => {
     try {
@@ -190,18 +193,27 @@ const AssetMasterConfiguration = () => {
   };
 
   useEffect(() => {
-    if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+    if (currentMenu?.FUNCTION_CODE && ASSET_NONASSET !== "") {
+      (async function () {
+        await getAPI()
+        await saveTracker(currentMenu);
+       })();
     }
   }, [currentMenu]);
 
+  useEffect(() => {
+    (async function () {
+      await getAPI();
+    })()
+  }, [ASSET_NONASSET]);
+
  
-  const onError: SubmitErrorHandler<FormData> = (errors, e) => {
+  const onError: SubmitErrorHandler<FormData> = () => {
     toast.error(t("Please fill the required fields."))
   };
-  useEffect(() => {
-    saveTracker(currentMenu);
-  }, []);
+  // useEffect(() => {
+   
+  // }, []);
   return (
     <section className="w-full">
       <form>
@@ -216,6 +228,7 @@ const AssetMasterConfiguration = () => {
               className="Primary_Button  w-20 me-2"
               label="Save"
               onClick={handleSubmit(onSubmit, onError)}
+              IsSubmit={IsSubmit}
             />
           </div>
         </div>
@@ -294,10 +307,10 @@ const AssetMasterConfiguration = () => {
                                   },
                                 }
                               )}
-                              require={checkStatus === true ? true : ""}
+                              require={checkStatus ? true : ""}
                               label="Column Caption"
                               invalid={checkStatus && errors.CONFIGLIST?.[index]?.COLUMN_CAPTION}
-                              disabled={checkStatus === true ? false : true}
+                              disabled={checkStatus ? false : true}
                               placeholder={"Please Enter"}
                               {...field}
                             />

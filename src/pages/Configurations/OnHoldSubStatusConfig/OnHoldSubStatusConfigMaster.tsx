@@ -3,15 +3,15 @@ import { Card } from "primereact/card";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
 import Checkboxs from "../../../components/Checkbox/Checkbox";
-import { callPostAPI } from "../../../services/apis";
-import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import FormHeader from "../../../components/FormHeader/FormHeader";
-import { saveTracker } from "../../../utils/constants";
+
 const OnHoldSubStatusConfigMaster = (props: any) => {
   const { t } = useTranslation();
+  const [IsSubmit, setIsSubmit] = useState<any|null>(false);
+ 
   const {
     register,
     handleSubmit,
@@ -33,7 +33,9 @@ const OnHoldSubStatusConfigMaster = (props: any) => {
     },
     mode: "onSubmit",
   });
-  const onSubmit = async (payload: any) => { };
+  const onSubmit = async () => {
+    setIsSubmit(true)
+   };
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
@@ -48,6 +50,7 @@ const OnHoldSubStatusConfigMaster = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">

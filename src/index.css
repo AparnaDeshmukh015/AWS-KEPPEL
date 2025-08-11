@@ -14,7 +14,9 @@
 
 /* @import 'react-big-calendar/lib/sass/styles'; */
 @import 'react-big-calendar/lib/addons/dragAndDrop/styles';
-
+@import "./components/Calendar/Calendar.css";
+@import "./components/Input/Input.css";
+@import "./components/Dropdown/Dropdown.css";
 body {
   margin: 0;
   font-family: 'Lato', sans-serif;
@@ -71,6 +73,7 @@ h2 {
   font-family: 'Lato', sans-serif !important;
 }
 
+
 h3 {
   font-size: 48px;
   font-weight: 400;
@@ -85,8 +88,10 @@ h4 {
 
 h5 {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 500;
   font-family: 'Lato', sans-serif !important;
+  line-height: 133.4%;
+  /* 32.016px */
 }
 
 h6,
@@ -112,61 +117,63 @@ h6,
 
 .Input_Label {
   font-size: 14px;
-font-style: normal;
-font-weight: 600;
-letter-spacing: 0.15px;
-line-height: 21px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.15px;
+  line-height: 21px;
   font-family: 'Lato', sans-serif !important;
 
 }
 
 .Helper_Text {
   font-family: 'Lato', sans-serif !important;
-font-size: 14px;
-font-style: normal;
-font-weight: 400;
-line-height: 21px;
-letter-spacing: 0.15px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
+  letter-spacing: 0.15px;
 }
 
 .Input_Text {
   font-family: 'Lato', sans-serif !important;
-  font-size: 16px;
-font-style: normal;
-font-weight: 400;
-line-height: 24px;
-letter-spacing: 0.15px;
-}
-.Main_Header_Text{
-  color: #272B30;
-  font-family: 'Lato', sans-serif !important;
-font-feature-settings: 'liga' off, 'clig' off;
-font-size: 18px;
-font-style: normal;
-font-weight: 600;
-line-height: 24px; 
-letter-spacing: 0.15px;
-}
-.Sub_Header_Text{
-color: #7E8083;
-font-feature-settings: 'liga' off, 'clig' off;
-font-family: 'Lato', sans-serif !important;
-font-size: 14px;
-font-style: normal;
-font-weight: 500;
-line-height: 21px;
-letter-spacing: 0.1px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.15px;
 }
 
-.Header_Text{
+.Main_Header_Text {
+  color: #272B30;
+  font-family: 'Lato', sans-serif !important;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.15px;
+}
+
+.Sub_Header_Text {
+  /* color: #7E8083; */
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 21px;
+  letter-spacing: 0.1px;
+}
+
+.Header_Text {
   color: var(--Light-Text-Primary, #272B30);
-font-feature-settings: 'liga' off, 'clig' off;
-font-family: 'Lato', sans-serif !important;
-font-size: 16px;
-font-style: normal;
-font-weight: 600;
-line-height: 24px;
-letter-spacing: 0.15px;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-family: 'Lato', sans-serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.15px;
 }
 
 .Avatar_Initials {
@@ -185,11 +192,12 @@ letter-spacing: 0.15px;
 
 .Alert_Title {
   word-wrap: break-word;
-  font-size: 14px;
-font-style: normal;
-font-weight: 400;
-line-height: 21px; /* 150% */
-letter-spacing: 0.15px;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
+  /* 150% */
+  letter-spacing: 0.15px;
   font-family: 'Lato', sans-serif !important;
 }
 
@@ -232,7 +240,7 @@ letter-spacing: 0.15px;
   padding: 2px 10px;
 }
 
-.p-chip svg { 
+.p-chip svg {
   color: #8E724A;
 }
 
@@ -249,4 +257,54 @@ letter-spacing: 0.15px;
   border-radius: 0.25rem;
   text-decoration: none;
   color: #8e724a;
+}
+
+
+.p-dialog .p-dialog-content .leftContainer {
+  display: flex;
+  padding: 0px 36px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  flex: 1 0 0;
+  align-self: stretch;
+  background-color: #FFFBF6;
+}
+
+.p-dialog .p-dialog-content .leftContainer h4,
+.p-dialog .p-dialog-content .leftContainer2 h4 {
+  color: #272B30;
+  text-align: center;
+  font-family: Lato;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 133.4%;
+  /* 32.016px */
+}
+
+.p-dialog .p-dialog-content .leftContainer p,
+.p-dialog .p-dialog-content .leftContainer2 p {
+  color: #272B30;
+  text-align: center;
+  font-family: Lato;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  /* 150% */
+  letter-spacing: 0.15px;
+}
+
+.p-dialog .p-dialog-content .leftContainer2 {
+  display: flex;
+  padding: 0px 36px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  flex: 1 0 0;
+  align-self: stretch;
+  background-color: #FFFBF6;
 }

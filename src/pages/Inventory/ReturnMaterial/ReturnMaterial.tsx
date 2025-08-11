@@ -6,6 +6,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import { toast } from "react-toastify";
 import ReturnMaterialForm from "./ReturnMaterialForm";
+import { onlyDateFormat } from "../../../utils/constants";
 
 const ReturnMaterial = (props: any) => {
   let { pathname } = useLocation();
@@ -22,16 +23,29 @@ const ReturnMaterial = (props: any) => {
         null,
         currentMenu?.FUNCTION_CODE
       );
-
-      props?.setData(res?.INVENTORYMASTERSLIST || []);
+      let updatedReturnMaterialList = formatReturnMaterialMasterList(res?.INVENTORYMASTERSLIST)
+      props?.setData(updatedReturnMaterialList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+  const formatReturnMaterialMasterList = (list: any) => {
+    let ReturnMaterialList = list;
+    ReturnMaterialList = ReturnMaterialList.map((element: any) => {
+      return {
+        ...element,
+        DOC_DATE: onlyDateFormat(element?.DOC_DATE)
+      }
+    })
+    return ReturnMaterialList
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (
@@ -43,7 +57,7 @@ const ReturnMaterial = (props: any) => {
       dataKey={currentMenu?.FUNCTION_DESC}
       columnTitle={[
         "DOC_NO",
-        "MATREQ_DATE",
+        "DOC_DATE",
         "STORE_NAME",
         "MATREQ_RAISEDBY",
         "WO_NO",
@@ -59,7 +73,7 @@ const ReturnMaterial = (props: any) => {
       ]}
       columnData={props?.data}
       clickableColumnHeader={["DOC_NO"]}
-      filterFields={["DOC_NO", "DOC_NO", "MATREQ_DATE", "STORE_NAME", "MATREQ_RAISEDBY", "WO_NO", "CNCL_IND"]}
+      filterFields={["DOC_NO", "DOC_DATE", "STORE_NAME", "MATREQ_RAISEDBY", "WO_NO", "CNCL_IND"]}
       setSelectedData
       isClick={props?.isForm}
       handelDelete={props?.handelDelete}

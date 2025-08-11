@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Select from "../../../components/Dropdown/Dropdown";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
@@ -20,10 +20,8 @@ import {
   eventNotification,
   helperEventNotification,
 } from "../../../utils/eventNotificationParameter";
-import { dateFormat, saveTracker } from "../../../utils/constants";
-import { validation } from "../../../utils/validation";
+import { saveTracker } from "../../../utils/constants";
 import { decryptData } from "../../../utils/encryption_decryption";
-
 interface Part {
   PART_ID?: string;
   PART_CODE?: string;
@@ -67,6 +65,7 @@ type FormErrors = {
 
 const InventoryMasterForm = (props: any) => {
   const [selectedParts, setSelectedParts] = useState<any | null>([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
   const { t } = useTranslation();
   let { pathname } = useLocation();
@@ -116,10 +115,10 @@ const InventoryMasterForm = (props: any) => {
           : "",
       PART_LIST: [],
     },
-    mode: "all",
-  });
+    mode: "all"
+  })
 
-  const { fields, remove, append } = useFieldArray({
+  const { fields, remove} = useFieldArray({
     name: "PART_LIST",
     control,
   });
@@ -135,10 +134,11 @@ const InventoryMasterForm = (props: any) => {
 
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
 
-  const onSubmit = async (payload: any) => {
-
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     try {
-      const partList: any = PART_LIST?.map((part: any, index: any) => {
+      const partList: any = PART_LIST?.map((part: any) => {
         return {
           PART_ID: part?.PART_ID,
           PART_CODE: part?.PART_CODE,
@@ -163,11 +163,10 @@ const InventoryMasterForm = (props: any) => {
         ? moment(payload.BILL_DATE).format("DD-MM-YYYY")
         : "";
       payload.STORE_ID = payload?.STORE?.STORE_ID;
-      delete payload?.STORE;
+      // delete payload?.STORE;
       payload.VENDOR_ID = payload?.VENDOR?.VENDOR_ID;
-      payload.PART_LIST = partList;
+      payload.PART_LIST = partList ;
       delete payload?.VENDOR;
-
       if (fields?.length > 0) {
         if (isAnyQTYUndefined === false) {
           const res = await callPostAPI(
@@ -191,25 +190,32 @@ const InventoryMasterForm = (props: any) => {
             };
 
             const eventPayload = { ...eventNotification, ...notifcation };
-            helperEventNotification(eventPayload);
+            await helperEventNotification(eventPayload);
             props?.getAPI();
+
             props?.isClick();
+            setIsSubmit(false)
           } else {
+            setIsSubmit(false)
             toast?.error(res?.MSG);
           }
         } else {
+
           toast.error("Please fill quantity");
+          setIsSubmit(false)
         }
       } else {
         toast.error("Please select at least one part list");
+        setIsSubmit(false)
       }
     } catch (error: any) {
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  }
+  }, [IsSubmit, PART_LIST, fields, toast, callPostAPI, currentMenu, search, helperEventNotification, props]);
 
   const handleCancel = async (e: any) => {
-
     e.preventDefault();
     const payload: any = {
       DOC_NO: props?.selectedData?.DOC_NO,
@@ -236,7 +242,7 @@ const InventoryMasterForm = (props: any) => {
         "PARA8": 'asset_name',
       };
       const eventPayload = { ...eventNotification, ...notifcation };
-      helperEventNotification(eventPayload);
+      await helperEventNotification(eventPayload);
       props?.getAPI();
       props?.isClick();
     } else {
@@ -261,8 +267,8 @@ const InventoryMasterForm = (props: any) => {
 
   const getinventorypartdetails = async () => {
     const payload = {
-      DOC_NO: props?.selectedData.DOC_NO,
-      DOC_ID: props?.selectedData.DOC_ID,
+      DOC_NO: search === "?edit=" ? dataId?.DOC_NO : props?.selectedData?.DOC_NO,
+      DOC_ID: search === "?edit=" ? dataId?.DOC_ID : props?.selectedData?.DOC_ID,
     };
 
     const res = await callPostAPI(
@@ -272,9 +278,9 @@ const InventoryMasterForm = (props: any) => {
     );
 
     setPartOptions(res?.PARTLIST);
-    const billDate: any = new Date(res?.INVENTORYDETAILS[0].BILL_DATE);
+    const billDate: any = new Date(res?.INVENTORYDETAILS[0]?.BILL_DATE);
     setValue("BILL_DATE", billDate);
-    const grnDate: any = new Date(res?.INVENTORYDETAILS[0].DOC_DATE);
+    const grnDate: any = new Date(res?.INVENTORYDETAILS[0]?.DOC_DATE);
     setValue("DOC_DATE", grnDate);
     setValue("PART_LIST", res?.PARTLIST);
   };
@@ -293,7 +299,7 @@ const InventoryMasterForm = (props: any) => {
     setVendorOptions(res?.VENDORLIST);
 
     if (props?.selectedData !== undefined) {
-      getinventorypartdetails();
+      await getinventorypartdetails();
     }
   };
 
@@ -324,15 +330,17 @@ const InventoryMasterForm = (props: any) => {
     }
   };
 
-  const onError: SubmitErrorHandler<FormValues> = (errors, e) => {
+  const onError: SubmitErrorHandler<FormValues> = (errors:any, e) => {
+   toast.error(errors)
   };
 
   useEffect(() => {
-    setStore();
+    (async function () { await setStore();
     const billDate: any = new Date();
     setValue("BILL_DATE", billDate);
     const grnDate: any = new Date();
     setValue("DOC_DATE", grnDate);
+    })()
     // setVendor()
   }, []);
 
@@ -348,14 +356,17 @@ const InventoryMasterForm = (props: any) => {
     }
   }, [isSubmitting]);
 
-  useEffect(() => {
-    saveTracker(currentMenu);
+  useEffect(() => {   
+     (async function () {
+      await saveTracker(currentMenu)
+      await getpartlist();
+     })();
   }, []);
 
 
   const handlerShow = (index: any, rowData: any) => {
     remove(index);
-    const data: any = selectedParts?.filter((f: any, id: any) => f?.PART_ID !== rowData?.PART_ID)
+    const data: any = selectedParts?.filter((f: any) => f?.PART_ID !== rowData?.PART_ID)
     setSelectedParts(data);
 
   };
@@ -366,7 +377,7 @@ const InventoryMasterForm = (props: any) => {
         <div className="flex flex-wrap justify-between mt-1">
           <div>
             <h6 className="Text_Primary">
-              {t(`${props?.selectedData ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
+              {t(`${search === "?edit=" ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
               {props?.selectedData ? props?.selectedData?.DOC_NO : ""}
             </h6>
           </div>
@@ -376,18 +387,19 @@ const InventoryMasterForm = (props: any) => {
               <Buttons
                 type="submit"
                 className="Primary_Button  w-20 me-2"
+                disabled={IsSubmit}
                 label={"Save"}
               />
             ) : (
               <>
-                {props?.selectedData?.CNCL_IND === false && (
+                {dataId?.CNCL_IND === false && (
                   <>
                     <Buttons
                       type="submit"
                       className="Primary_Button me-2"
                       label={"Cancel"}
-                      onClick={(e: any) => {
-                        handleCancel(e);
+                      onClick={async(e: any) => {
+                        await handleCancel(e);
                       }}
                     />
                   </>
@@ -415,7 +427,7 @@ const InventoryMasterForm = (props: any) => {
                       })}
                       label="GRN date"
                       setValue={setValue}
-                      disabled={props.selectedData ? true : false}
+                      disabled={search === '?edit=' ? true : false}
                       require={true}
                       invalid={errors.DOC_DATE}
                       showIcon
@@ -440,9 +452,9 @@ const InventoryMasterForm = (props: any) => {
                       require={true}
                       findKey={"STORE_ID"}
                       optionLabel="STORE_NAME"
-                      selectedData={props?.selectedData?.STORE_ID}
+                      selectedData={search === "?edit=" ? dataId?.STORE_ID : props?.selectedData?.STORE_ID}
                       setValue={setValue}
-                      disabled={props.selectedData ? true : false}
+                      disabled={search === '?edit=' ? true : false}
                       invalid={errors.STORE}
                       {...field}
                     />
@@ -465,9 +477,9 @@ const InventoryMasterForm = (props: any) => {
                       require={true}
                       findKey={"VENDOR_ID"}
                       optionLabel="VENDOR_NAME"
-                      selectedData={props?.selectedData?.VENDOR_ID}
+                      selectedData={search === "?edit=" ? dataId?.VENDOR_ID : props?.selectedData?.VENDOR_ID}
                       setValue={setValue}
-                      disabled={props.selectedData ? true : false}
+                      disabled={search === '?edit=' ? true : false}
                       invalid={errors.VENDOR}
                       {...field}
                     />
@@ -491,7 +503,7 @@ const InventoryMasterForm = (props: any) => {
                       require={true}
                       placeholder={t("Please_Enter")}
                       invalid={errors.BILL_NO}
-                      disabled={props.selectedData ? true : false}
+                      disabled={search === '?edit=' ? true : false}
                       {...field}
                     />
                   );
@@ -512,7 +524,7 @@ const InventoryMasterForm = (props: any) => {
                       setValue={setValue}
                       require={true}
                       invalid={errors.BILL_DATE}
-                      disabled={props.selectedData ? true : false}
+                      disabled={search === '?edit=' ? true : false}
                       showIcon
                       {...field}
                     />
@@ -602,7 +614,7 @@ const InventoryMasterForm = (props: any) => {
                               )}
                               errors
                               require={true}
-                              disabled={props.selectedData ? true : false}
+                              disabled={search === "?edit=" ? true : false}
                               setValue={setValue}
                               invalid={errors?.PART_LIST?.[rowIndex]?.QTY}
                               invalidMessage={
@@ -652,7 +664,7 @@ const InventoryMasterForm = (props: any) => {
                                 }
                               )}
                               errors
-                              disabled={props.selectedData ? true : false}
+                              disabled={search === "?edit=" ? true : false}
                               setValue={setValue}
                               require={true}
                               invalid={errors?.PART_LIST?.[rowIndex]?.RATE}

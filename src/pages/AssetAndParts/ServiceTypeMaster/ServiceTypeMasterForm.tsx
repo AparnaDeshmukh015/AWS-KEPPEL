@@ -6,7 +6,7 @@ import Checkboxs from "../../../components/Checkbox/Checkbox";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   eventNotification,
@@ -20,6 +20,7 @@ import { decryptData } from "../../../utils/encryption_decryption";
 
 const ServiceTypeMasterForm = (props: any) => {
   const [options, setOptions] = useState<any | null>([]);
+  const [IsSubmit, setIsSubmit] = useState<any|null>(false);
   const { t } = useTranslation();
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
@@ -45,10 +46,7 @@ const ServiceTypeMasterForm = (props: any) => {
       ASSETTYPE_ID: props?.selectedData ? props?.selectedData?.ASSETTYPE_ID : search === '?edit=' ? dataId?.ASSETTYPE_ID : 0,
       ASSETTYPE: "N",
       ASSETTYPE_NAME: props?.selectedData ? props?.selectedData?.ASSETTYPE_NAME : search === '?edit=' ? dataId?.ASSETTYPE_NAME : '',
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
       ASSETGROUP_ID: props?.selectedData ? props?.selectedData?.ASSETGROUP_NAME : search === '?edit=' ? dataId?.ASSETGROUP_NAME : '',
     },
     mode: "onSubmit",
@@ -56,7 +54,9 @@ const ServiceTypeMasterForm = (props: any) => {
   
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
   const watchGroup: any = watch("ASSETGROUP_ID")
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.ASSETGROUP_ID = payload?.ASSETGROUP_ID?.ASSETGROUP_ID
     try {
@@ -73,7 +73,7 @@ const ServiceTypeMasterForm = (props: any) => {
         };
 
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
@@ -81,8 +81,10 @@ const ServiceTypeMasterForm = (props: any) => {
       }
     } catch (error: any) {
       toast?.error(error);
+    }finally{
+      setIsSubmit(false)
     }
-  };
+  },[IsSubmit, search, props, eventNotification, toast]);
 
   const getOptions = async () => {
     const payload = {
@@ -105,8 +107,10 @@ const ServiceTypeMasterForm = (props: any) => {
   }, [isSubmitting]);
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await getOptions();
+    await saveTracker(currentMenu)
+    })();
   }, []);
 
   return (
@@ -155,7 +159,7 @@ const ServiceTypeMasterForm = (props: any) => {
                       optionLabel="ASSETGROUP_NAME"
                       findKey={"ASSETGROUP_ID"}
                       invalid={errors?.ASSETGROUP_ID}
-                      selectedData={props?.selectedData?.ASSETGROUP_ID}
+                      selectedData={search === "?edit=" ?dataId?.ASSETGROUP_ID:""}
                       setValue={setValue}
                       {...field}
                     />

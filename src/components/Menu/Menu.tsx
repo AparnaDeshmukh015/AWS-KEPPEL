@@ -5,11 +5,11 @@ const CustomMenu = React.forwardRef((props: any, ref: any) => {
     const menuRef: any = useRef(null);
 
     // Intercepting onBlur and onFocus events
-    const handleBlur = (e: any) => {
+    const handleBlur = () => {
     //    e?.stop
     };
 
-    const handleFocus = (e: any) => {
+    const handleFocus = () => {
         // Do nothing or handle it as per your requirement
     };
 

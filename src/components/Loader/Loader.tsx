@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+
 import "./Loader.css";
 import LoaderGif from "../../assest/images/Loader.gif";
 

@@ -35,8 +35,11 @@ const AssetGroupMaster = (props: any) => {
   };
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      //API Calling Done here
-      getAPI();
+    
+        (async function () {
+            await getAPI()
+           })();
+    
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (

@@ -6,26 +6,42 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import { toast } from "react-toastify";
 import StoreToStoreMasterForm from "./StoreToStoreMasterForm";
+import { onlyDateFormat } from "../../../utils/constants";
 const StoreToStoreMaster = (props: any) => {
   let { pathname } = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+    
   //Changes in API
   const getAPI = async () => {
     try {
       const res = await callPostAPI(ENDPOINTS.GETINVENTORYMASTERSLIST, null, currentMenu?.FUNCTION_CODE)
-      props?.setData(res?.INVENTORYMASTERSLIST || []);
+      let updatedStoreToStoreList = formatStoreToStoreMasterList(res?.INVENTORYMASTERSLIST)
+      props?.setData(updatedStoreToStoreList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
 
     } catch (error: any) {
       toast.error(error)
     }
   }
+  const formatStoreToStoreMasterList = (list: any) => {
+    let StoreToStoreList = list;
+    StoreToStoreList = StoreToStoreList.map((element: any) => {
+      return {
+        ...element,
+        DOC_DATE: onlyDateFormat(element?.DOC_DATE)
+      }
+    })
+    return StoreToStoreList
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (

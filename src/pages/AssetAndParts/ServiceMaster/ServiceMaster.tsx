@@ -22,7 +22,9 @@ const ServiceMaster = (props: any) => {
     }
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+            })();
         }
     }, [selectedFacility, currentMenu])
     return (
@@ -37,9 +39,7 @@ const ServiceMaster = (props: any) => {
                 customHeader={["Service Name", "Service Type", "Location", "Active", "Action"
                 ]}
                 columnData={props?.data}
-                // Change as per requirement 
                 clickableColumnHeader={["ASSET_NAME"]}
-                // Change as per requirement 
                 filterFields={['ASSET_NAME', "ASSETTYPE_NAME", "LOCATION_NAME",]}
                 setSelectedData
                 isClick={props?.isForm}

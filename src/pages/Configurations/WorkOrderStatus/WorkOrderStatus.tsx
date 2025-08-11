@@ -6,15 +6,20 @@ import { useLocation, useOutletContext } from 'react-router-dom';
 import TableListLayout from '../../../layouts/TableListLayout/TableListLayout'
 import { toast } from 'react-toastify';
 import WorkOrderStatusForm from './WorkOrderStatusForm';
+import {updatedConfigureColor} from '../../../store/configureStatusColor';
+import { useDispatch } from 'react-redux';
 
 const WorkOrderStatus = (props: any) => {
     let { pathname } = useLocation();
+    const dispatch :any=useDispatch()
     const [selectedFacility, menuList]: any = useOutletContext();
     const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL).filter((detail: any) => detail.URL === pathname)[0]
     const getAPI = async () => {
         try {
             const res = await callPostAPI(ENDPOINTS.WORKODRDERTYPE_LIST, null, currentMenu?.FUNCTION_CODE)
+            localStorage.setItem("statusColorCode", JSON.stringify(res?.CONFIGURATIONSMASTERSLIST))
             props?.setData(res?.CONFIGURATIONSMASTERSLIST)
+            dispatch(updatedConfigureColor(res?.CONFIGURATIONSMASTERSLIST))
             localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
         } catch (error: any) {
             toast.error(error)
@@ -22,7 +27,9 @@ const WorkOrderStatus = (props: any) => {
     }
     useEffect(() => {
         if (currentMenu?.FUNCTION_CODE) {
-            getAPI()
+            (async function () {
+                await getAPI()
+               })();
         }
     }, [selectedFacility, currentMenu])
     return (

@@ -4,7 +4,7 @@ import { MultiSelect } from 'primereact/multiselect'
 import { useTranslation } from 'react-i18next';
 
 const MultiSelects = (props: any) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (props?.selectedData) {
@@ -22,7 +22,7 @@ const MultiSelects = (props: any) => {
                     options={props?.options}
                     optionLabel={props?.optionLabel}
                     filter
-                    placeholder={t(`Please Select`)}
+                    placeholder={props?.isLocation ? t(`Select Location`) : t(`Please Select`)}
                     // maxSelectedLabels={props?.maxSelectedLabels || 4}
                     {...props}
                 />

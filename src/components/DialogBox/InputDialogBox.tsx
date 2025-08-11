@@ -7,13 +7,11 @@ import InputField from "../../components/Input/Input";
 import Field from "../../components/Field";
 const InputDialogBox = (props: any) => {
   const [visible, setVisible] = useState<boolean>(false);
-  const setInputDialogVisible = (e: any) => {
+  const setInputDialogVisible = () => {
     setVisible(!visible);
-    //props?.setValue(props?.visible)
   };
   const {
     register,
-    handleSubmit,
     control,
     formState: { errors },
   } = useForm({
@@ -31,13 +29,14 @@ const InputDialogBox = (props: any) => {
         className="dialogButton"
         label=""
         icon="pi pi-plus"
-        onClick={() => setInputDialogVisible(true)}
+        onClick={() => setInputDialogVisible()}
       />
       <Dialog
+      // blockScroll={true}
         header={props?.inputName + "Master"}
         visible={visible}
         style={{ width: "30vw" }}
-        onHide={() => setInputDialogVisible(false)}
+        onHide={() => setInputDialogVisible()}
       >
         <div>
           <Field

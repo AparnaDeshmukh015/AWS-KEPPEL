@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
@@ -16,11 +16,11 @@ import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import moment from "moment";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import CancelDialogBox from "../../../components/DialogBox/CancelDialogBox";
-import { dateFormat, saveTracker } from "../../../utils/constants";
+import { saveTracker } from "../../../utils/constants";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
-import { appName, PATH } from "../../../utils/pagePath";
+import { PATH } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
-
+ 
 type FormValues = {
   MATREQTYPE: string;
   MATREQ_DATE: string;
@@ -38,7 +38,7 @@ type FormValues = {
   PARA: { para1: string; para2: string };
   MATREQ_ID: number;
 };
-
+ 
 type FormErrors = {
   PART_LIST?: {
     [key: number]: {
@@ -49,19 +49,19 @@ type FormErrors = {
     };
   };
 };
-
+ 
 const MaterialRequestForm = (props: any) => {
   const { t } = useTranslation();
   const { search } = useLocation();
   const navigate: any = useNavigate();
   const [selectedParts, setSelectedParts] = useState<any>([]);
   const [options, setOptions] = useState<any | null>([]);
-  const [workorderId, setWorkorderId] = useState<any | null>();
-  const [rowClick] = useState<boolean>(true);
+// const [workorderId, setWorkorderId] = useState<any | null>();
+ // const [rowClick] = useState<boolean>(true);
   const location: any = useLocation();
   const [marQueType, setMarQueType] = useState<any | null>(false);
   const [selectedDetails, setSelectedDetails] = useState<any | null>();
-  const [showLoader, setShowLoader] = useState<boolean>(false);
+ // const [showLoader, setShowLoader] = useState<boolean>(false);
   const assestTypeLabel: any = [
     { name: "Self", key: "S" },
     { name: "Against Work Order", key: "A" },
@@ -72,6 +72,11 @@ const MaterialRequestForm = (props: any) => {
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
   let [partOptions, setPartOptions] = useState([]);
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
+ 
+ 
   const {
     register,
     handleSubmit,
@@ -79,58 +84,66 @@ const MaterialRequestForm = (props: any) => {
     getValues,
     setValue,
     watch,
+    // reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues, FormErrors>({
     defaultValues: {
       MATREQTYPE: "",
       MATREQ_DATE: moment(new Date()).format('DD-MM-YYYY'),
-      RAISED_BY: decryptData((localStorage.getItem("USER_NAME"))),
+      RAISED_BY: search === "?add=" ? search === "?add=" ? decryptData((localStorage.getItem("USER_NAME"))) : search === "?edit=" ? dataId?.USER_NAME : "" : search === "?edit=" ? dataId?.USER_NAME : "",
       WORKORDER: "",
       REMARKS: "",
       STORE_ID: "",
-
+ 
       PART_LIST: [],
-      MODE: props?.selectedData ? "E" : "A",
-      PARA: props?.selectedData
+      MODE: search === "?edit=" ? "E" : "A",
+      PARA: search === "?edit="
         ? { para1: t('Material Requisition'), para2: "Updated" }
         : { para1: t('Material Requisition'), para2: "Added" },
-      MATREQ_ID: props?.selectedData ? props?.selectedData?.MATREQ_ID : 0,
+      MATREQ_ID: search === "?edit=" ? dataId.MATREQ_ID : 0,
     },
     mode: "all",
   });
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
   const _MAT_REQ_TYPE: any = watch("MATREQTYPE");
-  const { fields, remove, append } = useFieldArray({
+  let { fields, remove, append} = useFieldArray({
     name: "PART_LIST",
     control,
   });
-
+ 
   const storeWatch: any = watch("STORE_ID");
   const PART_LIST: any = watch("PART_LIST");
   const getpartlist = async () => {
     const payload = {
       STORE_ID: storeWatch?.STORE_ID,
     };
-   
+ 
     const res = await callPostAPI(ENDPOINTS.GET_INVENTORY_PARTLIST, payload);
-    setPartOptions(res?.STORELIST);
+    const PartMasterList: any = res?.STORELIST.map((element: any) => {
+      return {
+        ...element,
+        REQUESTED_QUANTITY: ""
+      }
+    })
+ 
+    setPartOptions(PartMasterList);
   };
-
+ 
   function getSelec(data: any) {
     setSelectedParts(data);
   }
-
+ 
   const getOptionDetails = async () => {
     const payload: any = {
-      MATREQ_ID: props?.selectedData?.MATREQ_ID,
-      MATREQ_NO: props?.selected?.MATREQ_NO,
+      MATREQ_ID: dataId?.MATREQ_ID,
+      MATREQ_NO: dataId?.MATREQ_NO,
     };
-    // setShowLoader(true);
+    
     const res = await callPostAPI(
       ENDPOINTS.GET_MATERIAL_REQUISITION_DETAILS,
       payload
     );
-
+ 
     if (res.FLAG === 1) {
       setSelectedDetails(res?.MATREQUISITIONDETAILS[0]);
       setValue("WORKORDER", res?.MATREQUISITIONDETAILS[0]?.WO_ID);
@@ -139,7 +152,7 @@ const MaterialRequestForm = (props: any) => {
       }
       setValue("REMARKS", res?.MATREQUISITIONDETAILS[0]?.REMARKS);
       const upDatedPartList: any = res?.PARTLIST?.map(
-        (part: any, index: any) => {
+        (part: any) => {
           return {
             PART_ID: part?.PART_ID,
             PART_CODE: part?.PART_CODE,
@@ -150,15 +163,20 @@ const MaterialRequestForm = (props: any) => {
           };
         }
       );
-
+ 
       append(upDatedPartList);
       setSelectedParts(upDatedPartList);
     }
   };
-
-
+ 
+  //const [partListState, setPartListState] = useState(PART_LIST);
+ 
+  // useEffect(() => {
+  //   setPartListState(PART_LIST);
+  // }, [PART_LIST]);
+ 
   const saveFuc = () => {
-
+  
     if (PART_LIST?.length < selectedParts?.length) {
       const data: any = [];
       const partListIds = new Set(PART_LIST.map((part: any) => part.PART_ID));
@@ -173,142 +191,192 @@ const MaterialRequestForm = (props: any) => {
         append(data)
       }
     } else {
+     
       const selectedPartIds = new Set(selectedParts.map((part: any) => part.PART_ID));
       const matchingParts = selectedParts.filter((part: any) => selectedPartIds.has(part.PART_ID));
-      setValue("PART_LIST", matchingParts);
+        const updatedMatchingParts = matchingParts.map((part:any) => {
+          const matchedPart = PART_LIST.find((listPart:any) => listPart.PART_ID === part.PART_ID);
+        if (matchedPart) {
+            return { ...part, REQUESTED_QUANTITY: matchedPart.REQUESTED_QUANTITY };
+          }
+    
+          return { ...part, REQUESTED_QUANTITY: "" };
+        });
+      //replace(updatedMatchingParts)
+      setValue("PART_LIST", updatedMatchingParts);
     }
+ 
   };
 
 
-  const onSubmit = async (payload: any, e: any) => {
-
+  const onSubmit = useCallback(async (payload: any, e: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     const buttonMode: any = e?.nativeEvent?.submitter?.name;
-    const partList: any = payload?.PART_LIST?.map((part: any, index: any) => {
-      if (part?.PART_ID !== "") {
-        return {
-          PART_ID: part?.PART_ID,
-          UOM_ID: "1",
-          QTY: part?.REQUESTED_QUANTITY,
-          REQUESTED_QUANTITY: part?.REQUESTED_QUANTITY,
-          STOCK: part?.STOCK,
-        };
-      }
-    });
-
-    payload.RAISED_BY = decryptData(localStorage.getItem("USER_ID"));
-
-    payload.MATREQTYPE =
-      location?.state !== null
-        ? "A"
-        : _MAT_REQ_TYPE.key
-          ? _MAT_REQ_TYPE.key
-          : _MAT_REQ_TYPE;
-
-    payload.WO_NO =
-      _MAT_REQ_TYPE?.key === "A" || props?.selectedData?.SELF_WO
-        ? payload?.WORKORDER?.WO_NO
-        : "0";
-
-    payload.WO_ID =
-      _MAT_REQ_TYPE?.key === "A" ||
-        props?.selectedData?.SELF_WO ||
-        payload?.WO_ID !== undefined
-        ? payload?.WORKORDER?.WO_ID
-        : location?.state !== null
-          ? location?.state?.wo_ID
+    try {
+      const partList: any = payload?.PART_LIST?.map((part: any) => {
+        if (part?.PART_ID !== "") {
+          return {
+            PART_ID: part?.PART_ID,
+            UOM_ID: "1",
+            QTY: part?.REQUESTED_QUANTITY,
+            REQUESTED_QUANTITY: part?.REQUESTED_QUANTITY,
+            STOCK: part?.STOCK,
+          };
+        }
+      });
+ 
+      payload.RAISED_BY = decryptData(localStorage.getItem("USER_ID"));
+ 
+      payload.MATREQTYPE =
+        location?.state !== null
+          ? "A"
+          : _MAT_REQ_TYPE.key
+            ? _MAT_REQ_TYPE.key
+            : _MAT_REQ_TYPE;
+ 
+      payload.WO_NO =
+        _MAT_REQ_TYPE?.key === "A" || props?.selectedData?.SELF_WO
+          ? payload?.WORKORDER?.WO_NO
           : "0";
-
-    payload.STORE_ID = payload?.STORE_ID?.STORE_ID;
-
-    payload.PART_LIST = partList;
-    payload.MODE =
-      buttonMode === "APPROVE"
-        ? "AP"
-        : buttonMode === "CANCEL"
-          ? "C"
-          : props?.selectedData
-            ? "E"
-            : "A";
-    payload.PARA = payload.MODE =
-      buttonMode === "APPROVE"
-        ? "AP"
-        : buttonMode === "CANCEL"
-          ? "C"
-          : props?.selectedData
-            ? "E"
-            : "A";
-    payload.PARA =
-      buttonMode === "CANCEL"
-        ? { para1: `${props?.headerName}`, para2: "Cancel" }
-        : buttonMode === "CONVERT"
-          ? { para1: `${props?.headerName}`, para2: "Approved" }
-          : props?.selectedData
-            ? { para1: t('Material Requisition'), para2: "Updated" }
-            : { para1: t('Material Requisition'), para2: "Added" };
-    delete payload.WORKORDER;
-    payload.ISAPPROVED = payload.MODE === "AP" ? true : false;
-   
-    if (fields?.length > 0) {
-
-      const res = await callPostAPI(
-        ENDPOINTS.SAVE_INVENTORY_MATERIAL_REQUISITION,
-        payload
-      );
-      if (res?.FLAG === true) {
-        const notifcation: any = {
-          FUNCTION_CODE: props?.functionCode,
-          EVENT_TYPE: "I",
-          STATUS_CODE: buttonMode === "CANCEL" ? 8 : search === "?edit=" ? 2 : 1,
-          PARA1: search === "?edit=" ? User_Name : User_Name,
-          PARA2: payload?.MATREQTYPE,
-          PARA3: 'req_no',
-          PARA4: storeWatch?.STORE_NAME,
-          PARA5: payload?.MATREQ_DATE,
-          PARA6: payload?.RAISED_BY,
-          PARA7: payload?.WO_ID,
-          PARA8: 'equipment_name',
-        };
-        const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
-
-        if (
-          buttonMode === "APPROVE" &&
-          props?.selectedData?.ISAPPROVED === true
-        ) {
-          // navigate("/issuemateriallist?add=",  {state: payload?.STORE_ID,
-          // })
-        } else if (
-          buttonMode === "APPROVE" &&
-          props?.selectedData?.ISAPPROVED === false
-        ) {
-          localStorage.setItem("STORE_ID", payload?.STORE_ID);
-          localStorage.setItem("MATREQ_ID", props?.selectedData?.MATREQ_ID);
-          localStorage.setItem("MATREQ_NO", props?.selectedData?.MATREQ_NO);
-           navigate(PATH.ADD_ISSUEMATERIAL);
+ 
+      payload.WO_ID =
+        _MAT_REQ_TYPE?.key === "A" ||
+          props?.selectedData?.SELF_WO ||
+          payload?.WO_ID !== undefined
+          ? payload?.WORKORDER?.WO_ID
+          : location?.state !== null
+            ? location?.state?.wo_ID
+            : "0";
+ 
+      payload.STORE_ID = payload?.STORE_ID?.STORE_ID;
+ 
+      payload.PART_LIST = partList;
+      payload.MODE =
+        buttonMode === "APPROVE"
+          ? "AP"
+          : buttonMode === "CANCEL"
+            ? "C"
+            : props?.selectedData
+              ? "E"
+              : "A";
+      payload.PARA = payload.MODE =
+        buttonMode === "APPROVE"
+          ? "AP"
+          : buttonMode === "CANCEL"
+            ? "C"
+            : props?.selectedData
+              ? "E"
+              : "A";
+      payload.PARA =
+        buttonMode === "CANCEL"
+          ? { para1: `${props?.headerName}`, para2: "Cancel" }
+          : buttonMode === "CONVERT"
+            ? { para1: `${props?.headerName}`, para2: "Approved" }
+            : search === "?edit="
+              ? { para1: t('Material Requisition'), para2: "Updated" }
+              : { para1: t('Material Requisition'), para2: "Added" };
+      delete payload.WORKORDER;
+      payload.ISAPPROVED = payload.MODE === "AP" ? true : false;
+ 
+      if (fields?.length > 0) {
+        try {
+          const res = await callPostAPI(
+            ENDPOINTS.SAVE_INVENTORY_MATERIAL_REQUISITION,
+            payload
+          );
+          if (res?.FLAG === true) {
+            const notifcation: any = {
+              FUNCTION_CODE: currentMenu?.FUNCTION_CODE,
+              EVENT_TYPE: "I",
+              STATUS_CODE: buttonMode === "CANCEL" ? 8 : search === "?edit=" ? 2 : 1,
+              PARA1: search === "?edit=" ? User_Name : User_Name,
+              PARA2: payload?.MATREQTYPE,
+              PARA3: 'req_no',
+              PARA4: storeWatch?.STORE_NAME,
+              PARA5: payload?.MATREQ_DATE,
+              PARA6: payload?.RAISED_BY,
+              PARA7: payload?.WO_ID,
+              PARA8: 'equipment_name',
+            };
+            const eventPayload = { ...eventNotification, ...notifcation };
+            await helperEventNotification(eventPayload);
+            setIsSubmit(false)
+            if (
+              buttonMode === "APPROVE" &&
+              props?.selectedData?.ISAPPROVED === true
+            ) {
+              // navigate("/issuemateriallist?add=",  {state: payload?.STORE_ID,
+              // })
+            } else if (
+              buttonMode === "APPROVE" &&
+              props?.selectedData?.ISAPPROVED === false
+            ) {
+              localStorage.setItem("STORE_ID", payload?.STORE_ID);
+              localStorage.setItem("MATREQ_ID", props?.selectedData?.MATREQ_ID);
+              localStorage.setItem("MATREQ_NO", props?.selectedData?.MATREQ_NO);
+              navigate(PATH.ADD_ISSUEMATERIAL);
+            }
+            if (location?.state === null) {
+              toast?.success(res?.MSG);
+              props?.getAPI();
+              props?.isClick();
+            } else {
+              toast?.success(res?.MSG);
+              navigate(PATH.EDIT_WORKORDERMASTER, { state: location?.state?.wo_ID });
+            }
+          } else {
+            setIsSubmit(false)
+            toast?.error(res?.MSG);
+          }
+ 
+        } catch (error) {
+ 
         }
-        if (location?.state === null) {
-          toast?.success(res?.MSG);
-          props?.getAPI();
-          props?.isClick();
-        } else {
-          toast?.success(res?.MSG);
-          navigate(PATH.EDIT_WORKORDERMASTER, { state: location?.state?.wo_ID });
-        }
+ 
+ 
       } else {
-        toast?.error(res?.MSG);
+        setIsSubmit(false)
+        toast.error("please select part list ");
       }
-
-    } else {
-      toast.error("please select part list ");
+    } catch (error: any) {
+      toast.error(error)
+    } finally {
+      setIsSubmit(false)
     }
-  };
-
+  },[
+    IsSubmit,
+    decryptData,
+    _MAT_REQ_TYPE,
+    props?.selectedData,
+    props?.headerName,
+    props?.getAPI,
+    props?.isClick,
+    navigate,
+    callPostAPI,
+    helperEventNotification,
+    eventNotification,
+    fields,
+    location?.state,
+    storeWatch?.STORE_NAME,
+    search,
+    t,
+    User_Name,
+    currentMenu?.FUNCTION_CODE,
+  ]);
   useEffect(() => {
     if (storeWatch !== "") {
-      getpartlist();
+      (async function () {
+        await   getpartlist();
+       
+       })();
+     
     }
   }, [storeWatch]);
 
+  useEffect(() => {
+  }, [getValues("PART_LIST")]);
+ 
   useEffect(() => {
     if (_MAT_REQ_TYPE?.key === "S" || _MAT_REQ_TYPE === "S") {
       const data: any = {};
@@ -318,31 +386,31 @@ const MaterialRequestForm = (props: any) => {
       setMarQueType(true);
     }
   }, [_MAT_REQ_TYPE]);
-
+ 
   const getOptions = async () => {
     try {
       // we are accessing data from workorder using MODE :E
       const payload = {
-        WO_ID: search === '?add=' && location?.state !== null ? location?.state?.wo_ID : search === '?add=' ? 0 : props.selectedData?.WO_ID,
-        MATREQ_ID: search === '?add=' && location?.state !== null ? location?.state?.MATREQ_ID : search === '?add=' ? 0 : props.selectedData?.MATREQ_ID,
+        WO_ID: search === '?add=' && location?.state !== null ? location?.state?.wo_ID : search === '?add=' ? 0 : dataId?.WO_ID,
+        MATREQ_ID: search === '?add=' && location?.state !== null ? location?.state?.MATREQ_ID : search === '?add=' ? 0 : dataId?.MATREQ_ID,
         MODE: search === '?add=' && location?.state !== null ? "E" : search === '?add=' ? "A" : "E"
-
+ 
       }
-     
+ 
       const res = await callPostAPI(ENDPOINTS.GET_INVENTORY_MASTER_OPTIONS, payload);
-
+ 
       if (res?.FLAG === 1) {
         setOptions({
           woList: res?.WOLIST,
           storeList: res?.STORELIST,
         });
-
+ 
         setOptions({ woList: res?.WOLIST, storeList: res?.STORELIST });
         if (location?.state === null && search === "?add=") {
           setValue("MATREQTYPE", "S");
         }
         if (props?.selectedData !== undefined) {
-          getOptionDetails();
+          await getOptionDetails();
         }
       }
     } catch (error: any) {
@@ -350,12 +418,15 @@ const MaterialRequestForm = (props: any) => {
     }
   };
 
+
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
+    (async function () {
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, []);
-
-
+ 
+ 
   useEffect(() => {
     const nestedErrors: any = errors?.PART_LIST || {};
     const firstError: any = Object?.values(nestedErrors)[0];
@@ -367,26 +438,23 @@ const MaterialRequestForm = (props: any) => {
       toast?.error(t(check));
     }
   }, [isSubmitting]);
-
+ 
   useEffect(() => {
     if (location?.state) {
-
       setValue("MATREQTYPE", "A");
-
       setValue("WORKORDER", location?.state?.wo_ID);
-
       setSelectedDetails({ SELF_WO: "A", WO_ID: location?.state?.wo_ID });
       setMarQueType(true);
-      setWorkorderId(location?.state);
+      // setWorkorderId(location?.state);
     }
   }, [location?.state]);
-
+ 
   const handlerShow = (index: any, rowData: any) => {
     remove(index);
-    const data: any = selectedParts?.filter((f: any, id: any) => f?.PART_ID !== rowData?.PART_ID)
+    const data: any = selectedParts?.filter((f: any) => f?.PART_ID !== rowData?.PART_ID)
     setSelectedParts(data);
   }
-
+  
   return (
     <>
       <section className="w-full">
@@ -397,7 +465,7 @@ const MaterialRequestForm = (props: any) => {
                 {props?.headerName === "Material Request Approve" ? (
                   ""
                 ) : (
-                  <>{t(`${props?.selectedData ? "Edit" : "Add"}`)}</>
+                  <>{t(`${search === "?edit=" ? "Edit" : "Add"}`)}</>
                 )}{" "}
                 {props?.headerName}{" "}
               </h6>
@@ -412,21 +480,22 @@ const MaterialRequestForm = (props: any) => {
                   type="submit"
                   className="Primary_Button  w-20 me-2"
                   label={"Save"}
+                  IsSubmit={IsSubmit}
                 />
               )}
-
+ 
               {/* )} */}
-              {((search === "?edit=" &&
-                decryptData(localStorage.getItem("ROLETYPECODE")) === "SA") ||
-                decryptData(localStorage.getItem("ROLETYPECODE")) === "S")
-                // decryptData(localStorage.getItem("ROLETYPECODE")) === "BM" ||
-                // decryptData(localStorage.getItem("ROLETYPECODE")) === "SM")
-                && location?.state === null && (
+              {search === "?edit=" && location?.state === null &&
+                (decryptData(localStorage.getItem("ROLETYPECODE")) === "SA" ||
+                  decryptData(localStorage.getItem("ROLETYPECODE")) === "S")
+              
+                && (
                   <Buttons
                     name="APPROVE"
                     type="submit"
                     className="Primary_Button  w-20 me-2"
                     label={"Approve"}
+                    IsSubmit={IsSubmit}
                   />
                 )}
               {(search === "?edit=" && location?.state === null) && (
@@ -441,6 +510,8 @@ const MaterialRequestForm = (props: any) => {
                   watch={watch}
                   REMARK={"REMARK"}
                   errors={errors}
+                  IsSubmit={IsSubmit} 
+                  setIsSubmit={setIsSubmit}
                 />
               )}
               {location?.state === null ? <><Buttons
@@ -478,7 +549,7 @@ const MaterialRequestForm = (props: any) => {
                           selectedData={
                             location?.state !== null
                               ? "A"
-                              : location?.state === null && search === "?add="
+                              : search === "?add="
                                 ? "S"
                                 : selectedDetails?.SELF_WO
                           }
@@ -521,7 +592,7 @@ const MaterialRequestForm = (props: any) => {
                   },
                 }}
               />
-
+ 
               {(_MAT_REQ_TYPE?.key === "A" || _MAT_REQ_TYPE === "A") && (
                 <div>
                   <Field
@@ -542,6 +613,7 @@ const MaterialRequestForm = (props: any) => {
                             label="Raised By"
                             require={true}
                             disabled={true}
+                            selectedData={search === "?edit=" ? selectedDetails?.MATREQ_RAISEDBY : ""}
                             invalid={errors.RAISED_BY?.message}
                             {...field}
                           />
@@ -551,7 +623,7 @@ const MaterialRequestForm = (props: any) => {
                   />
                 </div>
               )}
-
+ 
               <Field
                 controller={{
                   name: "STORE_ID",
@@ -561,8 +633,8 @@ const MaterialRequestForm = (props: any) => {
                       options?.storeList?.length >= 1
                         ? options?.storeList[0]
                         : null;
-
-                   
+ 
+ 
                     return (
                       <Select
                         options={options?.storeList}
@@ -586,10 +658,10 @@ const MaterialRequestForm = (props: any) => {
                   },
                 }}
               />
-
+ 
               {marQueType === true &&
-                (props?.selectedData?.WO_NO !== "" ||
-                  props?.selectedData?.WO_NO !== undefined) ? (
+                (dataId?.WO_NO !== "" ||
+                  dataId?.WO_NO !== undefined) ? (
                 <div>
                   <Field
                     controller={{
@@ -624,9 +696,7 @@ const MaterialRequestForm = (props: any) => {
               ) : (
                 <></>
               )}
-
-              {/* )} */}
-
+             
               <Field
                 controller={{
                   name: "REMARKS",
@@ -635,8 +705,6 @@ const MaterialRequestForm = (props: any) => {
                     return (
                       <InputField
                         {...register("REMARKS", {
-                          // required: "Please fill the reqiured field",
-                          // validate: value => value.trim() !== "" || "Please fill the required fields"
                         })}
                         label="Remarks"
                         {...field}
@@ -665,7 +733,7 @@ const MaterialRequestForm = (props: any) => {
             </div>
             <div>
               <DataTable
-                value={fields}
+                value={PART_LIST}
                 key={fields?.length - 1}
                 showGridlines
                 disabled={
@@ -673,15 +741,15 @@ const MaterialRequestForm = (props: any) => {
                     ? true
                     : false
                 }
-
+ 
               >
                 <Column
                   field="SR_NO"
                   header={t("Sr No")}
                   className="w-20"
                   body={(rowData, { rowIndex }) => {
-
-
+ 
+ 
                     return <>{rowIndex + 1}</>;
                   }}
                 ></Column>
@@ -696,12 +764,13 @@ const MaterialRequestForm = (props: any) => {
                   className=""
                 ></Column>
                 <Column field="STOCK" header={t("Stock")} className=""></Column>
-
+ 
                 <Column
                   field="REQ_QTY"
                   header={t("Quantity")}
                   className="w-40"
                   body={(rowData, { rowIndex }) => {
+                  setValue(`PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any, rowData?.REQUESTED_QUANTITY);
                     return (
                       <>
                         <Field
@@ -715,24 +784,27 @@ const MaterialRequestForm = (props: any) => {
                                     `PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any,
                                     {
                                       required: t("Please fill the required fields."),
-                                      onChange(event) {
-                                      },
                                       validate: (value) => {
+ 
+ 
                                         if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
                                           return (t("Should be greater than 0"));
                                         } else if (parseInt(value, 10) === 0) {
                                           return (t("Please enter the number"))
-
+ 
                                         } else {
                                           const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                           setValue(`PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any, sanitizedValue);
                                           return true;
                                         }
-
+ 
+ 
+ 
                                       },
                                     }
                                   )}
-
+                                  // value={field.value} 
+ 
                                   disabled={
                                     props?.headerName ===
                                       "Material Request Approve" ||
@@ -752,6 +824,7 @@ const MaterialRequestForm = (props: any) => {
                                   }
                                   {...field}
                                 />
+ 
                               );
                             },
                           }}
@@ -795,5 +868,6 @@ const MaterialRequestForm = (props: any) => {
     </>
   );
 };
-
+ 
 export default MaterialRequestForm;
+ 

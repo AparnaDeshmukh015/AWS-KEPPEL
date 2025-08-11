@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { convertTime } from "../../utils/constants";
 
 const TimeCalendar = (props: any) => {
-  const [timeValue, setTimeValue] = useState<any|null>(props?.value || null);
+  const [timeValue, setTimeValue] = useState<any | null>(props?.value || null);
   const handleMinuteChange = (value: Date, change: any) => {
     const minutes = value.getMinutes();
     let newMinutes = minutes;
@@ -35,7 +35,7 @@ const TimeCalendar = (props: any) => {
       }
     }
 
-    const newValue:any = new Date(value);
+    const newValue: any = new Date(value);
     newValue.setMinutes(newMinutes);
     setTimeValue(newValue);
     props?.setValue(props?.name, newValue);
@@ -46,7 +46,8 @@ const TimeCalendar = (props: any) => {
     if ("00:00" === timeValue) {
       date = convertTime(timeValue);
     }
-    const newValue:any = new Date(e?.value);
+
+    const newValue: any = new Date(e?.value);
     if (newValue > date) {
       handleMinuteChange(newValue, "forward");
     } else if (newValue <= date) {
@@ -56,7 +57,7 @@ const TimeCalendar = (props: any) => {
   useEffect(() => {
     setTimeValue(props?.value);
   }, [props?.value]);
-  
+
   return (
     <div className={`${props?.invalid ? "errorBorder" : ""}`}>
       <div className={twMerge(props?.containerclassname)}>
@@ -73,16 +74,16 @@ const TimeCalendar = (props: any) => {
             placeholder="Please Select"
             id="calendar-timeonly"
             timeOnly
-            hourFormat={props?.id === "calendar-24"?"24":"12"} 
+            hourFormat={props?.id === "calendar-24" ? "24" : "12"}
             showIcon
             icon={() => <i className="pi pi-clock" />}
             {...props}
-            value={timeValue}
+            value={timeValue ? timeValue : new Date()}
             onChange={handleChange}
           />
         </span>
       </div>
-   
+
     </div>
   );
 };

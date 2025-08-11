@@ -6,7 +6,7 @@ import Select from "../../../components/Dropdown/Dropdown";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MultiSelects from "../../../components/MultiSelects/MultiSelects";
 import { useTranslation } from "react-i18next";
 import FormHeader from "../../../components/FormHeader/FormHeader";
@@ -18,6 +18,8 @@ const UserSkillMasterForm = (props: any) => {
   let { pathname } = useLocation();
   const { search } = useLocation();
   const [, menuList]: any = useOutletContext();
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
@@ -26,7 +28,7 @@ const UserSkillMasterForm = (props: any) => {
   const [usersListOptions, setUsersListOptions] = useState([]);
   const [userRoleList, setUserRoleList] = useState<any | null>([])
   const [userList, setUserList] = useState<any | null>([])
-
+ const[IsSubmit, setIsSubmit]=useState<any|null>(false)
   const {
     register,
     handleSubmit,
@@ -36,11 +38,11 @@ const UserSkillMasterForm = (props: any) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      MODE: props?.selectedData ? "E" : "A",
+      MODE: search === "=edit?" ? "E" : "A",
       PARA: props?.selectedData
         ? { para1: `${props?.headerName}`, para2: "Updated" }
         : { para1: `${props?.headerName}`, para2: "Added" },
-      USER_LIST: props?.selectedData?.USER_LIST,
+      USER_LIST: search === "=edit?"?dataId?.USER_LIST:"",
       SKILL_LIST: "",
       USER_ROLE: "",
     },
@@ -50,7 +52,7 @@ const UserSkillMasterForm = (props: any) => {
   const watchUSER_ROLE: any = watch('USER_ROLE')
   const getOptions = async () => {
     const skillPayload = {
-      SELECTED_USER_ID: props?.selectedData?.USER_ID,
+      SELECTED_USER_ID: dataId?.USER_ID,
     };
     const res = await callPostAPI(ENDPOINTS.getUserSkillMasterList);
     setUserskilloptions(res?.SKILLLIST);
@@ -64,33 +66,40 @@ const UserSkillMasterForm = (props: any) => {
     setSelectedSkills(response?.USER_SKILL_DETAILS);
   };
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if(IsSubmit) return true
+    setIsSubmit(true)
     payload.SKILL_LIST = payload?.SKILL_LIST?.map((item: any) => ({
       SKILL_ID: item?.SKILL_ID,
     }));
+   
     payload.SELECTED_USER_ID = payload?.USER_LIST?.USER_ID;
     delete payload.USER_ROLE;
-    delete payload?.USER_LIST
+    delete payload?.USER_LIST;
+    
     try {
       const res = await callPostAPI(ENDPOINTS.saveUserSkillMaster, payload);
-
       if (res?.FLAG === true) {
-        toast?.success(res?.MSG);
-        props?.getAPI();
-        props?.isClick();
-      }
-      else {
-        toast?.error(res?.MSG);
+        toast?.success(res?.MSG); 
+        props?.getAPI(); 
+        props?.isClick(); 
+      } else {
+        toast?.error(res?.MSG); 
       }
     } catch (error: any) {
-      toast?.error(error);
+      toast?.error(error); 
+    }finally{
+      setIsSubmit(false)
     }
-
-  };
+  }, [IsSubmit, props.getAPI, props.isClick]); 
+  
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
-  }, []);
+     (async function () {
+      await saveTracker(currentMenu)
+       await  getOptions();
+       
+      })();
+   }, []);
 
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
@@ -105,7 +114,7 @@ const UserSkillMasterForm = (props: any) => {
       const roleWiseList: any = usersListOptions?.filter((f: any) => f.ROLE_ID === watchUSER_ROLE?.ROLE_ID)
       setUserList(roleWiseList)
     }
-  }, [watchUSER_ROLE])
+  }, [watchUSER_ROLE, dataId])
 
   return (
     <section className="w-full">
@@ -114,6 +123,7 @@ const UserSkillMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -133,7 +143,7 @@ const UserSkillMasterForm = (props: any) => {
                       optionLabel="ROLE_NAME"
                       findKey={"ROLE_ID"}
                       disabled={search === '?edit=' ? true : false}
-                      selectedData={props?.selectedData?.ROLE_ID}
+                      selectedData={dataId?.ROLE_ID}
                       invalid={errors?.USER_ROLE}
                       setValue={setValue}
                       {...field}
@@ -158,7 +168,7 @@ const UserSkillMasterForm = (props: any) => {
                       require={true}
                       findKey={"USER_ID"}
                       disabled={search === '?edit=' ? true : false}
-                      selectedData={props?.selectedData?.USER_ID}
+                      selectedData={dataId?.USER_ID}
                       setValue={setValue}
                       invalid={errors.USER_LIST}
                       {...field}

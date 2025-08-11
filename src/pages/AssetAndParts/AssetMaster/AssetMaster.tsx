@@ -6,46 +6,70 @@ import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import AssetMasterForm from "./AssetMasterForm";
+import { clearScheduleTaskList } from "../../../store/scheduleTaskListStore";
+import { useDispatch } from "react-redux";
+import { appName } from "../../../utils/pagePath";
+import LoaderFileUpload from "../../../components/Loader/LoaderFileUpload";
 import LoaderS from "../../../components/Loader/Loader";
-
 const AssetMaster = (props: any) => {
-  let { pathname } = useLocation();
+  const dispatch = useDispatch()
+  let { pathname, search, location }: any = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
-  const [showLoader, setShowLoader] = useState<boolean>(true);
+  const[loading, setLoading] = useState<any| null>(false)
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
   //API Function
   const getAPI = async () => {
     try {
-      // setShowLoader(true);
+      setLoading(true)
       const res = await callPostAPI(
         ENDPOINTS.GET_ASSET_MASTER_LIST,
         null,
-       "AS007"
+        "AS007"
       );
-
+      
       if (res?.FLAG === 1) {
         props?.setData(res?.ASSESTMASTERSLIST || []);
         localStorage.setItem("currentMenu", JSON.stringify(currentMenu));
-        setShowLoader(false);
+           localStorage.removeItem("scheduleId")
+        localStorage.removeItem("assetDetails")
+         setLoading(false)
       } else {
-        setShowLoader(false);
+   setLoading(false)
         props?.setData([]);
       }
     } catch (error: any) {
+       setLoading(false)
       toast?.error(error);
-      
+
+    } finally {
+      setLoading(false)
     }
   };
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        sessionStorage.removeItem("formData");
+        await getAPI()
+      })();
     }
-  }, [selectedFacility, currentMenu]);
+  }, [selectedFacility, currentMenu, search]);
+
+  useEffect(() => {
+   
+    if (search === "" || search === undefined) {
+      dispatch(clearScheduleTaskList());
+     
+    }
+
+
+
+
+  }, [search]);
   return !props?.search ? (
     <>
-     
+      {loading ? <LoaderS /> :
         <Table
           tableHeader={{
             headerName: currentMenu?.FUNCTION_DESC,
@@ -75,13 +99,13 @@ const AssetMaster = (props: any) => {
           isClick={props?.isForm}
           handelDelete={props?.handelDelete}
         />
-     
+      }
     </>
   ) : (
     <AssetMasterForm
       headerName={currentMenu?.FUNCTION_DESC}
       setData={props?.setData}
-      getAPI={getAPI}
+     
       selectedData={props?.selectedData}
       isClick={props?.isForm}
       functionCode={currentMenu?.FUNCTION_CODE}
@@ -99,3 +123,5 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
+

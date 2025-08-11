@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputField from "../../../components/Input/Input";
 import Buttons from "../../../components/Button/Button";
 import { Card } from "primereact/card";
-import { useFieldArray, useForm } from "react-hook-form";
+import {useFieldArray, useForm } from "react-hook-form";
 import Field from "../../../components/Field";
 import Radio from "../../../components/Radio/Radio";
 import Select from "../../../components/Dropdown/Dropdown";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useTranslation } from "react-i18next";
-import FormHeader from "../../../components/FormHeader/FormHeader";
 import { toast } from "react-toastify";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { useLocation, useOutletContext } from "react-router-dom";
 import DateCalendar from "../../../components/Calendar/Calendar";
 import moment from "moment";
-import { dateFormat, saveTracker } from "../../../utils/constants";
+import { saveTracker } from "../../../utils/constants";
 import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
 import { decryptData } from "../../../utils/encryption_decryption";
 
@@ -52,16 +51,19 @@ type FormErrors = {
 const ReturnMaterialForm = (props: any) => {
   let localStoragedata: any = localStorage.getItem("Id");
   let returnFormLocalStorage: any = JSON.parse(localStoragedata)
+
   const { search } = useLocation();
   const { t } = useTranslation();
   let { pathname } = useLocation();
   const [options, setOptions] = useState<any | null>([]);
   const [redioOption, setRadioOption] = useState<any | null>(false)
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
-  const [selectedFacility, menuList]: any = useOutletContext();
+  const [ ,menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
   const assestTypeLabel: any = [
     { name: "Against Technician", key: "S" },
 
@@ -91,9 +93,11 @@ const ReturnMaterialForm = (props: any) => {
       USER_ID: decryptData((localStorage.getItem("USER_NAME"))),
       PART_LIST: [],
     },
-    mode: "all",
-  });
+    mode: "all"
+  })
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+
   // const STORE_NAMEwatch: any = watch("STORE_ID");
   const _RETURN_TYPE: any = watch("RETURN_TYPE");
   const _TechnicianWatch: any = watch("USER_ID");
@@ -101,7 +105,7 @@ const ReturnMaterialForm = (props: any) => {
 
   const PART_LIST: any = watch("PART_LIST");
 
-  const { fields, remove, append } = useFieldArray({
+  const { fields } = useFieldArray({
     name: "PART_LIST",
     control,
   });
@@ -126,7 +130,7 @@ const ReturnMaterialForm = (props: any) => {
           storeList: res?.STORELIST,
         });
         if (search === "?edit=") {
-          getinventorypartdetails();
+          await getinventorypartdetails();
 
         }
       }
@@ -158,11 +162,14 @@ const ReturnMaterialForm = (props: any) => {
   };
 
   const getinventorypartdetails = async () => {
+    
+    
     const payload = {
-      DOC_NO: props?.selectedData?.DOC_NO,
-      DOC_ID: props?.selectedData?.DOC_ID,
+      DOC_NO: search === "?edit=" ? dataId?.DOC_NO : "",
+      DOC_ID: search === "?edit=" ? dataId?.DOC_ID : 0,
     };
 
+    
 
     const res = await callPostAPI(
       ENDPOINTS.GETADDINVENTORYMASTERSDETAILS,
@@ -186,8 +193,9 @@ const ReturnMaterialForm = (props: any) => {
     }
   };
 
-  const onSubmit = async (payload: any, e: any) => {
-
+  const onSubmit = useCallback(async (payload: any, e: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
 
     try {
       const buttonMode: any = e?.nativeEvent?.submitter?.name;
@@ -230,22 +238,32 @@ const ReturnMaterialForm = (props: any) => {
           PARA7: payload?.WO_ID,
         };
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
+
         props?.isClick();
+
       } else {
+        setIsSubmit(false)
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+
       toast.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, props.selectedData, props.functionCode, props.getAPI, props.isClick, callPostAPI, toast, decryptData, moment, _RETURN_TYPE, PART_LIST, eventNotification, search, User_Name]);
 
   useEffect(() => {
-    const returnDate: any = new Date();
+    
+   
+    (async function () {
+      const returnDate: any = new Date();
     setValue("RETURN_DATE", returnDate);
-    getOptions();
-    saveTracker(currentMenu)
+      await  getOptions();
+      await saveTracker(currentMenu)
+     })();
   }, []);
 
   useEffect(() => {
@@ -269,7 +287,11 @@ const ReturnMaterialForm = (props: any) => {
   useEffect(() => {
     if (_TechnicianWatch !== undefined || _TechnicianWatch !== "" || _woid !== undefined || _woid !== "") {
       if (search === '?add=') {
-        getOptionDetails();
+        
+        (async function () {
+          await getOptionDetails();
+         })();
+   
       }
     }
   }, [_TechnicianWatch, _woid]);
@@ -289,8 +311,8 @@ const ReturnMaterialForm = (props: any) => {
           <div className="flex flex-wrap justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {props?.selectedData ? "Cancel" : "Add"} {props?.headerName}-
-                {props?.selectedData ? props?.selectedData?.DOC_NO : ""}
+                {search === "?edit="? "Cancel" : "Add"} {props?.headerName}-
+                {search === "?edit=" ? dataId?.DOC_NO : ""}
               </h6>
             </div>
 
@@ -300,7 +322,7 @@ const ReturnMaterialForm = (props: any) => {
                   type="submit"
                   className="Primary_Button  w-20 me-2"
                   label={"Save"}
-
+                  disabled={IsSubmit}
                 />
               ) : (
                 <>
@@ -388,8 +410,8 @@ const ReturnMaterialForm = (props: any) => {
                         require={true}
                         findKey={"STORE_ID"}
                         optionLabel="STORE_NAME"
-                        selectedData={props?.selectedData?.STORE_ID}
-                        disabled={props.selectedData ? true : false}
+                        selectedData={selectedDetails?.STORE_ID}
+                        disabled={search === '?edit=' ? true : false}
                         setValue={setValue}
                         invalid={errors.STORE_ID}
                         {...field}
@@ -496,7 +518,7 @@ const ReturnMaterialForm = (props: any) => {
                         label="Remarks"
 
                         require={true}
-                        disabled={props.selectedData ? true : false}
+                        disabled={props?.selectedData ? true : false}
                         invalid={errors.REMARKS}
                         {...field}
                       />

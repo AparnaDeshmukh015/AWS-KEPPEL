@@ -19,16 +19,15 @@ import { decryptData } from "../../../utils/encryption_decryption";
 
 const AssetScheduleMasterForm = (props: any) => {
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
-  const [scheduleTaskList, setScheduleTaskList] = useState([]);
   const [task, setTask] = useState<any | null>([]);
-  const [selectedTaskDetailsList, setSelectedTaskDetailsList] = useState([]);
   const [scheduleData, setScheduleData] = useState<any | null>([]);
-  const [editData, setEditData] = useState<any | null>([]);
-  const [editStatus, setEditStatus] = useState<any | null>(false);
-  const [issueList, setIssueList]= useState<any|null>([])
-  const [selectedIssue, setSelectedIssue] = useState<any|null>()
-  const[softService, setSoftService]=useState<any|null>([]);
-  const[assetData,setAsset]=useState<any|null>([])
+  const [issueList, setIssueList] = useState<any | null>([])
+  const [selectedIssue, setSelectedIssue] = useState<any | null>()
+  const [softService, setSoftService] = useState<any | null>([]);
+  const [assetData, setAsset] = useState<any | null>([])
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+
+
   const { t } = useTranslation();
   let { pathname } = useLocation();
   const [week, setWeek] = useState<{
@@ -51,9 +50,11 @@ const AssetScheduleMasterForm = (props: any) => {
     { name: "Equipment ", key: "A" },
     { name: "Soft Services", key: "N" },
   ];
-  const [selectedScheduleTaskDetails, setSelectedScheduleTaskDetails] =
-    useState<any>();
+  // const [selectedScheduleTaskDetails, setSelectedScheduleTaskDetails] = useState<any>();
   const { search } = useLocation();
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
+
   const {
     register,
     resetField,
@@ -71,12 +72,12 @@ const AssetScheduleMasterForm = (props: any) => {
         : { para1: `${props?.headerName}`, para2: "Added" },
       ASSET_NONASSET: "",
       TYPE: null,
-      SCHEDULE_NAME: "",
+      SCHEDULE_NAME: props?.selectedData ? props?.selectedData?.SCHEDULE_NAME : search === '?edit=' ? dataId?.SCHEDULE_NAME : "",
       SOFT_SERVICE: "",
       MAKE: props?.selectedData?.MAKE_ID || "",
       MODEL: props?.selectedData?.MODEL_ID || "",
-      REQ_ID:"",
-      SCHEDULE_ID: props?.selectedData ? props?.selectedData?.SCHEDULE_ID : 0,
+      REQ_ID: "",
+      SCHEDULE_ID: props?.selectedData ? props?.selectedData?.SCHEDULE_ID : search === '?edit=' ? dataId?.SCHEDULE_ID : 0,
       SCHEDULER: {
         MODE: "A",
         TEAM_LEAD_ID: 0,
@@ -131,18 +132,18 @@ const AssetScheduleMasterForm = (props: any) => {
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
   const watchAll: any = watch();
   const ASSET_NONASSET: any = watch("ASSET_NONASSET");
-  const SCHEDULER_WEEKLY_1_WEEKDAY: any = watch("SCHEDULER.WEEKLY_1_WEEKDAY");
+  //const SCHEDULER_WEEKLY_1_WEEKDAY: any = watch("SCHEDULER.WEEKLY_1_WEEKDAY");
   const SCHEDULER_DAILY_ONCE_EVERY_DAYS: any = watch(
     "SCHEDULER.DAILY_ONCE_EVERY_DAYS"
   );
-  const SCHEDULER_PERIOD = watch("SCHEDULER.PERIOD");
-  
+  //const SCHEDULER_PERIOD = watch("SCHEDULER.PERIOD");
+
   const getOptions = async () => {
     const payload = {
       ASSETTYPE: "P",
     };
     try {
-      const res = await callPostAPI(
+      await callPostAPI(
         ENDPOINTS.GET_REQUEST_DESCRIPTION_MASTERLIST,
         null,
         currentMenu?.FUNCTION_CODE
@@ -152,7 +153,7 @@ const AssetScheduleMasterForm = (props: any) => {
         payload,
         props?.functionCode
       );
-     
+
       setOptions({
         assetMake: res1?.MAKELIST,
         assetModel: res1?.MODELLIST,
@@ -169,7 +170,7 @@ const AssetScheduleMasterForm = (props: any) => {
       setSoftService(res1?.ASSESTTYPELIST?.filter(
         (item: any) => item?.ASSETTYPE === "N"))
       if (search === "?edit=") {
-        getScheduleDetails();
+        await getScheduleDetails();
       }
     } catch (error) { }
   };
@@ -177,13 +178,13 @@ const AssetScheduleMasterForm = (props: any) => {
   const getScheduleDetails = async () => {
     try {
       const res = await callPostAPI(ENDPOINTS.GET_SCHEDULE_DETAILS, {
-        SCHEDULE_ID: props?.selectedData?.SCHEDULE_ID,
+        SCHEDULE_ID: props?.selectedData ? props?.selectedData?.SCHEDULE_ID : search === '?edit=' ? dataId?.SCHEDULE_ID : 0,
       });
 
       if (res?.FLAG === 1) {
 
-        getTaskList();
-        getRequestList(res?.SCHEDULEDETAILS[0]?.ASSETGROUP_ID, res?.SCHEDULEDETAILS[0]?.ASSET_NONASSET,res?.SCHEDULEDETAILS[0]?.REQ_ID )
+        await getTaskList();
+        await getRequestList(res?.SCHEDULEDETAILS[0]?.ASSETGROUP_ID, res?.SCHEDULEDETAILS[0]?.ASSET_NONASSET, res?.SCHEDULEDETAILS[0]?.REQ_ID)
         setSelectedDetails(res?.SCHEDULEDETAILS[0]);
         setScheduleData(res?.SCHEDULEDETAILS[0]);
         // setSelectedTaskDetailsList(res?.TASkDETAILS)
@@ -200,9 +201,11 @@ const AssetScheduleMasterForm = (props: any) => {
   };
 
   const onSubmit = async (payload: any) => {
- 
+    if (IsSubmit) return true
+    setIsSubmit(true)
     if (week?.week === undefined && week?.SCHEDULER_PERIOD === "W") {
       toast.error("Please select the week");
+      setIsSubmit(false)
       return;
     }
     if (
@@ -211,6 +214,7 @@ const AssetScheduleMasterForm = (props: any) => {
     ) {
       setisValueCheck(true)
       toast.error(" Please add number of weeks required");
+      setIsSubmit(false)
       return;
     }
     if (
@@ -219,6 +223,7 @@ const AssetScheduleMasterForm = (props: any) => {
     ) {
       setisValueCheck(true)
       toast.error(" Please add number of weeks required");
+      setIsSubmit(false)
       return;
     }
     if (
@@ -227,6 +232,7 @@ const AssetScheduleMasterForm = (props: any) => {
       startEndDate.SCHEDULER_PERIOD === "D"
     ) {
       toast.error("Select start date");
+      setIsSubmit(false)
       return;
     }
     if (
@@ -235,20 +241,30 @@ const AssetScheduleMasterForm = (props: any) => {
       startEndDate.SCHEDULER_PERIOD === "D"
     ) {
       toast.error("Select end date");
+      setIsSubmit(false)
       return;
     }
     if (startEndDate?.SCHEDULER_DAILY_ONCE_EVERY?.key === "E" && startEndDate.SCHEDULER_PERIOD === "D" && !moment(startEndDate?.data.endDate).isAfter(startEndDate?.data.startDate)) {
       toast.error("Ending time should be more the starting time");
+      setIsSubmit(false)
       return;
     }
-    if (payload?.SCHEDULER?.RUN_AVG_DAILY == undefined || payload?.SCHEDULER?.RUN_AVG_DAILY == null
+    if (payload?.SCHEDULER?.RUN_AVG_DAILY == null
       || payload?.SCHEDULER?.RUN_AVG_DAILY == '') {
       payload.SCHEDULER.RUN_AVG_DAILY = 0;
     }
-    if (payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == undefined || payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == null
+    // if (payload?.SCHEDULER?.RUN_AVG_DAILY == undefined || payload?.SCHEDULER?.RUN_AVG_DAILY == null
+    //   || payload?.SCHEDULER?.RUN_AVG_DAILY == '') {
+    //   payload.SCHEDULER.RUN_AVG_DAILY = 0;
+    // }
+    if (payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == null
       || payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == '') {
       payload.SCHEDULER.RUN_THRESHOLD_MAIN_TRIGGER = 0;
     }
+    // if (payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == undefined || payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == null
+    //   || payload?.SCHEDULER?.RUN_THRESHOLD_MAIN_TRIGGER == '') {
+    //   payload.SCHEDULER.RUN_THRESHOLD_MAIN_TRIGGER = 0;
+    // }
     try {
       const schedulerData = payload.SCHEDULER;
       const updatedTaskList: any = payload?.SCHEDULER?.SCHEDULE_TASK_D?.filter(
@@ -273,8 +289,8 @@ const AssetScheduleMasterForm = (props: any) => {
       schedulerData.MONTHLY_2_WEEK_NUM =
         schedulerData?.MONTHLY_2_WEEK_NUM?.MONTHLY_2_WEEK_NUM || "0";
       schedulerData.MONTHLYONCETWICE = schedulerData?.MONTHLYONCETWICE?.key;
-      schedulerData.MODE = !payload.SCHEDULE_ID === false ? "E" : "A";
-      schedulerData.REQ_ID= payload?.REQ_ID?.REQ_ID;
+      schedulerData.MODE = !!payload.SCHEDULE_ID ? "E" : "A";
+      schedulerData.REQ_ID = payload?.REQ_ID?.REQ_ID;
 
       const timeConvert = [
         "DAILY_ONCE_AT_TIME",
@@ -314,8 +330,7 @@ const AssetScheduleMasterForm = (props: any) => {
       delete payload?.SCHEDULE_NAME;
       delete payload?.ASSET_NONASSET;
       delete payload?.REQ_ID;
-      console.log(schedulerPayload, 'schedulerPayload')
-   
+
       const res1 = await callPostAPI(ENDPOINTS.SCHEDULE_SAVE, schedulerPayload);
       payload.SCHEDULE_ID = res1?.SCHEDULE_ID;
       if (res1.FLAG === true) {
@@ -328,31 +343,35 @@ const AssetScheduleMasterForm = (props: any) => {
           "PARA2": schedulerPayload?.SCHEDULE_NAME
         };
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+        await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
         toast?.error(res1?.MSG);
       }
     } catch (error: any) {
+
       toast?.error(error);
+    } finally {
+      setIsSubmit(false)
     }
   };
-  const reqWatch:any=watch("REQ_ID")
-  const getRequestList = async(ASSETGROUP_ID: any, ASSET_NONASSET?: any, reqId?:any) =>{
+
+  //const reqWatch: any = watch("REQ_ID")
+  const getRequestList = async (ASSETGROUP_ID: any, ASSET_NONASSET?: any, reqId?: any) => {
     const payload: any = {
       ASSETGROUP_ID: ASSETGROUP_ID,
-      ASSET_NONASSET:ASSET_NONASSET
+      ASSET_NONASSET: ASSET_NONASSET
     };
-      
+
     const res = await callPostAPI(
       ENDPOINTS.GET_SERVICEREQUEST_WORKORDER,
       payload, null
     );
-   
+
     if (res?.FLAG === 1) {
       setIssueList(res?.WOREQLIST)
-      if(search === "?edit=") {
+      if (search === "?edit=") {
         setSelectedIssue(reqId)
       }
     } else {
@@ -360,15 +379,17 @@ const AssetScheduleMasterForm = (props: any) => {
     }
   }
 
-  useEffect(()=>{
-   setIssueList([])
-   setValue("REQ_ID", "")
-   setValue("TYPE", null);
-  },[ASSET_NONASSET])
+  useEffect(() => {
+    setIssueList([])
+    setValue("REQ_ID", "")
+    setValue("TYPE", null);
+  }, [ASSET_NONASSET])
 
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu);
+    (async function () {
+      await getOptions();
+      await saveTracker(currentMenu)
+    })();
   }, [selected]);
 
   const getTaskList = async () => {
@@ -385,8 +406,9 @@ const AssetScheduleMasterForm = (props: any) => {
     } catch (error) { }
   };
   useEffect(() => {
-    getTaskList();
+    (async function () { await getTaskList() })();
   }, [watchAll?.TYPE]);
+
   useEffect(() => {
     const nestedErrors: any = errors?.SCHEDULER || {};
     const firstError: any = Object?.values(nestedErrors)[0];
@@ -412,6 +434,7 @@ const AssetScheduleMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -445,7 +468,7 @@ const AssetScheduleMasterForm = (props: any) => {
                       <Radio
                         {...register("ASSET_NONASSET", {
                           required: "Please fill the required fields",
-                          onChange:(()=>{
+                          onChange: (() => {
                             setIssueList([]);
                             setValue("REQ_ID", "")
                             setValue("TYPE", null);
@@ -480,8 +503,8 @@ const AssetScheduleMasterForm = (props: any) => {
                       }
                       {...register("TYPE", {
                         required: "Please fill the required fields",
-                        onChange: (e: any) => {
-                          getRequestList(
+                        onChange: async (e: any) => {
+                          await getRequestList(
                             e?.target?.value?.ASSETGROUP_ID,
                             e?.target?.value?.ASSETTYPE
                           );
@@ -556,33 +579,33 @@ const AssetScheduleMasterForm = (props: any) => {
               ""
             )}
 
-                    <Field
-                        controller={{
-                          name: "REQ_ID",
-                          control: control,
-                          render: ({ field }: any) => {
-                            return (
-                              <Select
-                                options={issueList}
-                                //options={[]}
-                                {...register("REQ_ID", {
-                                  required: "Please fill the required fields",
-                                })}
-                                label={"Issue"}
-                                optionLabel="REQ_DESC"
-                                findKey={"REQ_ID"}
-                                require={true}
-                                selectedData={selectedIssue}
-                                setValue={setValue}
-                                invalid={errors.REQ_ID}
-                                {...field}
-                              />
-                            );
-                          },
-                        }}
-                      />
+            <Field
+              controller={{
+                name: "REQ_ID",
+                control: control,
+                render: ({ field }: any) => {
+                  return (
+                    <Select
+                      options={issueList}
+                      //options={[]}
+                      {...register("REQ_ID", {
+                        required: "Please fill the required fields",
+                      })}
+                      label={"Issue"}
+                      optionLabel="REQ_DESC"
+                      findKey={"REQ_ID"}
+                      require={true}
+                      selectedData={selectedIssue}
+                      setValue={setValue}
+                      invalid={errors.REQ_ID}
+                      {...field}
+                    />
+                  );
+                },
+              }}
+            />
           </div>
-         
+
         </Card>
 
         <AssetSchedule
@@ -593,14 +616,14 @@ const AssetScheduleMasterForm = (props: any) => {
           watch={watch}
           watchAll={watchAll}
           register={register}
-          selectedData={selectedScheduleTaskDetails}
+          // selectedData={selectedScheduleTaskDetails}
           resetField={resetField}
-          scheduleTaskList={scheduleTaskList}
-          scheduleId={props?.selectedData?.SCHEDULE_ID || 0}
+          // scheduleTaskList={scheduleTaskList}
+          scheduleId={props?.selectedData ? props?.selectedData?.SCHEDULE_ID : search === '?edit=' ? dataId?.SCHEDULE_ID : 0}
           getValues={getValues}
           isSubmitting={isSubmitting}
-          setEditStatus={setEditStatus}
-          setEditData={setEditData}
+          // setEditStatus={setEditStatus}
+          // setEditData={setEditData}
           AssetSchedule={false}
           scheduleData={scheduleData}
           task={task}

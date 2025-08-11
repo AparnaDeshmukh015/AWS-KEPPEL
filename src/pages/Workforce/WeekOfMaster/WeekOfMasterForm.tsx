@@ -21,10 +21,14 @@ const WeekOfMasterForm = (props: any) => {
   const listRef = useRef<any | null>(null);
   const { t } = useTranslation();
   let { pathname } = useLocation();
-  const [selected, menuList]: any = useOutletContext();
+  const [, menuList]: any = useOutletContext();
+  const { search } = useLocation();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
+
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
 
   const [weekData, setWeekData] = useState<any | null>(
     props?.selectedData !== undefined ? updatedWeekDay : initialWeekDay
@@ -38,18 +42,13 @@ const WeekOfMasterForm = (props: any) => {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      MODE: props?.selectedData ? "E" : "A",
-      PARA: props?.selectedData
+      MODE:search === '?edit='  ? "E" : "A",
+      PARA: search === '?edit=' 
         ? { para1: `${props?.headerName}`, para2: t("Updated") }
         : { para1: `${props?.headerName}`, para2: t("Added") },
-      WEEKOFF_ID: props?.selectedData ? props?.selectedData?.WEEKOFF_ID : 0,
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
-      WEEKOFF_DESC: props?.selectedData
-        ? props?.selectedData?.WEEKOFF_DESC
-        : "",
+      WEEKOFF_ID:search === '?edit='  ? dataId?.WEEKOFF_ID : 0,
+      ACTIVE:search === '?edit='  ? dataId?.ACTIVE  : true,
+      WEEKOFF_DESC: search === '?edit='  ? dataId?.WEEKOFF_DESC: "",
       WEEKOFF_DAY: [],
     },
     mode: "onSubmit",
@@ -91,10 +90,12 @@ const WeekOfMasterForm = (props: any) => {
         payload,
         currentMenu?.FUNCTION_CODE
       );
-     
+
       if (res?.FLAG === true) {
         toast.success(res?.MSG);
+        props?.getAPI();
         props?.isClick();
+       
       } else {
         toast.error(res?.MSG);
       }
@@ -168,12 +169,12 @@ const WeekOfMasterForm = (props: any) => {
 
   const uploadScheduleData = () => {
     const data: any = ["1", "2", "3", "4", "5", "6"];
-    if (props?.selectedData !== undefined) {
+    if (dataId !== undefined) {
       const updatedWeekDay = weekData.map((day: any, index: any) => {
         const dayKey = `DAY${index + 1}`;
         let countKey = `OFFTYPE${index + 1}`;
-        const dayStatus = props?.selectedData[dayKey];
-        let countStatus = props?.selectedData[countKey]?.split(",");
+        const dayStatus = dataId[dayKey];
+        let countStatus = dataId[countKey]?.split(",");
         if (countStatus?.length >= 5) {
           countStatus = data;
         }
@@ -194,10 +195,10 @@ const WeekOfMasterForm = (props: any) => {
   };
 
   useEffect(() => {
-    if (props?.selectedData) {
+    if (dataId !== null) {
       uploadScheduleData();
     }
-  }, [props?.selectedData]);
+  }, []);
 
   useEffect(() => {
     if (props?.selectedData === undefined) {
@@ -221,9 +222,11 @@ const WeekOfMasterForm = (props: any) => {
       toast?.error(t(check));
     }
   }, [isSubmitting]);
+
   useEffect(() => {
-    saveTracker(currentMenu)
-  }, []);
+    (async function () {
+      await saveTracker(currentMenu)})()
+  }, [currentMenu]);
 
 
 
@@ -334,7 +337,7 @@ const WeekOfMasterForm = (props: any) => {
                         checked={
                           props?.selectedData?.ACTIVE === true
                             ? true
-                            : false || false
+                            : false 
                         }
                         className="md:mt-6"
                         label="Active"

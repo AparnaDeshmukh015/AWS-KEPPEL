@@ -32,7 +32,6 @@
 is there a better way than the absolute positioning and negative margin to center the div .content: div with background color a width and a hight?: 
 */
 
-
 /* .content {
   position: absolute;
   left: 50%;
@@ -65,4 +64,57 @@ is there a better way than the absolute positioning and negative margin to cente
   width: 100px;
   /* Adjust the size of the loader as needed */
   height: 100px;
+}
+
+.uploadLoader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* Slight transparent background */
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000; /* Ensure it stays above the content */
+}
+
+.uploadLoader .content {
+  width: 50px; /* Adjust size based on your needs */
+  height: 50px;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px; /* Or any height based on your UI */
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.backgrounderror {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(231, 220, 220, 0.959);
+  /* Semi-transparent background */
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  z-index: 1000;
+  /* Ensure it appears above other content */
+  pointer-events: auto;
+  /* Ensure pointer events are enabled */
 }

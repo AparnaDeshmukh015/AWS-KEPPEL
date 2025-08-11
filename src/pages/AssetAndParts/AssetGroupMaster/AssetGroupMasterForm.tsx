@@ -6,7 +6,7 @@ import Checkboxs from "../../../components/Checkbox/Checkbox";
 import { callPostAPI } from "../../../services/apis";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   eventNotification,
@@ -22,7 +22,8 @@ const AssetGroupMasterForm = (props: any) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [showLoader, setShowLoader] = useState<boolean>(false);
-
+  const [IsSubmit, setIsSubmit] = useState<any|null>(false);
+ 
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
@@ -44,10 +45,7 @@ const AssetGroupMasterForm = (props: any) => {
         : { para1: `${props?.headerName}`, para2: t("Added") },
       ASSETGROUP_ID: props?.selectedData ? props?.selectedData?.ASSETGROUP_ID : search === '?edit=' ? dataId?.ASSETGROUP_ID : 0,
       ASSETGROUP_NAME: props?.selectedData ? props?.selectedData?.ASSETGROUP_NAME : search === '?edit=' ? dataId?.ASSETGROUP_NAME : "",
-      ACTIVE:
-        props?.selectedData?.ACTIVE !== undefined
-          ? props.selectedData.ACTIVE
-          : true,
+      ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
       // ASSETGROUP_TYPE: pathname === "/servicegroupmaster" ? "N" : "A",
       ASSETGROUP_TYPE: currentMenu?.FUNCTION_CODE === "AS0011" ? "N" : "A",
     },
@@ -55,8 +53,9 @@ const AssetGroupMasterForm = (props: any) => {
   });
 
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
     setShowLoader(true);
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     try {
       const res = await callPostAPI(ENDPOINTS.SAVE_ASSET_GROUP_MASTER, payload);
@@ -71,28 +70,36 @@ const AssetGroupMasterForm = (props: any) => {
           PARA2: payload?.ASSETGROUP_NAME,
         };
 
-
         const eventPayload = { ...eventNotification, ...notifcation };
-        helperEventNotification(eventPayload);
+          await helperEventNotification(eventPayload);
         props?.getAPI();
         props?.isClick();
       } else {
+        setIsSubmit(false)
         setShowLoader(false);
         toast?.error(res?.MSG);
       }
     } catch (error: any) {
+      setIsSubmit(false)
       setShowLoader(false);
       toast?.error(error);
+    }finally{
+      setIsSubmit(false)
     }
-  };
+  },[IsSubmit, search, props, eventNotification, toast]);
+
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
       toast?.error(t(check));
     }
   }, [isSubmitting]);
+
   useEffect(() => {
-    saveTracker(currentMenu)
+    (async function () {
+      await saveTracker(currentMenu)
+     })();
+    
   }, [])
 
   return (
@@ -105,6 +112,7 @@ const AssetGroupMasterForm = (props: any) => {
             headerName={props?.headerName}
             isSelected={props?.selectedData ? true : false}
             isClick={props?.isClick}
+            IsSubmit={IsSubmit}
           />
           <Card className="mt-2">
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">

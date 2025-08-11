@@ -8,7 +8,7 @@ import Select from "../../../components/Dropdown/Dropdown";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import Radio from "../../../components/Radio/Radio";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useOutletContext } from "react-router-dom";
 import FormHeader from "../../../components/FormHeader/FormHeader";
 import { Button } from "primereact/button";
@@ -34,6 +34,7 @@ interface FormData {
 
 const TaskMasterForm = (props: any) => {
   let { pathname } = useLocation();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   let { search } = useLocation();
   const [selected, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -45,18 +46,19 @@ const TaskMasterForm = (props: any) => {
   ];
   const { t } = useTranslation();
   const [options, setOptions] = useState<any>([]);
-  const [taskoption, setTaskOptions] = useState<any | null>([
-    { TASK_ID: 0, TASK_NAME: "" },
-  ]);
-  const [selectedDetails, setSelectedDetails] = useState<any>([]);
-
+  // const [taskoption, setTaskOptions] = useState<any | null>([
+  //   { TASK_ID: 0, TASK_NAME: "" },
+  // ]);
+  //const [selectedDetails, setSelectedDetails] = useState<any>([]);
+  const getId: any = localStorage.getItem("Id")
+  const dataId = JSON.parse(getId)
   const {
     register,
     handleSubmit,
     control,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
       MODE: props?.selectedData ? "E" : "A",
@@ -97,8 +99,8 @@ const TaskMasterForm = (props: any) => {
         ),
       });
       if (res?.FLAG === 1) {
-        if (props?.selectedData?.ASSETTYPE_ID) {
-          getTaskDetailsList();
+        if (props?.selectedData?.ASSETTYPE_ID || dataId?.ASSETTYPE_ID) {
+          await getTaskDetailsList();
         }
       }
     } catch (error) { }
@@ -115,7 +117,7 @@ const TaskMasterForm = (props: any) => {
 
     }
 
-    if (isempty === false) {
+    if (!isempty) {
 
       const newField: any = {
         TASK_ID: 0,
@@ -127,21 +129,6 @@ const TaskMasterForm = (props: any) => {
 
   }
 
-
-  const handleChangeColumn = (e: any, index: any) => {
-    const { name, value } = e.target;
-    setTaskOptions((prevConfigList: any) => {
-      return prevConfigList.map((config: any, id: any) => {
-        if (index === id) {
-          return {
-            ...config,
-            TASK_NAME: e.target.value,
-          };
-        }
-        return config;
-      });
-    });
-  };
   const taskList = watch('TASK_LIST');
 
   const handelDelete = async (selectedData: any, index: any) => {
@@ -156,11 +143,15 @@ const TaskMasterForm = (props: any) => {
           ENDPOINTS.DELETE_TASKMASTER,
           payLoadFinal
         );
-        toast.success(res?.MSG);
-        getTaskDetailsList();
+        if (res?.FLAG === true) {
+          toast.success(res?.MSG);
+          await getTaskDetailsList();
+        } else {
+          toast.error(res?.MSG)
+        }
       } else {
         const data: any = taskList.filter((task: any, i: any) => i !== index);
-        setTaskOptions(data);
+        //  setTaskOptions(data);
         setValue("TASK_LIST", data)
       }
     } catch (error: any) {
@@ -171,7 +162,7 @@ const TaskMasterForm = (props: any) => {
   const getTaskDetailsList = async () => {
     try {
       const payload = {
-        ASSETTYPE_ID: props?.selectedData?.ASSETTYPE_ID,
+        ASSETTYPE_ID: search === "?edit=" ? dataId?.ASSETTYPE_ID : "",
       };
       const response = await callPostAPI(
         ENDPOINTS.GET_TASK_MASTER_DETAILS,
@@ -179,13 +170,31 @@ const TaskMasterForm = (props: any) => {
         props?.FUNCTION_CODE
       );
 
-      setTaskOptions(response?.TASKLIST);
+      // setTaskOptions(response?.TASKLIST);
       setValue("TASK_LIST", response?.TASKLIST)
     } catch (error: any) { }
   };
 
   const assetType: any = watch('ASSEST_TYPE')
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
+    const uniq = taskList.map((name: any) => {
+      return {
+        count: 1,
+        name: name?.TASK_NAME
+      };
+    }).reduce((result: any, b) => {
+      result[b.name] = (result[b.name] || 0) + b.count;
+      return result;
+    }, {});
+    const duplicates = Object.keys(uniq).filter((a: any) => uniq[a] > 1);
+
+    if (duplicates?.length > 0) {
+      toast?.error("Task name already exist")
+      setIsSubmit(false)
+      return
+    }
     try {
       const TASKOPTION_LIST: any = taskList?.map((task: any, index: any) => {
         return {
@@ -209,32 +218,32 @@ const TaskMasterForm = (props: any) => {
         if (res?.FLAG === true) {
           toast?.success(res?.MSG);
           props?.getAPI();
+          // setIsSubmit(false)
           props?.isClick();
         } else if (res?.FLAG === false) {
+          // setIsSubmit(false)
           toast?.error(res?.MSG);
         }
       } else {
         toast.error("Please add at least on task")
       }
     } catch (error: any) {
+
       toast?.error(error);
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, search, props, toast, taskList]);
   useEffect(() => {
-    getOptions();
-    saveTracker(currentMenu)
+    (async function () {
+      await getOptions();
+      await saveTracker(currentMenu)
+    })()
   }, [selected]);
 
 
-  // useEffect(() => {
 
-  //   if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
-  //     const check: any = Object?.values(errors)[0]?.message;
-  //     toast?.error(t(check));
-  //   }
-  // }, [isSubmitting]);
-
-  const onError: SubmitErrorHandler<FormData> = (errors, e) => {
+  const onError: SubmitErrorHandler<FormData> = () => {
     toast.error(t("Please fill the required fields."))
   };
 
@@ -245,6 +254,7 @@ const TaskMasterForm = (props: any) => {
           headerName={props?.headerName}
           isSelected={props?.selectedData ? true : false}
           isClick={props?.isClick}
+          IsSubmit={IsSubmit}
         />
         <Card className="mt-2">
           <div className="mt-1 grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-5 lg:grid-cols-5">
@@ -260,8 +270,13 @@ const TaskMasterForm = (props: any) => {
                           required: t("Please fill the required fields."),
                         })}
                         labelHead="Type"
+                        disabled={
+                          search === "?edit="
+                            ? true
+                            : false
+                        }
                         options={assestTypeLabel}
-                        selectedData={props?.selectedData?.ASSETTYPE || "A"}
+                        selectedData={dataId?.ASSETTYPE || "A"}
                         setValue={setValue}
                         {...field}
                       />
@@ -290,9 +305,10 @@ const TaskMasterForm = (props: any) => {
                         label={`${assestType?.key === "A" ? "Equipment " : "Soft Service"
                           } Type `}
                         optionLabel="ASSETTYPE_NAME"
+                        disabled={search === "?edit=" ? true : false}
                         require={true}
                         findKey={"ASSETTYPE_ID"}
-                        selectedData={props?.selectedData?.ASSETTYPE_ID}
+                        selectedData={search === "?edit=" ? dataId?.ASSETTYPE_ID : ""}
                         invalid={errors.ASSEST_TYPE_NAME}
                         setValue={setValue}
                         {...field}

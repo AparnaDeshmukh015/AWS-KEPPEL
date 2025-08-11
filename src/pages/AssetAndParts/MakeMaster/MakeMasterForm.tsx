@@ -6,7 +6,7 @@ import Checkboxs from '../../../components/Checkbox/Checkbox';
 import { callPostAPI } from '../../../services/apis';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { eventNotification, helperEventNotification } from '../../../utils/eventNotificationParameter';
 import FormHeader from '../../../components/FormHeader/FormHeader';
@@ -20,6 +20,7 @@ const MakeMasterForm = (props: any) => {
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
   let { pathname } = useLocation();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
@@ -37,39 +38,47 @@ const MakeMasterForm = (props: any) => {
         : { "para1": `${props?.headerName}`, "para2": t('Added') },
       MAKE_ID: props?.selectedData ? props?.selectedData?.MAKE_ID : search === '?edit=' ? dataId?.MAKE_ID : 0,
       MAKE_NAME: props?.selectedData ? props?.selectedData?.MAKE_NAME : search === '?edit=' ? dataId?.MAKE_NAME : "",
-      ACTIVE: props?.selectedData?.ACTIVE !== undefined ? props.selectedData.ACTIVE : true,
+      ACTIVE: search === '?edit=' ? dataId?.ACTIVE : true,
     },
     mode: "onSubmit",
   });
 
   const User_Name = decryptData((localStorage.getItem("USER_NAME")))
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return;
+    setIsSubmit(true);
+
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.MAKE_NAME = payload?.MAKE_NAME?.trim();
 
     try {
-      const res = await callPostAPI(ENDPOINTS.SAVE_MAKE_MASTER, payload)
+      const res = await callPostAPI(ENDPOINTS.SAVE_MAKE_MASTER, payload);
+
       if (res?.FLAG === true) {
-        toast?.success(res?.MSG)
+        toast?.success(res?.MSG);
+
         const notifcation: any = {
           "FUNCTION_CODE": props?.functionCode,
           "EVENT_TYPE": "M",
           "STATUS_CODE": search === "?edit=" ? 2 : 1,
           "PARA1": search === "?edit=" ? User_Name : User_Name,
-          "PARA2": payload.MAKE_NAME
-        }
+          "PARA2": payload.MAKE_NAME,
+        };
 
-        const eventPayload = { ...eventNotification, ...notifcation }
-        helperEventNotification(eventPayload)
-        props?.getAPI()
-        props?.isClick()
+        const eventPayload = { ...eventNotification, ...notifcation };
+        await helperEventNotification(eventPayload);
+        props?.getAPI();
+        props?.isClick();
       } else {
-        toast?.error(res?.MSG)
+        toast?.error(res?.MSG);
       }
     } catch (error: any) {
-      toast?.error(error)
+      toast?.error(error);
+    } finally {
+      setIsSubmit(false);
     }
-  }
+  }, [IsSubmit, search, props, eventNotification, toast]);
+
 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
@@ -77,6 +86,7 @@ const MakeMasterForm = (props: any) => {
       toast?.error(t(check));
     }
   }, [isSubmitting]);
+
   useEffect(() => {
     if (props?.selectedData !== undefined) {
       localStorage.setItem("MAKE_ID", props?.selectedData?.MAKE_ID)
@@ -84,8 +94,9 @@ const MakeMasterForm = (props: any) => {
 
   }, [props?.selectedData])
   useEffect(() => {
-
-    saveTracker(currentMenu)
+    (async function () {
+      await saveTracker(currentMenu)
+    })();
   }, [])
 
   return (
@@ -95,8 +106,9 @@ const MakeMasterForm = (props: any) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormHeader
             headerName={props?.headerName}
-            isSelected={props?.selectedData ? true : false}
+            isSelected={search === "?edit=" ? true : false}
             isClick={props?.isClick}
+            IsSubmit={IsSubmit}
           />
           <Card className='mt-2'>
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -141,6 +153,7 @@ const MakeMasterForm = (props: any) => {
                 />
               </div>
             </div>
+            <div></div>
           </Card>
         </form>
       </section>

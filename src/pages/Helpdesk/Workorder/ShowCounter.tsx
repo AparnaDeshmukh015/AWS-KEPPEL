@@ -3,15 +3,6 @@ import './showCounter.css'
 import DateTimeDisplay from './DateTimeDisplay';
 import { useCountdown } from './count';
 
-const ExpiredNotice = () => {
-    return (
-        <div className="expired-notice">
-            <span>Expired!!!</span>
-            <p>Please select a future date and time.</p>
-        </div>
-    );
-};
-
 type ShowCounterProps = {
     days: any,
     hours: any,
@@ -41,20 +32,13 @@ export function ShowCounter({ days, hours, minutes, seconds }: ShowCounterProps)
             {/* } */}
         </>
     );
-};
-
-
-type CountdownTimerProps = {
-    targetDate: any,
-    getOptionDetails: any
 }
 
-const CountdownTimer = ({ targetDate, getOptionDetails ,current_time}: any) => {
 
+const CountdownTimer = ({ targetDate, getOptionDetails ,current_time}: any) => {
     // const [days, hours, minutes, seconds] = useCountdown(targetDate);
     const [days, hours, minutes, seconds] = useCountdown(targetDate, current_time);
 
-    // console.log(days + hours + minutes + seconds);
     if (days + hours + minutes + seconds == 0) {
         getOptionDetails();
         return <>
@@ -62,8 +46,7 @@ const CountdownTimer = ({ targetDate, getOptionDetails ,current_time}: any) => {
         </>;
     }
     else if (days + hours + minutes + seconds <= 0) {
-        //  getOptionDetails();
-        //    setSLADuration(new Date())
+    
         return <>
 
         </>;
@@ -79,6 +62,6 @@ const CountdownTimer = ({ targetDate, getOptionDetails ,current_time}: any) => {
             />
         );
     }
-};
+}
 
 export default CountdownTimer;

@@ -1,6 +1,4 @@
-import React, { memo, useState } from "react";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
+
 import { useTranslation } from "react-i18next";
 
 const TemplateUploadDialogBox = () => {
@@ -38,29 +36,7 @@ const TemplateUploadDialogBox = () => {
               {t("Document Format")}
             </label>
           </div>
-          {/* <input id="dropzone-file" type="file" className="hidden" /> */}
-          {/* <Field
-          controller={{
-            name: "DOC",
-            control: control,
-            render: ({ field }: any) => {
-              return (
-                <input
-                  {...register("DOC", {
-                    //required: 'Please fill the required fields.'
-                  })}
-                  id="dropzone-file"
-                  className="hidden"
-                  type={"file"}
-                  invalidMessage={errors.DOC?.message}
-                  
-                  {...field}
-                  onChange={handleFileInputChange}
-                />
-              );
-            },
-          }}
-        /> */}
+        
         </label>
       </div>
     </>

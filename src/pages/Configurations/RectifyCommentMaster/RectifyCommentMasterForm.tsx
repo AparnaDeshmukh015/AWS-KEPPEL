@@ -7,15 +7,15 @@ import Checkboxs from '../../../components/Checkbox/Checkbox';
 import { callPostAPI } from '../../../services/apis';
 import { ENDPOINTS } from '../../../utils/APIEndpoints';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormHeader from '../../../components/FormHeader/FormHeader';
-import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import { saveTracker } from '../../../utils/constants';
 const RectifyCommentMasterForm = (props: any) => {
   const { t } = useTranslation();
-  const navigate: any = useNavigate();
   const { search } = useLocation();
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
   let { pathname } = useLocation();
@@ -36,12 +36,14 @@ const RectifyCommentMasterForm = (props: any) => {
         : { "para1": `${props?.headerName}`, "para2": t('Added') },
       RECT_ID: props?.selectedData ? props?.selectedData?.RECT_ID : search === '?edit=' ? dataId?.RECT_ID : 0,
       COMMENT_DESC: props?.selectedData ? props?.selectedData?.COMMENT_DESC : search === '?edit=' ? dataId?.COMMENT_DESC : "",
-      ACTIVE: props?.selectedData?.ACTIVE !== undefined ? props.selectedData.ACTIVE : true,
+      ACTIVE: search === "?edit=" ? dataId?.ACTIVE : true,
     },
     mode: "onSubmit",
   });
 
-  const onSubmit = async (payload: any) => {
+  const onSubmit = useCallback(async (payload: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
     payload.COMMENT_DESC = payload?.COMMENT_DESC?.trim();
     try {
@@ -50,15 +52,20 @@ const RectifyCommentMasterForm = (props: any) => {
       if (res?.FLAG === true) {
         toast?.success(res?.MSG)
         props?.getAPI()
+
         props?.isClick()
       } else {
+
         toast?.error(res?.MSG)
       }
 
     } catch (error: any) {
+
       toast?.error(error)
+    } finally {
+      setIsSubmit(false)
     }
-  }
+  }, [IsSubmit, callPostAPI, toast, props?.getAPI, props?.isClick])
 
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
@@ -68,9 +75,10 @@ const RectifyCommentMasterForm = (props: any) => {
   }, [isSubmitting]);
 
   useEffect(() => {
-
-    saveTracker(currentMenu)
-  }, [])
+    (async function () {
+        await saveTracker(currentMenu)
+       })();
+}, [])
 
   return (
     <>
@@ -80,6 +88,7 @@ const RectifyCommentMasterForm = (props: any) => {
             headerName={props?.headerName}
             isSelected={props?.selectedData ? true : false}
             isClick={props?.isClick}
+            IsSubmit={IsSubmit}
           />
           <Card className='mt-2'>
             <div className={`${errors?.COMMENT_DESC ? "errorBorder" : ""}`}>

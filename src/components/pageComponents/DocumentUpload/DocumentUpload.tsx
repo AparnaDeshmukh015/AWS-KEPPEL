@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Table from "../../Table/Table";
-import InputField from "../../Input/Input";
 import Field from "../../Field";
 import { v4 as uuidv4 } from "uuid";
 import { useTranslation } from "react-i18next";
@@ -8,10 +7,9 @@ import { useFieldArray } from "react-hook-form";
 import FileUploads from "../../../assest/images/FileUpload.jpg";
 import { toast } from "react-toastify";
 import { decryptData } from "../../../utils/encryption_decryption";
-import { callPostAPI, FILESACNNING } from "../../../services/apis";
-import { ENDPOINTS } from "../../../utils/APIEndpoints";
-import axios from "axios";
 import { scanfileAPI } from "../../../utils/constants";
+import LoaderFileUpload from "../../Loader/LoaderFileUpload";
+
 const DocumentUpload = ({
   register,
   control,
@@ -27,8 +25,8 @@ const DocumentUpload = ({
     name: "DOC_LIST",
   });
   const { t } = useTranslation();
+  const [loading, setLoading] = useState<any | null>(false);
   const DOC_LIST_VALUE = getValues("DOC_LIST");
-  const [wo_images, setImages] = useState<any>([]);
   const getBase64 = (file: any) => {
     return new Promise((resolve) => {
       let baseURL: any = "";
@@ -41,10 +39,7 @@ const DocumentUpload = ({
     });
   };
 
-  
-
-
-  const handleFileInputChange = async(e: any) => {
+  const handleFileInputChange = async (e: any) => {
     var ext = e.target.files[0].name.split(".").pop();
     if (
       ext === "docx" ||
@@ -68,38 +63,45 @@ const DocumentUpload = ({
           const sameFileName: any = DOC_LIST_VALUE?.filter(
             (doc: any) => doc?.DOC_NAME === file?.name
           );
-       
-          const fileScanStatus:any = await scanfileAPI(file?.base64);
-          if(fileScanStatus === true) {
-          if (sameFileName?.length === 0) {
-            if (DOC_LIST_VALUE?.length < 5) {
-              append({
-                DOC_SRNO: DOC_LIST_VALUE?.length + 1,
-                DOC_NAME: file?.name,
-                DOC_DATA: (file?.base64).split("base64,")[1],
-                DOC_EXTENTION: check[check?.length - 1],
-                DOC_SYS_NAME: uuidv4(),
-                ISDELETE: false,
-                DOC_TYPE: "",
-                UPLOADEDBY: decryptData((localStorage.getItem("USER_NAME"))),
-                // FILE: file
-              });
-              e.target.value = null;
+          setLoading(true);
+          const fileScanStatus: any = await scanfileAPI(
+            file?.base64,
+            file.name
+          );
+
+          if (fileScanStatus === true) {
+            if (sameFileName?.length === 0) {
+              if (DOC_LIST_VALUE?.length < 5) {
+                append({
+                  DOC_SRNO: DOC_LIST_VALUE?.length + 1,
+                  DOC_NAME: file?.name,
+                  DOC_DATA: (file?.base64).split("base64,")[1],
+                  DOC_EXTENTION: check[check?.length - 1],
+                  DOC_SYS_NAME: uuidv4(),
+                  ISDELETE: false,
+                  DOC_TYPE: "",
+                  UPLOADEDBY: decryptData(localStorage.getItem("USER_NAME")),
+                  // FILE: file
+                });
+                e.target.value = null;
+              } else {
+                toast.error(t("Upload only 5 files"));
+              }
+              setLoading(false);
             } else {
-              toast.error(t("Upload only 5 files"));
+              toast.error(t("Same file name can not upload"));
             }
           } else {
-            toast.error(t("Same file name can not upload"));
+            setLoading(false);
           }
-        } else {
-
-        }
         })
         .catch((err: any) => {
+          setLoading(false);
           toast.error(err);
         });
     } else {
       toast.error(t("Can not upload this file "));
+      setLoading(false);
     }
   };
 
@@ -117,17 +119,24 @@ const DocumentUpload = ({
         <p>{t("Document Upload")}</p>
       </div>
       <div className="mt-2">
-        <Table
-          columnTitle={["DOC_NAME", "UPLOADEDBY", "ACTION"]}
-          customHeader={["Document Name", "Uploaded By", "Action"]}
-          columnData={DOC_LIST_VALUE?.filter(
-            (data: any) => data?.ISDELETE === false
-          )}
-          downloadColumnHeader={"DOC_NAME"}
-          isClick={props?.isForm}
-          handleFileDelete={handleFileDelete}
-          isDocumentDelete={true}
-        />
+        {loading ? (
+          <LoaderFileUpload IsScannig={true} />
+        ) : (
+          <>
+            {" "}
+            <Table
+              columnTitle={["DOC_NAME", "UPLOADEDBY", "ACTION"]}
+              customHeader={["Document Name", "Uploaded By", "Action"]}
+              columnData={DOC_LIST_VALUE?.filter(
+                (data: any) => data?.ISDELETE === false
+              )}
+              downloadColumnHeader={"DOC_NAME"}
+              isClick={props?.isForm}
+              handleFileDelete={handleFileDelete}
+              isDocumentDelete={true}
+            />
+          </>
+        )}
       </div>
       <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
         <div className="col-span-2">
@@ -156,12 +165,11 @@ const DocumentUpload = ({
                   render: ({ field }: any) => {
                     return (
                       <input
-                        {...register("DOC", {
-                        })}
+                        {...register("DOC", {})}
                         id="dropzone-file"
                         className="hidden"
                         type={"file"}
-                        accept=".csv, .pdf, .doc, .docx, .xls, .xlsx"
+                        multiple
                         invalidMessage={errors.DOC?.message}
                         {...field}
                         onChange={handleFileInputChange}

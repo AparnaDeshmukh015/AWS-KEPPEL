@@ -1,10 +1,6 @@
 import * as xlsx from "xlsx";
 import FileSaver from 'file-saver';
 
-export const getFunctionCode = (functionCode:any = null)=>{
-    return false
-}
-
 export const ExportCSV = (csvData:any,fileName:any, roleName?:any) => {
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
      const fileExtension = '.xlsx';
@@ -19,9 +15,7 @@ export const ExportCSV = (csvData:any,fileName:any, roleName?:any) => {
     const res = await fetch(base64)
     const buf = await res.arrayBuffer()
     var blob = new Blob([buf], {type: 'image/bmp'});
-    const file = new File([buf], "digitalsignature.jpeg", {
-      type: 'image/jpeg',
-    })
+   
     return blob;
   };
   

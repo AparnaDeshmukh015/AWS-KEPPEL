@@ -6,6 +6,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import TableListLayout from "../../../layouts/TableListLayout/TableListLayout";
 import { toast } from "react-toastify";
 import IssueMaterialForm from "./IssueMaterialForm";
+import { onlyDateFormat } from "../../../utils/constants";
 
 
 
@@ -24,16 +25,29 @@ const IssueMaterial = (props: any) => {
         null,
         currentMenu?.FUNCTION_CODE
       );
-
-      props?.setData(res?.INVENTORYMASTERSLIST || []);
+      let updatedIssueMasterList = formatIssueMasterList(res?.INVENTORYMASTERSLIST)
+      props?.setData(updatedIssueMasterList || []);
       localStorage.setItem('currentMenu', JSON.stringify(currentMenu))
     } catch (error: any) {
       toast.error(error);
     }
   };
+  const formatIssueMasterList = (list: any) => {
+    let IssueMasterList = list;
+    IssueMasterList = IssueMasterList.map((element: any) => {
+      return {
+        ...element,
+        DOC_DATE: onlyDateFormat(element?.DOC_DATE)
+      }
+    })
+    return IssueMasterList
+
+  }
   useEffect(() => {
     if (currentMenu?.FUNCTION_CODE) {
-      getAPI();
+      (async function () {
+        await getAPI()
+       })();
     }
   }, [selectedFacility, currentMenu]);
   return !props?.search ? (
@@ -45,7 +59,7 @@ const IssueMaterial = (props: any) => {
       dataKey={currentMenu?.FUNCTION_DESC}
       columnTitle={[
         "DOC_NO",
-        "MATREQ_DATE",
+        "DOC_DATE",
         "STORE_NAME",
         "USER_NAME",
         "WO_NO",
@@ -61,7 +75,7 @@ const IssueMaterial = (props: any) => {
       ]}
       columnData={props?.data}
       clickableColumnHeader={["DOC_NO"]}
-      filterFields={["DOC_NO", "MATREQ_DATE", "STORE_NAME", "USER_NAME", "WO_NO", "CNCL_IND"]}
+      filterFields={["DOC_NO", "DOC_DATE", "STORE_NAME", "USER_NAME", "WO_NO", "CNCL_IND"]}
       setSelectedData
       isClick={props?.isForm}
       handelDelete={props?.handelDelete}

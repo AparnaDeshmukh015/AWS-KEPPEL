@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Card } from "primereact/card";
@@ -31,6 +31,7 @@ const LocationTypeMaster = () => {
   const [locationMasterList, setLocationMasterList] = useState();
   const [edit, setEdit] = useState(false);
   const [color, setColor] = useState("#ffffff");
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
   const [editData, setEditData] = useState({
     locationName: "",
@@ -61,10 +62,9 @@ const LocationTypeMaster = () => {
     mode: "onSubmit",
   });
 
-  const onSubmit = async (data: any) => {
-    let id: any = localStorage.getItem("FACILITYID");
-    const facilityId: any = JSON.parse(id);
-
+  const onSubmit = useCallback(async (data: any) => {
+    if (IsSubmit) return true
+    setIsSubmit(true)
     const payload: any = {
       LOCATIONTYPE_ID: edit ? data?.locationTypeId : 0,
       LOCATIONTYPE_NAME: data?.locationName,
@@ -86,16 +86,20 @@ const LocationTypeMaster = () => {
           sequenceNo: "",
           locationTypeId: "0",
         });
-        const res1: any = getCommonLocationMasterList().then((res2) =>
+       getCommonLocationMasterList().then((res2) =>
           setLocationMasterList(res2?.LOCATIONTYPELIST)
         );
+      
       } else if (res?.FLAG === false) {
+        setIsSubmit(false)
         toast.error(res?.MSG);
       }
     } catch (error: any) {
       toast.error(error)
+    } finally {
+      setIsSubmit(false)
     }
-  };
+  }, [IsSubmit, callPostAPI, toast, edit, color, checked, setLocationMasterList]);
 
   const getCommonLocationMasterList = async () => {
     const res = await callPostAPI(ENDPOINTS.LOCATIONTYPE_MASTER, {});
@@ -106,9 +110,10 @@ const LocationTypeMaster = () => {
     localStorage.removeItem("edit");
     localStorage.setItem("edit", "false");
     if (selectedFacility !== null) {
-      const res: any = getCommonLocationMasterList().then((res) =>
+      getCommonLocationMasterList().then((res) =>
         setLocationMasterList(res?.LOCATIONTYPELIST)
       );
+  
     } else {
       toast.error(t("Please_select_Building"));
     }
@@ -122,7 +127,10 @@ const LocationTypeMaster = () => {
   }, [isSubmitting]);
 
   useEffect(() => {
-    saveTracker(currentMenu)
+    (async function () {
+    
+     await saveTracker(currentMenu)
+     })();
   }, []);
   return (
     <>
@@ -137,6 +145,7 @@ const LocationTypeMaster = () => {
                 className="Primary_Button  w-20 me-2"
                 label={t("Save")}
                 onClick={handleSubmit(onSubmit)}
+                disabled={IsSubmit}
               />
             </div>
           </div>

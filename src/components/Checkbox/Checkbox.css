@@ -16,3 +16,17 @@
 .Required .p-checkbox .p-checkbox-box {
     border: 1px solid #c90c2b !important;
 }
+
+.p-checkbox .p-indeterminate .p-checkbox-icon {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.p-checkbox .p-indeterminate .p-checkbox-icon:before {
+  content: "-";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

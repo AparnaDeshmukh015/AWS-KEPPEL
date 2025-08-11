@@ -2,45 +2,37 @@ import React, { useEffect, useState } from "react";
 import Login_BG from "../../assest/images/LoginFrame.png";
 import Keppel_Logo from "../../assest/images/keppel_logo.svg";
 import Klik_Logo from "../../assest/images/SidebarMenuImg/klik-plus-fm-logo.svg";
-import {
-  Link,
-  useLocation,
-  useNavigate
-} from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Buttons from "../../components/Button/Button";
 import { toast } from "react-toastify";
 import InputField from "../../components/Input/Input";
 import { useForm } from "react-hook-form";
 import Field from "../../components/Field";
-import { LOCALSTORAGE, } from "../../utils/constants";
-//import { Cookies } from "react-cookie";
-import { getAccessTokenForlogin, loginUser, UserCheck } from "../../services/Login/services";
+import { LOCALSTORAGE } from "../../utils/constants";
+import {
+  getAccessTokenForlogin,
+  loginUser,
+  UserCheck,
+} from "../../services/Login/services";
 import { PATH } from "../../utils/pagePath";
 import PublicRoute from "../../auth/PublicRoute";
 import "./Login.css";
 import { encryptData } from "../../utils/encryption_decryption";
 import { jwtDecode } from "jwt-decode";
 import LoaderS from "../../components/Loader/Loader";
-// import { error } from "console";
-// import { getLoginToken } from "../../utils/B2CLogin";
+
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../utils/B2BLogin";
-// import { AuthenticationResult } from "@azure/msal-browser";
-
 
 const Login: React.FC<any> = () => {
-  // const [IsB2BLogin, setIsB2BLogin] = useState<any | null>(false);
   const { instance, inProgress } = useMsal();
-
-  //const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState<any | null>(false);
   let curr_loc = useLocation();
   const [error, setError] = useState<any | null>(false);
   const [errorMsg, setErrorMsg] = useState<any>();
-  //const [B2BLoginSuccess, setB2BLoginSuccess] = useState<any | null>(false);
-  let B2BLoginSuccess: any = false
+  let B2BLoginSuccess: any = false;
   const navigate = useNavigate();
-  //  let cookies = new Cookies();
+
   const {
     register,
     handleSubmit,
@@ -55,16 +47,15 @@ const Login: React.FC<any> = () => {
   });
 
   const onSubmit = async (data: any, e: any = "secondcheck") => {
-    // const buttonMode: any = e?.nativeEvent?.submitter?.name;
     let Logincheck: any = e?.nativeEvent?.submitter?.name;
     const payload = {
       EMAIL_ID: data?.email?.trim(),
       LANGUAGE_CODE: "EN",
       LOGIN_TYPE: "W",
       MOBILEIP_ADDRESS: "",
-      MOBILE_NO: data?.MOBILE_NO == undefined ? "" : data?.MOBILE_NO,
-      // TOKEN: data?.TOKEN == undefined ? "" : data?.TOKEN,
-      USER_CHECK: data?.TOKEN == undefined ? true : false
+      MOBILE_NO: data?.MOBILE_NO === undefined ? "" : data?.MOBILE_NO,
+      USER_CHECK: data?.TOKEN === undefined ? true : false,
+      USER_ID: 0,
     };
     let isValid: boolean;
     let isMobile: boolean = false;
@@ -82,11 +73,9 @@ const Login: React.FC<any> = () => {
       const emailPattern =
         /^\s*[^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))\s*$/;
       if (emailPattern.test(payload?.EMAIL_ID)) {
-        // toast.error('Please Enter valid Email Id')
         isEmail = true;
         isValid = true;
       } else {
-        // msg = "Please Enter valid email"
         msg = "We can’t find an account with this email address.";
         isEmail = true;
         isValid = false;
@@ -94,7 +83,7 @@ const Login: React.FC<any> = () => {
         setErrorMsg(msg);
       }
     } else {
-      const phonePattern = /^[+]{1}(?:[0-9\-\\/.]\s?){6,15}[0-9]{1}$/;  // Basic international format
+      const phonePattern = /^[+]{1}(?:[0-9\-\\/.]\s?){6,15}[0-9]{1}$/; // Basic international format
       if (phonePattern.test(payload?.EMAIL_ID)) {
         isMobile = true;
         isValid = true;
@@ -109,93 +98,77 @@ const Login: React.FC<any> = () => {
     }
 
     if (inProgress === "none") {
-
-
       if (isValid) {
-
         try {
-         
           if (Logincheck === "firstcheck") {
             const usercheck = await UserCheck(payload);
             let e_type = usercheck?.USER_DETAILS[0]?.USER_TYPE;
 
             if (e_type === "I") {
-              const loginType: any = encryptData(
-                JSON.stringify("B2B")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2B"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
             }
             if (e_type === "E") {
-              const loginType: any = encryptData(
-                JSON.stringify("B2C")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2C"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
             }
 
             if (e_type === "E" && curr_loc?.search === "") {
               // local
-              window.location.href = `${process.env.REACT_APP_LOGIN_URL}` + data.email.toString().replace(/\+/g, "%2b").trim();
-              window.location.href = `${process.env.REACT_APP_LOGIN_URL}` + data.email.toString().replace(/\+/g, "%2b").trim();
-
+              window.location.href =
+                `${process.env.REACT_APP_LOGIN_URL}` +
+                data.email.toString().replace(/\+/g, "%2b").trim();
+              window.location.href =
+                `${process.env.REACT_APP_LOGIN_URL}` +
+                data.email.toString().replace(/\+/g, "%2b").trim();
             }
 
             if (e_type === "I" && B2BLoginSuccess === false) {
-
               // setIsB2BLogin(true);
               B2BLoginSuccess = true;
 
-              await instance.loginPopup(loginRequest)
+              await instance
+                .loginPopup(loginRequest)
                 .then(async (res) => {
-
                   let new_data = {
                     email: data?.email?.trim(),
                     MOBILE_NO: "",
                     TOKEN: res?.idToken,
-                    USER_CHECK: false
+                    USER_CHECK: false,
                   };
-
 
                   const decodedToken: any = jwtDecode(res?.idToken);
 
                   const expirationTime = decodedToken?.exp; // Convert to milliseconds
                   //  const timeLeft = expirationTime - Date.now();
 
-                  let expiresIn: any = { "not_before": 0, "id_token_expires_in": expirationTime }
+                  let expiresIn: any = {
+                    not_before: 0,
+                    id_token_expires_in: expirationTime,
+                  };
                   localStorage.setItem("expiresIn", JSON.stringify(expiresIn));
 
-                  const AccountDetails: any = encryptData(JSON.stringify(res?.account));
+                  const AccountDetails: any = encryptData(
+                    JSON.stringify(res?.account)
+                  );
                   localStorage.setItem("AccountDetails", AccountDetails);
-
-                  // localStorage.setItem("AccountDetails", JSON.stringify(res?.account));
-
                   await onSubmit(new_data);
-
                 })
                 .catch((error: any) => {
                   B2BLoginSuccess = false;
-                  //setB2BLoginSuccess(false);
-                  console.error("B2B Authentication error: ", error);
                   toast.error("B2B Authentication failed. Please try again.");
                 });
-
-
             }
-
           } else {
-
             const res = await loginUser(payload, data?.TOKEN);
             //  if(res && res?.FACILITYLIST?.length !== 0 ){
 
             if (res?.USERLIST[0]?.USER_TYPE === "I") {
-              const loginType: any = encryptData(
-                JSON.stringify("B2B")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2B"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
             }
             if (res?.USERLIST[0]?.USER_TYPE === "E") {
-              const loginType: any = encryptData(
-                JSON.stringify("B2C")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2C"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
             }
 
@@ -203,26 +176,20 @@ const Login: React.FC<any> = () => {
               LOCALSTORAGE.FACILITY,
               JSON.stringify(res?.FACILITYLIST)
             );
-            // const Facility: any = encryptData(JSON.stringify(res?.FACILITYLIST));
-            // localStorage.setItem(LOCALSTORAGE.FACILITY, Facility)
 
-
+            const facilityId: any =
+              res?.FACILITYLIST?.filter((facility: any) => {
+                return (
+                  facility?.FACILITY_ID === +res?.USERLIST[0]?.DEFAULT_FACILITY
+                );
+              })[0] || res?.FACILITYLIST[0];
             localStorage.setItem(
               LOCALSTORAGE.FACILITYID,
-              JSON.stringify(
-                res?.FACILITYLIST?.filter((facility: any) => {
-                  return (
-                    facility?.FACILITY_ID === +res?.USERLIST[0]?.DEFAULT_FACILITY
-                  );
-                })[0] || res?.FACILITYLIST[0]
-              )
+              JSON.stringify(facilityId)
             );
 
             const Userdata: any = encryptData(JSON.stringify(res?.USERLIST[0]));
-
-            // localStorage.setItem("USER", JSON.stringify(res?.USERLIST[0]))
             localStorage.setItem("USER", Userdata);
-            // localStorage.setItem(LOCALSTORAGE.USER_ID, res?.USERLIST[0]?.USER_ID);
             const User_Id: any = encryptData(
               JSON.stringify(res?.USERLIST[0]?.USER_ID)
             );
@@ -234,15 +201,13 @@ const Login: React.FC<any> = () => {
 
             localStorage.setItem(LOCALSTORAGE.USER_NAME, User_Name);
 
-
             const Role_Name: any = encryptData(
-              JSON.stringify(res?.USERLIST[0]?.ROLE_NAME)
+              JSON.stringify(facilityId?.ROLE_NAME)
             );
-
             localStorage.setItem(LOCALSTORAGE.ROLE_NAME, Role_Name);
-            localStorage.setItem(LOCALSTORAGE.ROLE_ID, res?.USERLIST[0]?.ROLE_ID);
+            localStorage.setItem(LOCALSTORAGE.ROLE_ID, facilityId?.ROLE_ID);
             const Role_Id: any = encryptData(
-              JSON.stringify(res?.USERLIST[0]?.ROLE_ID)
+              JSON.stringify(facilityId?.ROLE_ID)
             );
             localStorage.setItem(LOCALSTORAGE.ROLE_ID, Role_Id);
 
@@ -261,19 +226,22 @@ const Login: React.FC<any> = () => {
               res?.USERLIST[0]?.DEFAULT_LANGUAGE
             );
             const Roletype_Code: any = encryptData(
-              JSON.stringify(res?.USERLIST[0]?.ROLETYPECODE)
+              JSON.stringify(facilityId?.ROLETYPECODE)
             );
             localStorage.setItem(LOCALSTORAGE.ROLETYPECODE, Roletype_Code);
 
             const Role_Hierarchy_Id: any = encryptData(
-              JSON.stringify(res?.USERLIST[0]?.ROLE_HIERARCHY_ID)
+              JSON.stringify(facilityId?.ROLE_HIERARCHY_ID)
             );
             localStorage.setItem(
               LOCALSTORAGE.ROLE_HIERARCHY_ID,
               Role_Hierarchy_Id
             );
 
-            localStorage.setItem(LOCALSTORAGE.TEAM_ID, res?.USERLIST[0]?.TEAM_ID);
+            localStorage.setItem(
+              LOCALSTORAGE.TEAM_ID,
+              res?.USERLIST[0]?.TEAM_ID
+            );
             // }
             let e_type = res?.USERLIST[0]?.USER_TYPE;
 
@@ -285,9 +253,7 @@ const Login: React.FC<any> = () => {
               //   sameSite: "strict"
               // });
 
-              const loginType: any = encryptData(
-                JSON.stringify("B2C")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2C"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
 
               // cookies.set(COOKIES.ACCESS_TOKEN, res?.RESULTLIST[0]?.TOKEN, {
@@ -298,14 +264,11 @@ const Login: React.FC<any> = () => {
               //   // httpOnly:true
               // });
 
-              const accesstoken: any = encryptData(
-                JSON.stringify(data?.TOKEN)
-              );
+              const accesstoken: any = encryptData(JSON.stringify(data?.TOKEN));
               localStorage.setItem(LOCALSTORAGE.ACCESS_TOKEN, accesstoken);
             }
 
             if (e_type === "I" && curr_loc?.search === "" && B2BLoginSuccess) {
-
               let access_token = data?.TOKEN;
               let refresh_token = data?.TOKEN;
 
@@ -325,9 +288,7 @@ const Login: React.FC<any> = () => {
               //   secure: true,
               //   sameSite: "strict"
               // });
-              const loginType: any = encryptData(
-                JSON.stringify("B2B")
-              );
+              const loginType: any = encryptData(JSON.stringify("B2B"));
               localStorage.setItem(LOCALSTORAGE.LOGIN_TYPE, loginType);
 
               // cookies.set(COOKIES.ACCESS_TOKEN, access_token, {
@@ -341,15 +302,9 @@ const Login: React.FC<any> = () => {
               localStorage.setItem(LOCALSTORAGE.ACCESS_TOKEN, accesstoken);
 
               B2BLoginSuccess = true;
-              navigate(PATH?.WORKORDERMASTER)
-
+              navigate(PATH?.WORKORDERMASTER);
             }
-
-
           }
-
-
-
 
           //   cookies.set(COOKIES.ACCESS_TOKEN, res?.RESULTLIST[0]?.TOKEN, {
           //     httpOnly: true,
@@ -359,27 +314,22 @@ const Login: React.FC<any> = () => {
           //   });
           // }
 
-
-
-
           // navigate(PATH?.WORKORDERMASTER); // Commented by Gauresh
 
           // toast.success(res?.RESULTLIST[0].MSG)
-        }
-        catch (err: any) {
-
+        } catch (err: any) {
           if (isMobileOREmail) {
             msg = "Please Enter valid email or phone number.";
-            setErrorMsg(msg)
-            return
+            setErrorMsg(msg);
+            return;
           } else if (isEmail) {
             msg = "We can’t find an account with this email id.";
-            setErrorMsg(msg)
-            return
+            setErrorMsg(msg);
+            return;
           } else if (isMobile) {
             msg = "We can’t find an account with this mobile number.";
-            setErrorMsg(msg)
-            return
+            setErrorMsg(msg);
+            return;
           }
           //  toast.error(err);
         } finally {
@@ -392,12 +342,11 @@ const Login: React.FC<any> = () => {
         // toast.error(msg)
       }
     } else {
-      toast.error("B2B Authentication is already in progress,  Please ensure that this process has been completed before login again .");
+      toast.error(
+        "B2B Authentication is already in progress,  Please ensure that this process has been completed before login again ."
+      );
     }
-
-
   };
-
 
   const handleInputChange = (event: any) => {
     if (event.target.value === "" || event.target.value === undefined) {
@@ -406,8 +355,6 @@ const Login: React.FC<any> = () => {
       return;
     }
   };
-
-
 
   useEffect(() => {
     if (
@@ -421,21 +368,19 @@ const Login: React.FC<any> = () => {
 
   useEffect(() => {
     (async function () {
-    if (curr_loc?.search !== "") {
-      if (curr_loc?.pathname === "/login") {
-        setLoading(true);
-        //searchParams.get("acces_key")
-        //   localStorage.setItem("LOC_KEY", window?.location?.search);
+      if (curr_loc?.search !== "") {
+        if (curr_loc?.pathname === "/login") {
+          setLoading(true);
+          //searchParams.get("acces_key")
+          //   localStorage.setItem("LOC_KEY", window?.location?.search);
 
-        if (window?.location?.search !== "") {
-
-        
+          if (window?.location?.search !== "") {
             try {
               let token_data = window.location.search.replace("?code=", "");
 
               let token_payload = {
-                TOKEN: `${token_data}`
-              }
+                TOKEN: `${token_data}`,
+              };
               let res: any = await getAccessTokenForlogin(token_payload);
               let refresh_token = res?.data?.refresh_token;
               let id_token: any = res?.data?.id_token;
@@ -452,9 +397,9 @@ const Login: React.FC<any> = () => {
               localStorage.setItem(LOCALSTORAGE.REFERESH_TOKEN, refreshtoken);
 
               let expiresIn: any = {
-                "not_before": res?.data?.not_before,
-                "id_token_expires_in": res?.data?.id_token_expires_in,
-              }
+                not_before: res?.data?.not_before,
+                id_token_expires_in: res?.data?.id_token_expires_in,
+              };
               localStorage.setItem("expiresIn", JSON.stringify(expiresIn));
               let decode: any = jwtDecode(id_token);
               let data = {
@@ -465,19 +410,15 @@ const Login: React.FC<any> = () => {
               await onSubmit(data);
             } catch (error: any) {
               setLoading(false);
-              console.log(error, "error")
+
               toast.error("Somthing went wrong.");
-              navigate(PATH.LOGIN)
+              navigate(PATH.LOGIN);
             }
-
-
+          }
         }
       }
-    }
-  })()
+    })();
   }, [curr_loc?.search !== ""]);
-
-
 
   return (
     <>
@@ -568,7 +509,8 @@ const Login: React.FC<any> = () => {
                         className="w-full font-['Lato-Regular',_sans-serif] font-normal"
                         name="external"
                       /> */}
-                        <br /><br />
+                        <br />
+                        <br />
                         {/* {<Buttons
                           type="submit"
                           label="Internal Login"
@@ -583,6 +525,15 @@ const Login: React.FC<any> = () => {
                     </div>
                   </div>
                   {/*  */}
+                  {/* <button
+                    type="button"
+                    onClick={() => {
+                      throw new Error("Sentry Test Error");
+                    }}
+                  >
+                    Break the world
+                  </button>; */}
+
                   <div className="text-left font-['Lato-Regular',_sans-serif] text-[12px] leading-[12.04px] font-normal flex justify-between self-stretch">
                     <span>
                       <p className="text-left Text_Secondary font-['Lato-Regular',_sans-serif] text-[12px] leading-[18px] font-normal">

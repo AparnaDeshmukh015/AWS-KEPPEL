@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "primereact/button";
 import { useNavigate, useOutletContext } from "react-router-dom";
@@ -8,7 +7,7 @@ import { Card } from "primereact/card";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { ENDPOINTS } from "../../../utils/APIEndpoints";
-import { dateFormat, LOCALSTORAGE, saveTracker, VALIDATION } from "../../../utils/constants";
+import { LOCALSTORAGE, saveTracker } from "../../../utils/constants";
 import { callPostAPI } from "../../../services/apis";
 import { useForm } from "react-hook-form";
 import Field from "../../../components/Field";
@@ -19,15 +18,19 @@ import HolidayList from "./HolidayList";
 import { RadioButton } from "primereact/radiobutton";
 import "../../../components/Radio/Radio.css";
 import { validation } from "../../../utils/validation";
-import { eventNotification, helperEventNotification } from "../../../utils/eventNotificationParameter";
+import {
+  eventNotification,
+  helperEventNotification,
+} from "../../../utils/eventNotificationParameter";
 import { appName } from "../../../utils/pagePath";
-import { decryptData, encryptData } from "../../../utils/encryption_decryption";
-import { EMAIL_REGEX } from "../../../utils/regEx";
+import { decryptData } from "../../../utils/encryption_decryption";
+import Radio from "../../../components/Radio/Radio";
+import MultiSelects from "../../../components/MultiSelects/MultiSelects";
 
 const AddBuilding = () => {
   let location: any = useLocation();
-
-  const { search } = useLocation()
+  const [IsSubmit, setIsSubmit] = useState<any | null>(false);
+  const { search } = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const currentMenu = menuList
@@ -38,25 +41,36 @@ const AddBuilding = () => {
   const [timeZone, setTimeZone] = useState([]);
   const [dateFormatType, setDateFormatType] = useState([]);
   const [weekList, setWeekList] = useState([]);
-  const [portfolio, setPortfolio] = useState([]);
+  const [portfolio, setPortfolio] = useState<any | null>([]);
   const [checked, setChecked] = useState<any | null>(true);
   const [HOLIDAYLIST, setHolidayList] = useState([]);
   const [PPM_SCHEDULAR, setPPM_SCHEDULAR] = useState<any | null>();
   const navigate: any = useNavigate();
-  const [error, setError] = useState<any | null>(false)
-  const [errorEmail, setErrorEmail] = useState<any | null>(false)
+  const [error, setError] = useState<any | null>(false);
+  const [errorEmail, setErrorEmail] = useState<any | null>(false);
+  const [buildingType, setbuildingType] = useState<any | null>("R");
+  const [configuarationDetails, setConfigurationDetails] = useState<any | null>(
+    []
+  );
+  const [dashbaordConfigurationList, setDashboardConfigurationList] = useState<
+    any | null
+  >([]);
   const assestTypeLabel: any = [
     { name: "Auto", key: "A" },
     { name: "Manual", key: "M" },
+  ];
+
+  const BuildingTypeRadio: any = [
+    { name: "Infrastructure", key: "I" },
+    { name: "Real Estate", key: "R" },
   ];
   const {
     register,
     handleSubmit,
     control,
     setValue,
-    watch,
     reset,
-
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
@@ -80,6 +94,7 @@ const AddBuilding = () => {
       WEEKOFF: "",
       ACTIVE: "",
       LOCATION_HOLIDAY_D: "",
+      FACILITY_TYPE: { name: "Real Estate", key: "R" },
       PORTFOLIO: "",
       WO_ASSIGN: "",
       PARA:
@@ -91,155 +106,188 @@ const AddBuilding = () => {
       INHERIT_WORKING: false,
       REDIRECT_APPROVAL: false,
       MATREQ_APPROVAL: false,
-      OBEM_INTEG_REQUIRED: false
+      OBEM_INTEG_REQUIRED: false,
+      ISEQUIPMENT_EDIT: false,
+      ISLOCATION_EDIT: false,
+      isImgRequired: false,
+      ISALLREQ: false,
+      KF_DASHBOARD_FACILITY_LIST: "",
+      ISPRECONDITION: false,
     },
     // values:editData,
     mode: "all",
   });
-
-
-  const User_Name = decryptData((localStorage.getItem("USER_NAME")))
-  const showHandler = (e: any) => {
+  const watchBuildingType = watch("FACILITY_TYPE");
+  const User_Name = decryptData(localStorage.getItem("USER_NAME"));
+  const showHandler = () => {
     // e.preventDefault();
     navigate(`${appName}/facilitydetail`);
   };
 
+  const onSubmit = useCallback(
+    async (payload: any) => {
+      if (IsSubmit) return true;
+      setIsSubmit(true);
+      try {
+        let isValid: boolean;
+        let isEmailValid: boolean;
+        let msg: any = "";
+        const holiday: any = HOLIDAYLIST?.map((holi: any) => {
+          return {
+            HOLIDAY_DATE: moment(holi.HOLIDAY_DATE).format("DD-MM-YYYY"),
+            HOLIDAY_NAME: holi.HOLIDAY_NAME,
+          };
+        });
+        payload.ISALLREQ =
+          payload?.ISALLREQ === undefined ? false : payload?.ISALLREQ;
+        payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
+        payload.CURRENCY_CODE = payload?.CURRENCY?.CURRENCY_CODE;
+        payload.DATE_FORMAT = payload?.DATEFORMAT?.DATE_FORMAT;
+        payload.FACILITY_TIMEZONE = payload?.TIMEZONE?.TIMEZONE_NAME;
+        payload.FACILITY_OFFSET = payload?.TIMEZONE?.current_utc_offset;
+        payload.FACILITY_UTS_MINUTES = payload?.TIMEZONE?.utc_minutes;
+        payload.WEEKOFF_ID = payload?.WEEKOFF?.WEEKOFF_ID;
+        // payload.ACTIVE = true;
+        payload.LOCATION_HOLIDAY_D = holiday;
+        payload.WO_ASSIGN = payload?.WO_ASSIGN?.key;
+        payload.PORTFOLIO_ID = payload?.PORTFOLIO?.PORTFOLIO_ID;
+        payload.PPM_SCHEDULAR = PPM_SCHEDULAR;
+        payload.FACILITY_TYPE =
+          search === "?edit="
+            ? selectedDetails?.FACILITY_TYPE
+            : payload?.FACILITY_TYPE !== "" ||
+              payload?.FACILITY_TYPE !== undefined
+            ? payload?.FACILITY_TYPE?.key
+            : "R";
 
+        // payload.REDIRECT_APPROVAL = payload.REDIRECT_APPROVAL;
+        // payload.MATREQ_APPROVAL = payload.MATREQ_APPROVAL;
+        // payload.OBEM_INTEG_REQUIRED = payload.OBEM_INTEG_REQUIRED;
+        payload.PARA =
+          location?.state !== null
+            ? { para1: "Building set up", para2: t("Updated") }
+            : { para1: "Building set up", para2: t("created") };
+        payload.FACILITY_ID =
+          location?.state !== null ? location?.state.facilityId : 0;
+        payload.MODE = location?.state !== null ? "E" : "A";
+        delete payload.CURRENCY;
+        delete payload.DATEFORMAT;
+        delete payload?.WEEKOFF;
+        delete payload?.TIMEZONE;
+        delete payload?.PORTFOLIO;
 
-  const onSubmit = async (payload: any) => {
-    try {
-      let isValid: boolean = false;
-      let isEmailValid: boolean = false;
-      let msg: any = ''
-      const holiday: any = HOLIDAYLIST?.map((holi: any) => {
-        return {
-          HOLIDAY_DATE: moment(holi.HOLIDAY_DATE).format('DD-MM-YYYY'),
-          HOLIDAY_NAME: holi.HOLIDAY_NAME,
-        };
-      });
-      payload.ACTIVE = payload?.ACTIVE ? 1 : 0;
-      payload.CURRENCY_CODE = payload?.CURRENCY?.CURRENCY_CODE;
-      payload.DATE_FORMAT = payload?.DATEFORMAT?.DATE_FORMAT;
-      payload.FACILITY_TIMEZONE = payload?.TIMEZONE?.TIMEZONE_NAME;
-      payload.FACILITY_OFFSET = payload?.TIMEZONE?.current_utc_offset;
-      payload.FACILITY_UTS_MINUTES = payload?.TIMEZONE?.utc_minutes;
-      payload.WEEKOFF_ID = payload?.WEEKOFF?.WEEKOFF_ID;
-      // payload.ACTIVE = true;
-      payload.LOCATION_HOLIDAY_D = holiday;
-      payload.WO_ASSIGN = payload?.WO_ASSIGN?.key;
-      payload.PORTFOLIO_ID = payload?.PORTFOLIO?.PORTFOLIO_ID;
-      payload.PPM_SCHEDULAR = PPM_SCHEDULAR;
-      payload.REDIRECT_APPROVAL = payload.REDIRECT_APPROVAL;
-      payload.MATREQ_APPROVAL = payload.MATREQ_APPROVAL;
-      payload.OBEM_INTEG_REQUIRED = payload.OBEM_INTEG_REQUIRED;
-      payload.PARA=
-      location?.state !== null
-        ? { para1: "Building set up", para2: t("Updated") }
-        : { para1: "Building set up", para2: t("created") };
-         payload.FACILITY_ID= location?.state !== null ? location?.state.facilityId : 0;
-         payload.MODE= location?.state !== null ? "E" : "A";
-      delete payload.CURRENCY;
-      delete payload.DATEFORMAT;
-      delete payload?.WEEKOFF;
-      delete payload?.TIMEZONE;
-      delete payload?.PORTFOLIO;
-
-      if (payload?.FACILITY_EMAIL_ID === '' || payload?.FACILITY_EMAIL_ID === undefined) {
-        isEmailValid = true
-      } else {
-        const emailPattern =
-          /^\s*[^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))\s*$/;
-        if (emailPattern.test(payload?.FACILITY_EMAIL_ID)) {
+        if (
+          payload?.FACILITY_EMAIL_ID === "" ||
+          payload?.FACILITY_EMAIL_ID === undefined
+        ) {
           isEmailValid = true;
         } else {
-          msg = "Please enter valid email.";
+          const emailPattern =
+            /^\s*[^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))\s*$/;
+          if (emailPattern.test(payload?.FACILITY_EMAIL_ID)) {
+            isEmailValid = true;
+          } else {
+            msg = "Please enter valid email.";
 
-          isEmailValid = false;
-          setErrorEmail(true);
-
+            isEmailValid = false;
+            setIsSubmit(false);
+            setErrorEmail(true);
+          }
         }
-      }
-      const phonePattern = /^[+]{1}(?:[0-9\-\\(\\)\\/.]\s?){6,15}[0-9]{1}$/; // Basic international format
-      if (payload?.FACILITY_CONTACT_NUMBER === '' || payload?.FACILITY_CONTACT_NUMBER === undefined) {
-        isValid = true
-      }
-      else if (phonePattern.test(payload?.FACILITY_CONTACT_NUMBER)) {
-
-        if (payload?.FACILITY_CONTACT_NUMBER?.length < 6 || payload?.FACILITY_CONTACT_NUMBER?.length > 16) {
-          msg = 'Please Enter valid Mobile Number'
-          isValid = false
-          setError(true)
+        const phonePattern = /^[+]{1}(?:[0-9\-\\/.]\s?){6,15}[0-9]{1}$/; // Basic international format
+        if (
+          payload?.FACILITY_CONTACT_NUMBER === "" ||
+          payload?.FACILITY_CONTACT_NUMBER === undefined
+        ) {
+          isValid = true;
+        } else if (phonePattern.test(payload?.FACILITY_CONTACT_NUMBER)) {
+          if (
+            payload?.FACILITY_CONTACT_NUMBER?.length < 6 ||
+            payload?.FACILITY_CONTACT_NUMBER?.length > 16
+          ) {
+            msg = "Please Enter valid Mobile Number";
+            isValid = false;
+            setError(true);
+            setIsSubmit(false);
+          } else {
+            isValid = true;
+          }
         } else {
-          isValid = true
+          msg = "Please Enter valid Mobile Number";
+          isValid = false;
+          setIsSubmit(false);
+          setError(true);
         }
-      }
-      else {
-        msg = 'Please Enter valid Mobile Number'
-        isValid = false
-        setError(true)
-      }
-      console.log(payload, 'payload')
- 
-      if (isValid === true && isEmailValid === true) {
-        const res = await callPostAPI(ENDPOINTS?.BUILDING_SAVE, payload);
 
+        if (isValid && isEmailValid) {
+          const res = await callPostAPI(ENDPOINTS?.BUILDING_SAVE, payload);
+          if (res?.FLAG === true) {
+            const response = await callPostAPI(
+              ENDPOINTS?.COMMON_LOCATION_LIST,
+              {}
+            );
+            toast.success(res?.MSG);
+            const notifcation: any = {
+              FUNCTION_CODE: currentMenu?.FUNCTION_CODE,
+              EVENT_TYPE: "M",
+              STATUS_CODE: search === "?edit=" ? 2 : 1,
+              PARA1: search === "?edit=" ? User_Name : User_Name,
+              PARA2: payload?.FACILITY_NAME,
+              PARA3: "",
+              PARA4: payload?.AREA_UNIT,
+              PARA5: "",
+            };
 
-        if (res?.FLAG === true) {
-          toast.success(res?.MSG);
-          const notifcation: any = {
-            "FUNCTION_CODE": currentMenu?.FUNCTION_CODE,
-            "EVENT_TYPE": "M",
-            "STATUS_CODE": search === "?edit=" ? 2 : 1,
-            "PARA1": search === "?edit=" ? User_Name : User_Name,
-            "PARA2": payload?.FACILITY_NAME,
-            PARA3: "",
-            PARA4: payload?.AREA_UNIT,
-            PARA5: "",
-          };
-
-          const eventPayload = { ...eventNotification, ...notifcation };
-          helperEventNotification(eventPayload);
-          const res1 = await callPostAPI(ENDPOINTS?.BUILDING_DETAILS);
-          if (res1?.FLAG === 1) {
-            localStorage.setItem(LOCALSTORAGE.FACILITYID, JSON.stringify(res1?.FACILITYDETAILS[0]))
-            // const Facility_Id:any=encryptData(JSON.stringify(res1?.FACILITYDETAILS[0])) 
-
-            // localStorage.setItem(LOCALSTORAGE.FACILITYID,Facility_Id)
-            const res2 = await callPostAPI(ENDPOINTS?.BUILDING_GET, {});
-            if (res2?.FLAG === 1) {
+            const eventPayload = { ...eventNotification, ...notifcation };
+            await helperEventNotification(eventPayload);
+            const res1 = await callPostAPI(ENDPOINTS?.BUILDING_DETAILS);
+            if (res1?.FLAG === 1) {
               localStorage.setItem(
-                LOCALSTORAGE.FACILITY,
-              JSON.stringify(res2?.FACILITYLIST)
+                LOCALSTORAGE.FACILITYID,
+                JSON.stringify(res1?.FACILITYDETAILS[0])
               );
 
-              navigate(`${appName}/facilitydetail`);
+              const res2 = await callPostAPI(ENDPOINTS?.BUILDING_GET, {});
+              if (res2?.FLAG === 1) {
+                localStorage.setItem(
+                  LOCALSTORAGE.FACILITY,
+                  JSON.stringify(res2?.FACILITYLIST)
+                );
+                navigate(`${appName}/facilitydetail`);
+              }
             }
-            //  localStorage.setItem(LOCALSTORAGE.FACILITYID, JSON.stringify(res?.FACILITYDETAILS[0]))
           }
 
-          // if (location?.state === null) {
-          //   const res1 = await callPostAPI(ENDPOINTS?.BUILDING_GET, {});
-          //   if (res1?.FLAG === 1) {
-          //     localStorage.setItem(
-          //       LOCALSTORAGE.FACILITY,
-          //       JSON.stringify(res1?.FACILITYLIST)
-          //     );
-          //     navigate(`${appName}/facilitydetail`);
-          //   }
-          // }
-
+          if (res?.FLAG === false) {
+            setIsSubmit(false);
+            toast.error(res?.MSG);
+          }
+        } else {
+          toast.error(msg);
         }
-
-        if (res?.FLAG === false) {
-          toast.error(res?.MSG);
-        }
-      } else {
-        toast.error(msg)
+      } catch (error: any) {
+        toast.error(error);
+      } finally {
+        setIsSubmit(false);
       }
-    } catch (error: any) {
-      toast.error(error);
-    }
-  };
+    },
+    [
+      IsSubmit,
+      callPostAPI,
+      toast,
+      location,
+      eventNotification,
+      navigate,
+      search,
+      currentMenu,
+      HolidayList,
+      HOLIDAYLIST,
+      setHolidayList,
+      PPM_SCHEDULAR,
+      setPPM_SCHEDULAR,
+      BuildingTypeRadio,
+    ]
+  );
 
   const getCommonFacility = async () => {
     try {
@@ -254,6 +302,7 @@ const AddBuilding = () => {
         setTimeZone(res?.TIMEZONELIST);
         setWeekList(res?.WEEKOFFLIST);
         setPortfolio(res?.PORFOLIOLIST);
+        setDashboardConfigurationList(res?.DASHBOARDCONFIGLIST);
         if (location?.state === null) {
           setChecked(true);
           setValue("ACTIVE", checked);
@@ -262,9 +311,7 @@ const AddBuilding = () => {
         }
 
         if (search === "?edit=") {
-          // console.log(location?.state, "location ststu")
-          getFacilityDetails()
-
+          await getFacilityDetails();
         }
       }
     } catch (error: any) {
@@ -272,22 +319,31 @@ const AddBuilding = () => {
     }
   };
 
-
   const getFacilityDetails = async () => {
-
     if (location?.state !== null) {
       let editData: any = location?.state;
 
       let payload: any = {
         FACILITY_ID: editData?.facilityId,
         LOCATION_ID: editData?.locationId,
-      }
-
+      };
 
       const res = await callPostAPI(ENDPOINTS?.BUILDING_DETAILS, payload);
       if (res.FLAG === 1) {
-
+        setConfigurationDetails(res?.DASHBOARDCONFIGLIST);
         setSelectedDetails(res.FACILITYDETAILS[0]);
+        setValue(
+          "ISEQUIPMENT_EDIT",
+          res?.FACILITYDETAILS[0].ISEQUIPMENT_EDIT === true ? true : false
+        );
+        setValue(
+          "ISLOCATION_EDIT",
+          res?.FACILITYDETAILS[0]?.ISLOCATION_EDIT === true ? true : false
+        );
+        setValue(
+          "isImgRequired",
+          res?.FACILITYDETAILS[0]?.isImgRequired === true ? true : false
+        );
         setChecked(res?.FACILITYDETAILS[0]?.ACTIVE === true ? true : false);
         setValue("ACTIVE", res?.FACILITYDETAILS[0]?.ACTIVE);
         setHolidayList(res?.HOLIDAYLIST);
@@ -313,66 +369,68 @@ const AddBuilding = () => {
           res.FACILITYDETAILS[0]?.CONTACT_NUMBER
         );
         setValue("AREA_UNIT", res.FACILITYDETAILS[0]?.AREA_UNIT);
-        setValue("REDIRECT_APPROVAL", res.FACILITYDETAILS[0]?.REDIRECT_APPROVAL === true ? true : false)
-        setValue("MATREQ_APPROVAL", res.FACILITYDETAILS[0]?.MATREQ_APPROVAL === true ? true : false)
-        setValue("OBEM_INTEG_REQUIRED", res.FACILITYDETAILS[0]?.OBEM_INTEG_REQUIRED === true ? true : false)
+        setValue(
+          "REDIRECT_APPROVAL",
+          res.FACILITYDETAILS[0]?.REDIRECT_APPROVAL === true ? true : false
+        );
+        setValue(
+          "MATREQ_APPROVAL",
+          res.FACILITYDETAILS[0]?.MATREQ_APPROVAL === true ? true : false
+        );
+        setValue(
+          "ISALLREQ",
+          res.FACILITYDETAILS[0]?.ISALLREQ === true ? true : false
+        );
+        setValue(
+          "OBEM_INTEG_REQUIRED",
+          res.FACILITYDETAILS[0]?.OBEM_INTEG_REQUIRED === true ? true : false
+        );
+        setValue(
+          "ISPRECONDITION",
+          res.FACILITYDETAILS[0]?.ISPRECONDITION === true ? true : false
+        );
 
         setPPM_SCHEDULAR(res.FACILITYDETAILS[0]?.PPM_SCHEDULAR);
       }
     }
   };
 
-  console.log(selectedDetails, "set")
-  // useEffect(() => {
-  //   getCommonFacility();
-  //   saveTracker(currentMenu)
-  // }, [selectedFacility]);
-  console.log(location?.state, search, '555')
   useEffect(() => {
-    getCommonFacility();
+    (async function () {
+      await getCommonFacility();
+    })();
     if (location?.state === null || search === "") {
       reset({
         WO_ASSIGN: "",
         WEEKOFF: "",
         TIMEZONE: "",
-
       });
       setSelectedDetails([]);
-      console.log(selectedDetails, "selectedDetails")
       setHolidayList([]);
-
       setChecked(false);
-      // setValue("ACTIVE", );
       setHolidayList([]);
       setValue("FACILITY_NAME", "");
-      setValue(
-        "FACILITY_LEGAL_NAME",
-        ""
-      );
+      setValue("FACILITY_LEGAL_NAME", "");
 
       setValue("FACILITY_ADDRESS", "");
 
       setValue("FACILITY_CITY", "");
       setValue("FACILITY_STATE", "");
       setValue("FACILITY_ZIP", "");
-      setValue(
-        "FACILITY_COUNTRY",
-        ""
-      );
+      setValue("FACILITY_COUNTRY", "");
 
       setValue("FACILITY_EMAIL_ID", "");
-      setValue(
-        "FACILITY_CONTACT_NUMBER",
-        ""
-      );
+      setValue("FACILITY_CONTACT_NUMBER", "");
       setValue("AREA_UNIT", "");
-      setValue("REDIRECT_APPROVAL", false)
-      setValue("MATREQ_APPROVAL", false)
-      setValue("OBEM_INTEG_REQUIRED", false)
+      setValue("REDIRECT_APPROVAL", false);
+      setValue("MATREQ_APPROVAL", false);
+      setValue("OBEM_INTEG_REQUIRED", false);
 
       setPPM_SCHEDULAR([]);
     }
-    saveTracker(currentMenu);
+    (async function () {
+      await saveTracker(currentMenu);
+    })();
   }, [location, selectedFacility]);
 
   useEffect(() => {
@@ -381,8 +439,6 @@ const AddBuilding = () => {
       toast?.error(t(check));
     }
   }, [isSubmitting]);
-
-
 
   return (
     <>
@@ -398,32 +454,66 @@ const AddBuilding = () => {
             </div>
             <div className="flex">
               <>
-                {search === "?edit=" ?
+                {search === "?edit=" ? (
                   <>
-                    {currentMenu?.UPDATE_RIGHTS === "True" && (<Button
-                      className="Primary_Button  w-20 me-2"
-                      label={t("Save")}
-                      onClick={handleSubmit(onSubmit)}
-                    />)}
+                    {currentMenu?.UPDATE_RIGHTS === "True" && (
+                      <Button
+                        className="Primary_Button  w-20 me-2"
+                        label={t("Save")}
+                        onClick={handleSubmit(onSubmit)}
+                        disabled={IsSubmit}
+                      />
+                    )}
                   </>
-                  :
+                ) : (
                   <>
-                    {currentMenu?.ADD_RIGHTS === "True" && (<Button
-                      className="Primary_Button  w-20 me-2"
-                      label={t("Save")}
-                      onClick={handleSubmit(onSubmit)}
-                    />)}
+                    {currentMenu?.ADD_RIGHTS === "True" && (
+                      <Button
+                        className="Primary_Button  w-20 me-2"
+                        label={t("Save")}
+                        onClick={handleSubmit(onSubmit)}
+                        disabled={IsSubmit}
+                      />
+                    )}
                   </>
-                }
+                )}
               </>
               <Button
                 className="Secondary_Button  w-20"
                 label={t("List")}
-                onClick={(e) => showHandler(e)}
+                onClick={() => showHandler()}
               />
             </div>
           </div>
+
           <Card className="mt-2">
+            <div className="mb-3">
+              <Field
+                controller={{
+                  name: "FACILITY_TYPE",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <>
+                        <Radio
+                          {...register("FACILITY_TYPE", {})}
+                          options={BuildingTypeRadio}
+                          labelHead="Building Type"
+                          selectedData={selectedDetails?.FACILITY_TYPE || "R"}
+                          setValue={setValue}
+                          disabled={search === "?edit="}
+                          onChange={(e: any) => {
+                            setbuildingType(e.target.value.key);
+                            setValue("FACILITY_TYPE", e.target.value.key);
+                          }}
+                          {...field}
+                        />
+                      </>
+                    );
+                  },
+                }}
+              />
+            </div>
             <div className=" grid grid-cols-1 gap-x-4 gap-y-4 md:grid-cols-3 lg:grid-cols-3">
               <Field
                 controller={{
@@ -473,6 +563,10 @@ const AddBuilding = () => {
                   name: "PORTFOLIO",
                   control: control,
                   render: ({ field }: any) => {
+                    const defaultSelectedPortfolio =
+                      search === "?edit="
+                        ? selectedDetails?.PORTFOLIO_ID
+                        : portfolio[0]?.PORTFOLIO_ID;
                     return (
                       <Select
                         options={portfolio}
@@ -481,7 +575,7 @@ const AddBuilding = () => {
                           required: "",
                         })}
                         label={"Portfolio"}
-                        selectedData={search === "?edit=" ? selectedDetails?.PORTFOLIO_ID : ""}
+                        selectedData={defaultSelectedPortfolio}
                         findKey={"PORTFOLIO_ID"}
                         setValue={setValue}
                         {...field}
@@ -500,12 +594,9 @@ const AddBuilding = () => {
                       return (
                         <InputField
                           {...register("FACILITY_EMAIL_ID", {
-                            onChange: ((e: any) => {
-                              setErrorEmail(false)
-                              // setError(false)
-                            }),
-
-
+                            onChange: () => {
+                              setErrorEmail(false);
+                            },
                           })}
                           label={"Email Id"}
                           setValue={setValue}
@@ -516,7 +607,8 @@ const AddBuilding = () => {
                     },
                   }}
                   error={{}}
-                /></div>
+                />
+              </div>
               <div className={error === true ? "errorBorder" : ""}>
                 <Field
                   controller={{
@@ -526,9 +618,9 @@ const AddBuilding = () => {
                       return (
                         <InputField
                           {...register("FACILITY_CONTACT_NUMBER", {
-                            onChange: ((e: any) => {
-                              setError(false)
-                            }),
+                            onChange: () => {
+                              setError(false);
+                            },
                             validate: (fieldValue: any) => {
                               return validation?.onlyPhoneWithInternationNumber(
                                 fieldValue,
@@ -536,7 +628,6 @@ const AddBuilding = () => {
                                 setValue
                               );
                             },
-
                           })}
                           label={"Contact Number"}
                           // setValue={setValue}
@@ -549,7 +640,8 @@ const AddBuilding = () => {
                       );
                     },
                   }}
-                /></div>
+                />
+              </div>
 
               <Field
                 controller={{
@@ -566,7 +658,11 @@ const AddBuilding = () => {
                         label={"Date Format"}
                         findKey={"DATE_FORMAT"}
                         require={true}
-                        selectedData={search === "?edit=" || selectedDetails?.length > 0 ? selectedDetails?.DATE_FORMAT : ""}
+                        selectedData={
+                          search === "?edit=" || selectedDetails?.length > 0
+                            ? selectedDetails?.DATE_FORMAT
+                            : ""
+                        }
                         setValue={setValue}
                         invalid={errors?.DATEFORMAT}
                         {...field}
@@ -656,9 +752,7 @@ const AddBuilding = () => {
                         })}
                         label={"City"}
                         setValue={setValue}
-                        invalidMessage={
-                          errors?.FACILITY_CITY?.message
-                        }
+                        invalidMessage={errors?.FACILITY_CITY?.message}
                         invalid={""}
                         {...field}
                       />
@@ -687,9 +781,7 @@ const AddBuilding = () => {
                         label={"State"}
                         setValue={setValue}
                         invalid={""}
-                        invalidMessage={
-                          errors?.FACILITY_CITY?.message
-                        }
+                        invalidMessage={errors?.FACILITY_CITY?.message}
                         {...field}
                       />
                     );
@@ -739,14 +831,14 @@ const AddBuilding = () => {
                               setValue
                             );
                           },
-
                         })}
                         label={"Zip"}
                         require={true}
-
                         invalid={errors.FACILITY_ZIP}
                         {...field}
-
+                        inputMode="numeric" // Ensures numeric keyboard on mobile devices
+                        pattern="[0-9]{10}"
+                        maxLength={10}
                       />
                     );
                   },
@@ -770,11 +862,11 @@ const AddBuilding = () => {
                         require={true}
                         filter={true}
                         findKey={"TIMEZONE_NAME"}
-                        selectedData={search === "?edit=" ? selectedDetails?.TIME_ZONE : ""
+                        selectedData={
+                          search === "?edit=" ? selectedDetails?.TIME_ZONE : ""
                         }
                         setValue={setValue}
-                        invalid={errors?.TIMEZONE
-                        }
+                        invalid={errors?.TIMEZONE}
                         {...field}
                       />
                     );
@@ -795,11 +887,35 @@ const AddBuilding = () => {
                         label={"Work Order Assign"}
                         optionLabel="name"
                         require={true}
-
                         findKey={"key"}
                         selectedData={selectedDetails?.WO_ASSIGN}
                         setValue={setValue}
                         invalid={errors.WO_ASSIGN}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+              <Field
+                controller={{
+                  name: "KF_DASHBOARD_FACILITY_LIST",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <MultiSelects
+                        options={dashbaordConfigurationList}
+                        {...register("KF_DASHBOARD_FACILITY_LIST", {
+                          required: t("Please fill the required fields."),
+                        })}
+                        label="Dashboard Configuartion"
+                        optionLabel="DASHBOARD_BOX_NAME"
+                        require={true}
+                        setValue={setValue}
+                        maxSelectedLabels={2}
+                        selectedData={configuarationDetails}
+                        findKey={"DASHBOARD_ID"}
+                        invalid={errors.KF_DASHBOARD_FACILITY_LIST}
                         {...field}
                       />
                     );
@@ -813,12 +929,14 @@ const AddBuilding = () => {
                   render: ({ field }: any) => {
                     return (
                       <Checkboxs
-                        {...register("REDIRECT_APPROVAL", {
-
-                        })}
-                        className=""
+                        {...register("REDIRECT_APPROVAL", {})}
+                        className="md:mt-7"
                         label="Redirect Approval"
-                        checked={selectedDetails?.REDIRECT_APPROVAL === true ? true : false}
+                        checked={
+                          selectedDetails?.REDIRECT_APPROVAL === true
+                            ? true
+                            : false
+                        }
                         setValue={setValue}
                         {...field}
                       />
@@ -827,7 +945,6 @@ const AddBuilding = () => {
                 }}
               />
 
-
               <Field
                 controller={{
                   name: "MATREQ_APPROVAL",
@@ -835,12 +952,14 @@ const AddBuilding = () => {
                   render: ({ field }: any) => {
                     return (
                       <Checkboxs
-                        {...register("MATREQ_APPROVAL", {
-
-                        })}
-                        className=""
+                        {...register("MATREQ_APPROVAL", {})}
+                        className="md:mt-7"
                         label="Material Approval"
-                        checked={selectedDetails?.MATREQ_APPROVAL === true ? true : false}
+                        checked={
+                          selectedDetails?.MATREQ_APPROVAL === true
+                            ? true
+                            : false
+                        }
                         setValue={setValue}
                         {...field}
                       />
@@ -856,12 +975,14 @@ const AddBuilding = () => {
                   render: ({ field }: any) => {
                     return (
                       <Checkboxs
-                        {...register("OBEM_INTEG_REQUIRED", {
-
-                        })}
+                        {...register("OBEM_INTEG_REQUIRED", {})}
                         className=""
-                        label="Obem Integration Required"
-                        checked={selectedDetails?.OBEM_INTEG_REQUIRED === true ? true : false}
+                        label="OBEM Integration Required"
+                        checked={
+                          selectedDetails?.OBEM_INTEG_REQUIRED === true
+                            ? true
+                            : false
+                        }
                         setValue={setValue}
                         {...field}
                       />
@@ -869,6 +990,117 @@ const AddBuilding = () => {
                   },
                 }}
               />
+
+              <Field
+                controller={{
+                  name: "ISEQUIPMENT_EDIT",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ISEQUIPMENT_EDIT", {})}
+                        className=""
+                        label="Equipment Edit "
+                        checked={
+                          selectedDetails?.ISEQUIPMENT_EDIT === true
+                            ? true
+                            : false
+                        }
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+              <Field
+                controller={{
+                  name: "ISLOCATION_EDIT",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ISLOCATION_EDIT", {})}
+                        className=""
+                        label="Location Edit"
+                        checked={
+                          selectedDetails?.ISLOCATION_EDIT === true
+                            ? true
+                            : false
+                        }
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+              <Field
+                controller={{
+                  name: "isImgRequired",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("isImgRequired", {})}
+                        className=""
+                        label="Upload Support File Manadatory"
+                        checked={
+                          selectedDetails?.isImgRequired === true ? true : false
+                        }
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+
+              {watchBuildingType?.key === "I" && (
+                <Field
+                  controller={{
+                    name: "ISALLREQ",
+                    control: control,
+                    render: ({ field }: any) => {
+                      return (
+                        <Checkboxs
+                          {...register("ISALLREQ", {})}
+                          className=""
+                          label="All Service Request"
+                          checked={
+                            selectedDetails?.ISALLREQ === true ? true : false
+                          }
+                          setValue={setValue}
+                          {...field}
+                        />
+                      );
+                    },
+                  }}
+                />
+              )}
+              <Field
+                controller={{
+                  name: "ISPRECONDITION",
+                  control: control,
+                  render: ({ field }: any) => {
+                    return (
+                      <Checkboxs
+                        {...register("ISPRECONDITION", {})}
+                        className=""
+                        label="Cancel - Pre Conditional"
+                        checked={
+                          selectedDetails?.ISPRECONDITION === true
+                            ? true
+                            : false
+                        }
+                        setValue={setValue}
+                        {...field}
+                      />
+                    );
+                  },
+                }}
+              />
+
               <Field
                 controller={{
                   name: "ACTIVE",
