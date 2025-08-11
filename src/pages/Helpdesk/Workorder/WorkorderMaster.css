@@ -1,0 +1,291 @@
+.WO_Button {
+    background-color: transparent !important;
+    color: black;
+    text-align: left;
+    border-bottom: 1px solid #b7b8ba;
+    border-radius: 0;
+}
+
+.WO_Button:hover {
+    background-color: #F7F8F9 !important;
+}
+
+.Open {
+    color: #DC2020;
+}
+
+.Acknowledge {
+    color: #FFAB00;
+}
+
+.WorkInProgress {
+    color: #FBE205;
+}
+
+.OnHoldForParts {
+    color: #707070;
+}
+
+.Rectified {
+    color: #03C3EC;
+}
+
+.Completed {
+    color: #55A629;
+}
+
+.signatureStyle {
+    border: 1px solid #32475c38;
+    width: 100%;
+    height: 56px;
+    border-radius: 6px;
+}
+
+.ClearButton {
+    /* border: 1px solid #32475c38; */
+    color: #8E724A;
+}
+
+
+.Status_Text {
+    padding: 3px 12px;
+    margin-left: 12px;
+    border-radius: 10px;
+    background: #8e724a;
+    color: #fff;
+}
+
+.dashboardTab .p-tabview-selected .p-tabview-nav-link {
+    color: #8E724A;
+    background: transparent !important;
+}
+
+.dashboardTab .p-tabview .p-tabview-nav .p-tabview-ink-bar {
+    height: 2px !important;
+    background-color: #8e724a !important;
+    position: absolute;
+    top: 42px;
+    display: block;
+}
+
+.dashboardTab .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 1rem;
+    font-weight: 500;
+    font-size: 14px;
+    background: transparent;
+}
+
+.dashboardTab .p-tabview-panels {
+    padding: 1rem;
+    background: transparent;
+}
+
+.dashboardTab .p-tabview .p-tabview-nav {
+    background: #fff !important;
+    border: 0;
+}
+
+.dashboardTab .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 1rem;
+    text-align: center;
+    color: #7E8083;
+    background: transparent;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px !important;
+    letter-spacing: 0.4px;
+}
+
+.woTabview .dashboardTab .p-tabview-nav {
+    width: auto;
+}
+
+.woTabview .dashboardTab .p-tabview-nav-link {
+    justify-content: space-around;
+    background-color: transparent !important;
+    /* color: #fff !important; */
+}
+
+.woTabview .dashboardTab .p-tabview .p-tabview-panels {
+    background-color: transparent !important;
+}
+
+.woTabview .dashboardTab .p-tabview-nav .p-unselectable-text {
+    width: auto;
+    text-align: center;
+
+}
+
+.woTabview .dashboardTab .p-tabview-selected.p-highlight {
+    color: #4A3C28 !important;
+    background: #fff !important;
+    border-radius: 0px;
+}
+
+.woTabview .dashboardTab .p-tabview-selected.p-highlight .p-tabview-nav-link {
+    color: #4A3C28 !important;
+}
+
+.p-timeline .p-timeline-event-marker {
+    border: 2px solid #7E8083 !important;
+
+}
+
+.p-timeline.p-timeline-horizontal .p-timeline-event-opposite,
+.p-timeline.p-timeline-horizontal .p-timeline-event-content {
+    padding: 0.2rem 0;
+}
+
+.p-timeline-event {
+    min-height: auto;
+}
+
+.woTabview .p-tabview .p-tabview-nav {
+    background: #FFF;
+    border-bottom: 1px solid #E6E9EB;
+}
+
+.woTabview .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 1rem;
+    text-align: center;
+    color: #7E8083;
+    background: transparent;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px !important;
+    letter-spacing: 0.4px;
+}
+
+.woTabview .p-tabview-nav {
+    width: 100%;
+}
+
+.woTabview .p-tabview-nav-link {
+    justify-content: space-around;
+    background-color: transparent !important;
+    /* color: #fff !important; */
+}
+
+.woTabview .p-tabview .p-tabview-panels {
+    background-color: transparent !important;
+}
+
+.woTabview .p-tabview-nav .p-unselectable-text {
+    width: 100%;
+    text-align: center;
+
+}
+
+.woTabview .p-tabview-selected.p-highlight {
+    color: #ffffff !important;
+    background: #4A3C28 !important;
+    border-radius: 5px;
+}
+
+.woTabview .p-tabview-selected.p-highlight .p-tabview-nav-link {
+    color: #fff !important;
+}
+
+
+.p-timeline-event-opposite {
+    display: none;
+}
+
+.woTabview .p-badge {
+    background: #DC2020;
+}
+
+.Review_Button.p-button {
+    color: #ffffff;
+    background: #9F4034 !important;
+}
+
+.reviewContainer {
+    padding: 10px 12px;
+    background: #FDF6E7;
+    border-radius: 7px;
+    margin-bottom: 10px;
+
+}
+
+.p-sidebar-custom-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.p-datepicker table td>span.p-highlight {
+    color: #8E724A;
+    background: #F1EEE9;
+}
+
+.fixedContainer {
+    position: fixed;
+    width: calc(100% - 18.8rem);
+    left: 17.5rem;
+    right: 0;
+    z-index: 1075;
+    top: 76px;
+}
+
+.left-container .fixedContainer {
+    left: 6.8rem;
+    width: calc(100% - 8.5rem);
+}
+
+.text-truncate {
+    width: auto;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.woDetailTabview{
+    overflow: auto;
+    height: 100%;
+    max-height: calc(100vh - 400px);
+}
+.woDetailTabview .p-tabview-nav-container{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.dashboardTab .p-tabview-nav-container{
+    z-index: 800 !important;
+}
+
+.woDetailTabview::-webkit-scrollbar {
+    width: .3em;
+}
+
+.woDetailTabview::-webkit-scrollbar,
+.woDetailTabview::-webkit-scrollbar-thumb {
+    /* overflow:visible; */
+    border-radius: 4px;
+}
+
+.woDetailTabview::-webkit-scrollbar-thumb {
+    background: rgba(87, 82, 82, 0.2);
+}
+
+.ScrollViewAssigneeTab {
+    overflow: auto;
+    height: 100%;
+    max-height: calc(100vh - 580px);
+    /* max-height: 100px; */
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar {
+    width: .3em;
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar-thumb {
+    background: rgba(87, 82, 82, 0.2);
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar,
+.ScrollViewAssigneeTab::-webkit-scrollbar-thumb {
+    /* overflow:visible; */
+    border-radius: 4px;
+}

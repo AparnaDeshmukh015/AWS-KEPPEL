@@ -1,0 +1,5 @@
+{
+  "appService.defaultWebAppToDeploy": "/subscriptions/b03425f4-9257-443f-81f9-035685acc35a/resourceGroups/kllsg-sgp-dv-klikplusfm-rg-01/providers/Microsoft.Web/sites/kllsg-sgp-dv-klikplusfm-web-01",
+  "appService.deploySubpath": "build",
+  "editor.formatOnSave": true
+}

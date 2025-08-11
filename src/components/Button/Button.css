@@ -1,0 +1,173 @@
+/* SD_LOGIN SCREEN CSS */
+
+
+/* .p-button {
+    border: none;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.46px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Lato', sans-serif !important;
+} */
+.p-datepicker-trigger.p-button {
+  padding: 0 !important;
+}
+
+.p-button {
+  width: auto;
+  padding: 7px 20px;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  /* 171.429% */
+  letter-spacing: 0.4px;
+  /* box-shadow: 0px 1px 6px 2px rgba(50, 71, 92, 0.06), 0px 2px 6px 1px rgba(50, 71, 92, 0.04), 0px 1px 4px 2px rgba(50, 71, 92, 0.02); */
+  font-family: 'Lato', sans-serif !important;
+}
+
+.p-splitbutton-menubutton.p-button {
+  padding: 7px 10px;
+}
+
+.Login-Button .p-button {
+  background: #F1F3F5;
+  color: #6A7178;
+  border-radius: 24px;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: 'Lato', sans-serif !important;
+}
+
+.Login-Button .p-button:focus,
+.Login-Button .p-button:hover {
+  color: #ffffff;
+  background: #8E724A !important;
+  box-shadow: none !important;
+}
+
+.Primary_Button.p-button {
+  color: #ffffff;
+  background: #8E724A !important;
+}
+
+.Primary_Button.p-button:hover {
+  background: #4e330c !important;
+}
+
+/* .Primary_Button.p-button {
+    padding: 8px 28px !important;
+} */
+.Primary_SplitButton .p-button {
+  color: #ffffff;
+  background: #8E724A !important;
+}
+
+.Secondary_Button.p-button {
+  color: #8E724A;
+  border: 1px solid #C4BAA6;
+  background: transparent !important;
+}
+
+.Cancel_Button.p-button {
+  color: #9F4034;
+  border: 0;
+  background: transparent !important;
+}
+
+.headingConainer {
+  padding: 4px 10px;
+  background: #F1EEE9;
+  color: #8e724a;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.15px;
+}
+
+.dialogButton {
+  background: #8e724a;
+  border-radius: 50%;
+  margin-bottom: 2px;
+  width: 1.3rem !important;
+  height: 1.3rem;
+  padding: 2px !important;
+  color: #fff;
+}
+
+.dialogButton .p-button-icon {
+  font-size: 10px !important;
+}
+
+.p-tooltip .p-tooltip-text {
+  background: #4b5563;
+  color: #ffffff;
+  padding: 0.55rem;
+  font-size: 11px;
+  letter-spacing: 0.15px;
+  width: 200px;
+  word-wrap: break-word;
+}
+
+
+.weekButton {
+  border: 1px solid #32475c38;
+}
+
+.weekButton:hover {
+  border-color: #b7b8ba;
+}
+
+.dropZoneOverlay,
+.FileUpload {
+  width: 283px;
+  height: 71px;
+  border: 1px solid black;
+}
+
+.dropZoneOverlay {
+  border: dotted 1px;
+  font-family: cursive;
+  color: #7066fb;
+  position: absolute;
+  top: 0px;
+  text-align: center;
+}
+
+.FileUpload {
+  opacity: 0;
+  position: relative;
+  z-index: 100;
+  border: 2px solid black;
+}
+
+input#file {
+  /* display: inline-block;
+  width: 100%;
+  padding: 120px 0 0 0;
+  height: 100px;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  
+
+  background-size: 60px 60px; */
+  width: 100%;
+  padding: 120px 0 0 0;
+  height: 100px;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  /* opacity: 0;
+   position: absolute; */
+  /* //z-index: -1; */
+}
+
+.Border_Button {
+  border: 0 !important;
+  box-shadow: none;
+  padding: 0;
+}

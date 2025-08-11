@@ -1,0 +1,18 @@
+.p-dialog .p-dialog-header .p-dialog-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+.p-dialog .p-dialog-header {
+    padding: 1rem;
+}
+.deleteButton.p-button-icon-only {
+    padding: 0px;
+    /* border: 1px solid #ddd; */
+}
+/* .p-dialog-header-icons{
+    display: none;
+} */
+
+.p-dialog-mask {
+    z-index: 1800 !important;
+}

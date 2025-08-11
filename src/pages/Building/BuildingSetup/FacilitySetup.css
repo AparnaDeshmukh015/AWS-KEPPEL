@@ -1,0 +1,179 @@
+.facility-card.p-card .p-card-body {
+    padding: 0;
+}
+
+.Facility_bg {
+    background-color: #024662;
+}
+
+.Building_bg {
+    background-color: #04364A;
+}
+
+.Wing_bg {
+    background-color: #176B87;
+}
+
+.Floor_bg {
+    background-color: #64CCC5;
+}
+
+.Room_bg {
+    background-color: #DAFFFB;
+}
+
+.Primary_Button.p-button {
+    padding: 8px 28px !important;
+}
+
+
+
+/*-------------vertical-tree-view------------*/
+/* .vertical-tree {
+    padding-top: 20px;
+    padding-bottom: 20px;
+} */
+
+.vertical-tree ul {
+    padding-left: 15px;
+}
+
+.vertical-tree li {
+
+    list-style-type: none;
+    position: relative;
+    /* padding: 10px; */
+    /* margin-top: 10px; */
+    margin-left: 10px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif !important;
+}
+.vertical-tree li .child-node:hover {
+    background-color: #000 !important;
+    color: #fff;
+}
+
+.vertical-tree li::before {
+    /* content: '';
+    position: absolute; 
+    top: 0;
+    width: 1px; 
+    height: 100%;
+    right: auto; 
+    left: -20px;
+    border-left: 1px solid #ccc;
+    bottom: 50px; */
+    content: '';
+    position: absolute;
+    top: -9px;
+    width: 1px;
+    height: 100%;
+    right: auto;
+    left: -17px;
+    border-left: 1px solid #e5e7eb;
+    bottom: 50px;
+}
+
+.vertical-tree li::after {
+    /* content: '';
+    position: absolute; 
+    top: 34px; 
+    width: 25px; 
+    height: 20px;
+    right: auto; 
+    left: -20px;
+    border-top: 1px solid #ccc; */
+    content: '';
+    position: absolute;
+    top: 15px;
+    width: 21px;
+    height: 20px;
+    right: auto;
+    left: -16px;
+    border-top: 1px solid #e5e7eb;
+
+}
+.buildingBtn{
+    display: inline-block;
+    padding: 4px 10px;
+    text-decoration: none;
+    background-color: transparent;
+    font-size: 13px;
+    border-radius: 6px;
+    text-align: center;
+    width: 130px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+
+}
+
+.vertical-tree li a {
+    display: inline-block;
+    padding: 4px 10px;
+    text-decoration: none;
+    background-color: transparent;
+    font-size: 13px;
+    border-radius: 6px;
+    text-align: center;
+    width: 130px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.vertical-tree>ul>li::before,
+.vertical-tree>ul>li::after {
+    border: 0;
+}
+
+/* .vertical-tree li:last-child::before {
+    height: 34px;
+} */
+
+/* .vertical-tree li a:hover, 
+.vertical-tree li a:hover+ul li a {
+    background-color: #5a8dee;
+    color: #fff;
+    border: 1px solid #5a8dee;
+} */
+.vertical-tree li a:hover+ul li::after,
+.vertical-tree li a:hover+ul li::before,
+.vertical-tree li a:hover+ul::before,
+.vertical-tree li a:hover+ul ul::before {
+    border-color: #fbba00;
+}
+.tree-container{
+width: 100%;
+/* max-width: calc(100vw - 560px); */
+overflow-x: auto;
+overflow-y: hidden ;
+height: 100%;
+/* min-height: calc(100vh - 250px); */
+
+}
+.submenu{
+    display: none;
+}
+.child-tree-node li{
+    padding: 2px 12px;
+}
+.child-tree-node li::after {
+    top: 17px;
+}
+
+/* ----- menu panel------- */
+.p-menu .p-menuitem>.p-menuitem-content .p-menuitem-link {
+    color: #7E8083;
+    font-size: 14px;
+    padding: 0.75rem;
+}
+
+#popup_menu_left_5 .p-menuitem-content>a>span {
+    color: #E2001A;
+}
+

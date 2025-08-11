@@ -1,0 +1,15 @@
+.p-datepicker table td > span {
+    width: 1.8rem;
+    height: 1.8rem;
+}
+.p-datepicker-calendar{
+    font-size: 14px;
+}
+.p-datepicker table td.p-datepicker-today > span {
+    background: #8e724a;
+    color: #fff;
+}
+
+.p-calendar-time-panel .p-calendar-am-pm-picker {
+    display: none;
+}

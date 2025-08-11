@@ -1,0 +1,91 @@
+.dashboardTab .p-tabview-selected .p-tabview-nav-link{
+    color: #8E724A  !important;
+    background: transparent !important;
+}
+.dashboardTab .p-tabview .p-tabview-nav .p-tabview-ink-bar {
+    height: 2px !important;
+    background-color: #8e724a !important;
+    position: absolute !important;
+    top: 42px !important;
+    display: block !important;
+}
+.dashboardTab .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 1rem !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    background: transparent !important;
+}
+.dashboardTab .p-tabview-panels {
+    padding: 1rem !important;
+   background: transparent !important;
+}
+.dateSelect{
+    background: #fff;
+    width: 230px;
+    text-align: left;
+    border: 1px solid #32475c38;
+}
+
+/* chart */
+
+
+
+.apexcharts-canvas {
+    margin: auto;
+}
+.Title_Label
+{
+  font-family: 'Lato', sans-serif !important;
+  margin-bottom: 12px;
+  font-size: 20px;
+font-style: normal;
+font-weight: 500;
+line-height: 32px; /* 160% */
+letter-spacing: 0.15px;
+}
+.p-selectbutton{
+    padding: 4px;
+    background: #e0e0e0;
+    border-radius: 4px;
+}
+.p-selectbutton .p-button{
+    background-color: #E0E0E0;
+    padding: 10px 12px;
+}
+.p-selectbutton  .p-highlight{
+    background-color: #fff;
+    color: #272B30;
+}
+
+.dateFilterOverlayPanel{
+    width: 360px;
+}
+.dateFilterOverlayPanel li{
+    cursor: pointer;
+}
+.dateFilterOverlayPanel li:hover{
+    background-color: #F7F8F9;
+}
+.dateFilterOverlayPanel .p-overlaypanel-content{
+    padding: 0;
+}
+.dateText{
+    color: #272B30;
+    font-size: 16px;
+font-style: normal;
+font-weight: 600;
+line-height: 24px; /* 150% */
+letter-spacing: 0.15px;
+}
+.CustomDate{
+    background-color: #F7F8F9;
+}
+/* .apexcharts-datalabel, .apexcharts-datalabel-label, .apexcharts-datalabel-value, .apexcharts-datalabels, .apexcharts-pie-label {
+font-size: 30px;
+font-style: normal;
+font-weight: 500;
+line-height: 40px; 
+letter-spacing: 0.25px;
+color: #272B30;
+font-family: 'Lato', sans-serif !important;
+} */

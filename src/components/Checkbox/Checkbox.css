@@ -1,0 +1,18 @@
+.p-checkbox .p-checkbox-box {
+    background: #fff;
+    border: 1px solid #32475c38;
+    border-radius: 4px;
+    color: #4b5563;
+    height: 20px;
+    transition: background-color .2s, color .2s, border-color .2s, box-shadow .2s;
+    width: 20px;
+}
+
+.p-checkbox.p-highlight .p-checkbox-box {
+    background: #8e724a;
+    border-color: #8e724a;
+}
+
+.Required .p-checkbox .p-checkbox-box {
+    border: 1px solid #c90c2b !important;
+}

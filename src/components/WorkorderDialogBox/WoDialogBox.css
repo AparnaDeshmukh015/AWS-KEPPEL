@@ -1,0 +1,5 @@
+.redirectContainer:hover{
+    border-color: hsl(35, 31%, 42%);
+    cursor: pointer;
+    background-color: #F7F8F9;
+}

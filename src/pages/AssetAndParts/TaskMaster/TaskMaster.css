@@ -1,0 +1,9 @@
+.addListButton {
+    padding: 0;
+    text-align: left;
+    border-bottom: 1px solid;
+    border-radius: 0;
+    width: 100px;
+    outline: none;
+    box-shadow: none;
+}

@@ -1,0 +1,64 @@
+.fixedContainer {
+    position: fixed;
+    width: calc(100% - 18.8rem);
+    left: 17.5rem;
+    right: 0;
+    z-index: 1075;
+}
+
+.left-container .fixedContainer {
+    left: 6.8rem;
+    width: calc(100% - 8.5rem);
+}
+
+.fixed-content {
+    position: fixed;
+    width: 50%;
+    height: 30vh;
+    /* z-index: 1; */
+}
+
+.serviceTabview{
+    overflow: auto;
+    height: 100%;
+    max-height: calc(100vh - 280px);
+}
+.serviceTabview .p-tabview-nav-container{
+    position: sticky;
+    top: 0;
+    z-index: 1773;
+}
+
+.serviceTabview::-webkit-scrollbar {
+    width: .3em;
+}
+
+.serviceTabview::-webkit-scrollbar,
+.serviceTabview::-webkit-scrollbar-thumb {
+    /* overflow:visible; */
+    border-radius: 4px;
+}
+
+.serviceTabview::-webkit-scrollbar-thumb {
+    background: rgba(87, 82, 82, 0.2);
+}
+
+.ScrollViewAssigneeTab {
+    overflow: auto;
+    height: 100%;
+    max-height: calc(100vh - 345px);
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar {
+    width: .3em;
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar-thumb {
+    background: rgba(87, 82, 82, 0.2);
+}
+ 
+.ScrollViewAssigneeTab::-webkit-scrollbar,
+.ScrollViewAssigneeTab::-webkit-scrollbar-thumb {
+    /* overflow:visible; */
+    border-radius: 4px;
+}
