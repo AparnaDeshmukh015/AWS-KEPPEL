@@ -14,5 +14,5 @@ COPY . .
 EXPOSE 3000
  
 # Start React app
-CMD ["npm", "start"]
+CMD ["npm", "start"]git
  
