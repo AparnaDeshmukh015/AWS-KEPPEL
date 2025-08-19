@@ -15,13 +15,13 @@ const InputField = (props: any) => {
                     {props?.type === "search" && <i className="pi pi-search ml-3" />}
                     {props?.label &&
                         <label className='Text_Secondary Input_Label'>
-                            {t(`${props?.label}`)}
+                            {(`${props?.label}`)}
                             {props?.require && <span className='text-red-600'> *</span>}
                         </label>
                     }
                     <InputText
                         {...props}
-                        placeholder={props?.placeholder === true ? t(`Select Equipment`) : props?.placeholder === "role" ? t(`Select Building & Role`) : t(`Please Enter`)}
+                        placeholder={props?.placeholder === true ? (`Select Equipment`) : props?.placeholder === "role" ? (`Select Building & Role`) : (`Please Enter`)}
                         className={twMerge(props.className, `${props?.error && "requiredField"}`)}
                         disabled={props?.disabled === true ? "disabled" : ""}
                         type={props?.type}

@@ -19,13 +19,13 @@ const Select = (props: any) => {
   return (
     <>
       <label className="Text_Secondary Input_Label">
-        {props?.label && t(`${props?.label}`)}
+        {props?.label && (`${props?.label}`)}
         {props?.require && <span className="text-red-600"> *</span>}
       </label>
       <div className={`${props?.invalid ? "errorBorder" : ""}`}>
         <Dropdown
           className={`${props?.className} w-full custom-dropdown `}
-          placeholder={t(`Please Select`)}
+          placeholder={(`Please Select`)}
           {...props}
           filter={props?.filter === true ? true : false}
           options={props?.options || []}

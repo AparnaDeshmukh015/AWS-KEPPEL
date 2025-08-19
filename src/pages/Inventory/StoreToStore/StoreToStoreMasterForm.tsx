@@ -50,7 +50,7 @@ type FormErrors = {
 };
 
 const StoreToStoreMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const [storeList, setStoreList] = useState<any>([]);
   const [SampelStoreList, setSampelStoreList] = useState<any>([]);
@@ -196,11 +196,11 @@ const StoreToStoreMasterForm = (props: any) => {
             toast?.error(res?.MSG);
           }
         } else {
-          toast.error(t("Please fill the quantity"));
+          toast.error( ("Please fill the quantity"));
           setIsSubmit(false)
         }
       } else {
-        toast.error(t("Please select atleast one part list"));
+        toast.error( ("Please select atleast one part list"));
         setIsSubmit(false)
 
       }
@@ -221,7 +221,7 @@ const StoreToStoreMasterForm = (props: any) => {
     FROM_STOREwatch?.STORE_NAME,
     TO_STOREwatch?.STORE_NAME,
     eventNotification,
-    toast, t]);
+    toast,  ]);
 
   const getpartlist = async () => {
 
@@ -314,10 +314,10 @@ const StoreToStoreMasterForm = (props: any) => {
     const firstError: any = Object?.values(nestedErrors)[0];
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (!isSubmitting && (firstError?.REQUESTED_QUANTITY?.type === "required" || firstError?.REQUESTED_QUANTITY?.type === "validate")) {
       const check: any = firstError?.REQUESTED_QUANTITY?.message
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -341,7 +341,7 @@ const StoreToStoreMasterForm = (props: any) => {
           <div className="flex justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {t(`${search === "?edit=" ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
+                { (`${search === "?edit=" ? "Cancel" : "Add"}`)} { (`${props?.headerName}`)}-
                 {search === "?edit=" ? dataId?.DOC_NO : ""}
               </h6>
             </div>
@@ -475,8 +475,8 @@ const StoreToStoreMasterForm = (props: any) => {
                     return (
                       <InputField
                         {...register("REMARKS", {
-                          required: t("Please fill the required fields."),
-                          validate: value => value.trim() !== "" || t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields."),
                         })}
                         disabled={search === '?edit=' ? true : false}
                         label="Remarks"
@@ -493,7 +493,7 @@ const StoreToStoreMasterForm = (props: any) => {
           </Card>
           <Card className="mt-2">
             <div className="headingConainer flex justify-between">
-              <p>{t("Part Details")}</p>
+              <p>{ ("Part Details")}</p>
               <div>
                 {search === '?add=' && (<PartDetailsDialogBox
                   getpartlist={getpartlist}
@@ -509,7 +509,7 @@ const StoreToStoreMasterForm = (props: any) => {
                 <DataTable value={fields} key={fields?.length - 1} showGridlines>
                   <Column
                     field="SR_NO"
-                    header={t("Sr No")}
+                    header={ ("Sr No")}
                     className="w-20"
                     body={(rowData, { rowIndex }) => {
                       return <>{rowIndex + 1}</>;
@@ -517,22 +517,22 @@ const StoreToStoreMasterForm = (props: any) => {
                   ></Column>
                   <Column
                     field="PART_CODE"
-                    header={t("Part Code")}
+                    header={ ("Part Code")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="PART_NAME"
-                    header={t("Part Name")}
+                    header={ ("Part Name")}
                     className=""
                   ></Column>
                   <Column
                     field="STOCK"
-                    header={t("Current Stock")}
+                    header={ ("Current Stock")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="REQ_QTY"
-                    header={t("Requested Quantity")}
+                    header={ ("Requested Quantity")}
                     className="w-40"
                     body={(rowData, { rowIndex }) => {
                       return (
@@ -550,9 +550,9 @@ const StoreToStoreMasterForm = (props: any) => {
                                         required: "Please fill the Required fields",
                                         validate: (value) => {
                                           if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                            return (t("Should be greater than 0"));
+                                            return ( ("Should be greater than 0"));
                                           } else if (parseInt(value, 10) === 0) {
-                                            return (t("Please enter the number"))
+                                            return ( ("Please enter the number"))
                                           } else {
                                             const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                             setValue(`PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any, sanitizedValue);
@@ -587,7 +587,7 @@ const StoreToStoreMasterForm = (props: any) => {
 
                   <Column
                     field="UOM_NAME"
-                    header={t("UOM")}
+                    header={ ("UOM")}
                     className="w-40">
                   </Column>
 

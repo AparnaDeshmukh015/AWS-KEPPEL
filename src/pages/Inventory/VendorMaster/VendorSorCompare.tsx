@@ -12,7 +12,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 
 const VendorSorCompare = () => {
 
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -135,24 +135,24 @@ const VendorSorCompare = () => {
               <DataTable
                 value={vendorComparisionList}
                 showGridlines
-                emptyMessage={t("No Data found.")}
+                emptyMessage={("No Data found.")}
                 dataKey="VENDOR_ID"
               >
-                <Column field="VENDOR_NAME" header={t("Vendor Name")}></Column>
-                <Column field="SOR" header={t("SOR(In SGD)")}></Column>
-                <Column field="MIN_QTY" header={t("Min order")}></Column>
+                <Column field="VENDOR_NAME" header={("Vendor Name")}></Column>
+                <Column field="SOR" header={("SOR(In SGD)")}></Column>
+                <Column field="MIN_QTY" header={("Min order")}></Column>
                 {/* <Column
                   field="SOR_VALIDITY"
-                  header={t("SOR Validity")}
+                  header={ ("SOR Validity")}
                 ></Column> */}
-                <Column field="SOR_FROM_DATE" header={t("From Date")}></Column>
-                <Column field="SOR_TO_DATE" header={t("To Date")}></Column>
+                <Column field="SOR_FROM_DATE" header={("From Date")}></Column>
+                <Column field="SOR_TO_DATE" header={("To Date")}></Column>
                 <Column
                   field="WARRANTY_DUR"
-                  header={t("Warranty Duration)")}
+                  header={("Warranty Duration)")}
                 ></Column>
-                <Column field="REMARKS" header={t("Remarks")}></Column>
-                <Column field="UOM_NAME" header={t("UOM")}></Column>
+                <Column field="REMARKS" header={("Remarks")}></Column>
+                <Column field="UOM_NAME" header={("UOM")}></Column>
               </DataTable>
             </div>
           </Card>

@@ -179,7 +179,7 @@ const AssetSchedule = ({
                   <>
                     <Radio
                       {...register(registerName, {
-                        required: t("Please fill the required fields.."),
+                        required: ("Please fill the required fields.."),
                       })}
                       options={options}
                       selectedData={selectedData}
@@ -775,7 +775,7 @@ const AssetSchedule = ({
                 showGridlines
                 scrollable
                 scrollHeight="200px"
-                emptyMessage={t("No Data found.")}
+                emptyMessage={("No Data found.")}
               >
                 <Column
                   field=""
@@ -825,7 +825,7 @@ const AssetSchedule = ({
 
                 <Column
                   field="SCHEDULE_NAME"
-                  header={t("Schedule Name")}
+                  header={("Schedule Name")}
                   body={(rowData: any) => {
                     return <label> {rowData?.SCHEDULE_NAME}</label>;
                   }}
@@ -833,7 +833,7 @@ const AssetSchedule = ({
                 <Column
                   field="FREQUENCY_DESC"
                   className="w-96"
-                  header={t("Frequency")}
+                  header={("Frequency")}
                   body={(rowData: any) => {
                     return <label> {rowData?.FREQUENCY_DESC}</label>;
                   }}
@@ -842,7 +842,7 @@ const AssetSchedule = ({
                 <Column
                   field="OCCURS"
                   className="w-96"
-                  header={t("Occurs")}
+                  header={("Occurs")}
                   body={(rowData: any) => {
                     return <label> {rowData?.OCCURS}</label>;
                   }}
@@ -873,7 +873,7 @@ const AssetSchedule = ({
             )}
           </div>
           <Dialog
-            header={t("Schedule Details")}
+            header={("Schedule Details")}
             visible={visible}
             style={{ width: "40vw" }}
             breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -886,7 +886,7 @@ const AssetSchedule = ({
               <div className="flex justify-start mb-2">
                 <div className="w-36">
                   <label className="Text_Secondary Input_Label mr-2">
-                    {t("Schedule Name")}
+                    {("Schedule Name")}
                     <span className="text-red-600"> *</span>
                   </label>
                 </div>
@@ -915,7 +915,7 @@ const AssetSchedule = ({
               <div className="flex justify-start mb-2">
                 <div className="w-36">
                   <label className="Text_Secondary Input_Label mr-2">
-                    {t("Issue")}
+                    {("Issue")}
                     <span className="text-red-600"> *</span>
                   </label>
                 </div>
@@ -934,7 +934,7 @@ const AssetSchedule = ({
                                   !watchAll?.SCHEDULE_ID &&
                                   !watchScheduler?.Record
                                 ) {
-                                  return t("Please fill the required fields.");
+                                  return ("Please fill the required fields.");
                                 }
                                 return true;
                               },
@@ -963,7 +963,7 @@ const AssetSchedule = ({
               <div className="flex justify-start mb-2">
                 <div className="w-36">
                   <label className="Text_Secondary Input_Label mr-2">
-                    {t("Repeat")}
+                    {("Repeat")}
                     <span className="text-red-600"> *</span>
                   </label>
                 </div>
@@ -982,7 +982,7 @@ const AssetSchedule = ({
                                   !watchAll?.SCHEDULE_ID &&
                                   !watchScheduler?.PERIOD
                                 ) {
-                                  return t("Please fill the required fields.");
+                                  return ("Please fill the required fields.");
                                 }
                                 return true;
                               },
@@ -1326,12 +1326,12 @@ const AssetSchedule = ({
                             return (
                               <InputField
                                 {...register("SCHEDULER.RUN_HOURS", {
-                                  required: t(
+                                  required: (
                                     "Please fill the required fields."
                                   ),
                                   validate: (value: any) =>
                                     +value !== 0 ||
-                                    t("Please fill the required fields."),
+                                    ("Please fill the required fields."),
                                 })}
                                 invalid={errors?.SCHEDULER?.RUN_HOURS}
                                 {...field}
@@ -1360,12 +1360,12 @@ const AssetSchedule = ({
                             return (
                               <InputField
                                 {...register("SCHEDULER.RUN_AVG_DAILY", {
-                                  required: t(
+                                  required: (
                                     "Please fill the required fields."
                                   ),
                                   validate: (value: any) =>
                                     +value !== 0 ||
-                                    t("Please fill the required fields."),
+                                    ("Please fill the required fields."),
                                 })}
                                 require={true}
                                 invalid={errors?.SCHEDULER?.RUN_AVG_DAILY}
@@ -1396,12 +1396,12 @@ const AssetSchedule = ({
                                 {...register(
                                   "SCHEDULER.RUN_THRESHOLD_MAIN_TRIGGER",
                                   {
-                                    required: t(
+                                    required: (
                                       "Please fill the required fields."
                                     ),
                                     validate: (value: any) =>
                                       +value !== 0 ||
-                                      t("Please fill the required fields."),
+                                      ("Please fill the required fields."),
                                   }
                                 )}
                                 require={true}
@@ -1432,12 +1432,12 @@ const AssetSchedule = ({
               <Button
                 type="button"
                 className="Primary_Button w-28 me-2"
-                label={t("Ok")}
+                label={("Ok")}
                 onClick={onSubmit}
               />
               <Button
                 className="Secondary_Button w-28 "
-                label={t("Cancel")}
+                label={("Cancel")}
                 onClick={() => {
                   if (!visible) return;
                   setVisible(false);

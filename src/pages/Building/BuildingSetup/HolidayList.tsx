@@ -23,7 +23,7 @@ const HolidayList = ({
   HOLIDAYLIST
 
 }: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [visible, setVisible] = useState<boolean>(false);
   const [date, setDate] = useState<any | null>();
   const [excelFile, setExcelFile] = useState<any | null>(null);
@@ -206,7 +206,7 @@ const HolidayList = ({
       <div className=" grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3">
         <div className={`${errors?.HOLIDAY_DATE ? "errorBorder" : ""}`}>
           <label className="Text_Secondary Input_Label" htmlFor="buttondisplay">
-            {t("Holiday Date")}{" "}
+            { ("Holiday Date")}{" "}
           </label>
           <Field
             controller={{
@@ -245,7 +245,7 @@ const HolidayList = ({
                 return (
                   <InputField
                     {...register("HOLIDAY_NAME", {
-                      required: t("Please fill the required fields.."),
+                      required:  ("Please fill the required fields.."),
                       validate: (value) =>
                         value.trim() !== "" ||
                         "Please fill the required fields.",
@@ -266,14 +266,14 @@ const HolidayList = ({
           <Button
             className="Primary_Button md:mt-5 w-20 "
             disabled={disabled}
-            label={t("Add")}
+            label={ ("Add")}
             onClick={handleSubmit(onSubmit)}
           />
 
           <SplitButtons
             className="Secondary_Button md:mt-5 ml-2"
             disabled={disabled}
-            label={t("Action")}
+            label={ ("Action")}
             model={Actionitems}
           />
           <Dialog
@@ -294,7 +294,7 @@ const HolidayList = ({
               <Button
                 type="button"
                 className="Secondary_Button md:mt-6 w-20"
-                label={t("Upload")}
+                label={ ("Upload")}
                 onClick={(e) => handleFileSubmit(e)}
               />
               <Button
@@ -321,20 +321,20 @@ const HolidayList = ({
           {/* <Column>{dateFormat()}</Column> */}
           <Column
             field="HOLIDAY_DATE"
-            header={t("Date")}
+            header={ ("Date")}
             body={(rowData: any) => {
 
               return <>{moment(rowData.HOLIDAY_DATE).format(dateFormat())}</>;
             }}
           ></Column>
-          <Column field="HOLIDAY_NAME" header={t("Holiday")}
+          <Column field="HOLIDAY_NAME" header={ ("Holiday")}
             body={(rowData: any) => {
 
               return <>{rowData.HOLIDAY_NAME}</>;
             }}></Column>
           <Column
             field=""
-            header={t("Action")}
+            header={ ("Action")}
             body={(rowData: any, { rowIndex }: any) => {
               return (
                 <button

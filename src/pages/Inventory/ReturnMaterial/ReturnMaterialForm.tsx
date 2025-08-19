@@ -53,7 +53,7 @@ const ReturnMaterialForm = (props: any) => {
   let returnFormLocalStorage: any = JSON.parse(localStoragedata)
 
   const { search } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [options, setOptions] = useState<any | null>([]);
   const [redioOption, setRadioOption] = useState<any | null>(false)
@@ -299,7 +299,7 @@ const ReturnMaterialForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -530,14 +530,14 @@ const ReturnMaterialForm = (props: any) => {
           </Card>
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Part Details")}</p>
+              <p>{ ("Part Details")}</p>
             </div>
             <div>
               <div>
                 <DataTable value={fields} showGridlines>
                   <Column
                     field="SR_NO"
-                    header={t("Sr No")}
+                    header={ ("Sr No")}
                     className="w-20"
                     body={(rowData, { rowIndex }) => {
                       return <>{rowIndex + 1}</>;
@@ -545,27 +545,27 @@ const ReturnMaterialForm = (props: any) => {
                   ></Column>
                   <Column
                     field="PART_CODE"
-                    header={t("Part Code")}
+                    header={ ("Part Code")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="PART_NAME"
-                    header={t("Part Name")}
+                    header={ ("Part Name")}
                     className=""
                   ></Column>
                   <Column
                     field="UOM_NAME"
-                    header={t("UOM")}
+                    header={ ("UOM")}
                     className=""
                   ></Column>
                   <Column
                     field={search === '?add=' ? "ISSUED_QTY" : "STOCK"}
-                    header={t("Stock Available")}
+                    header={ ("Stock Available")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="RETURN_QTY"
-                    header={t("Return Quantity")}
+                    header={ ("Return Quantity")}
                     className="w-40"
                     body={(rowData, { rowIndex }) => {
                       if (search === '?add=') {
@@ -589,7 +589,7 @@ const ReturnMaterialForm = (props: any) => {
                                       {
                                         validate: (value: any) => {
                                           if (parseInt(value, 10) > parseInt(rowData?.ISSUED_QTY, 10)) {
-                                            return (t("Should be less than stock avialalble"));
+                                            return ( ("Should be less than stock avialalble"));
                                           } else {
                                             const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                             setValue(`PART_LIST.[${rowIndex}].RETURN_QTY` as any, sanitizedValue);

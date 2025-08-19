@@ -14,7 +14,7 @@ import { saveTracker } from "../../../utils/constants";
 import { useLocation, useOutletContext } from "react-router-dom";
 
 const UserSkillMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const { search } = useLocation();
   const [, menuList]: any = useOutletContext();
@@ -104,7 +104,7 @@ const UserSkillMasterForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -136,7 +136,7 @@ const UserSkillMasterForm = (props: any) => {
                     <Select
                       options={userRoleList}
                       {...register("USER_ROLE", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="User Role"
                       require={true}
@@ -161,7 +161,7 @@ const UserSkillMasterForm = (props: any) => {
                     <Select
                       options={userList}
                       {...register("USER_LIST", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="User Name List"
                       optionLabel="USER_NAME"
@@ -187,7 +187,7 @@ const UserSkillMasterForm = (props: any) => {
                     <MultiSelects
                       options={userskilloptions}
                       {...register("SKILL_LIST", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       selectedData={selectedSkills}
                       label="Skill Name"

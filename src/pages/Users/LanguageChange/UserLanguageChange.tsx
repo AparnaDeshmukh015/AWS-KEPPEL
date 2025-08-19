@@ -53,7 +53,7 @@ const LanguageChange = () => {
                         <h6 className="Text_Primary">Language Change</h6>
                     </div>
                     <div className='flex'>
-                        <Button className='Primary_Button  w-20 me-2' label={t('Save')} onClick={() => handlerSubmit()} />
+                        <Button className='Primary_Button  w-20 me-2' label={('Save')} onClick={() => handlerSubmit()} />
                     </div>
                 </div>
                 <Card className='mt-2'>

@@ -29,7 +29,7 @@ const AddResolutionDialog = ({
 }: any) => {
 
   const [visible1, setVisible1] = useState<boolean>(false);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [Descriptionlength, setDescriptionlength] = useState(0);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const {
@@ -200,7 +200,7 @@ const AddResolutionDialog = ({
                     : "Text_Secondary"
                     } Helper_Text`}
                 >
-                  {t(`${Descriptionlength}/400 characters`)}
+                  { (`${Descriptionlength}/400 characters`)}
                 </label>
               </div>
             </div>

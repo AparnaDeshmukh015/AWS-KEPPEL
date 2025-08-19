@@ -44,7 +44,7 @@ const VendorMasterForm = (props: any) => {
   const [rolelist, setRoleList] = useState([]);
   // const [userlist, setUserList] = useState([]);
   const [ContractList1, setContractList1] = useState<any>([]);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
@@ -263,8 +263,8 @@ const VendorMasterForm = (props: any) => {
       const payload = {
         CONTRACT_ID: CONTRACT_ID == 0 ? 0 : CONTRACT_ID,
         MODE: CONTRACT_ID == 0 ? "A" : "E",
-        PARA: CONTRACT_ID == 0 ? { "para1": `Contract Details`, "para2": t('Added') }
-          : { "para1": `Contract Details`, "para2": t('Updated') },
+        PARA: CONTRACT_ID == 0 ? { "para1": `Contract Details`, "para2":  ('Added') }
+          : { "para1": `Contract Details`, "para2":  ('Updated') },
         VENDOR_ID: dataId?.VENDOR_ID,
         CONTRACT_NAME: payload1.CONTRACT_NAME,
         START_DATE: payload1.START_DATE
@@ -501,7 +501,7 @@ const VendorMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -535,7 +535,7 @@ const VendorMasterForm = (props: any) => {
                           })}
                           label="Vendor Name"
                           require={true}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           invalid={errors.VENDOR_NAME}
                           {...field}
                         />
@@ -568,7 +568,7 @@ const VendorMasterForm = (props: any) => {
                         <InputField
                           {...register("VENDOR_CONTACT_PERSON")}
                           label="Contact Person"
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           {...field}
                         />
                       );
@@ -595,7 +595,7 @@ const VendorMasterForm = (props: any) => {
                           //     // },
                           //   })}
                           //   label={"Mobile No"}
-                          //   placeholder={t("Please_Enter")}
+                          //   placeholder={ ("Please_Enter")}
                           //   invalidMessage={errors.VENDOR_MOBILE?.message}
                           //   {...field}
                           // />
@@ -612,7 +612,7 @@ const VendorMasterForm = (props: any) => {
                             })}
                             label={"Mobile No"}
                             require={true}
-                            placeholder={t("Please_Enter")}
+                            placeholder={ ("Please_Enter")}
                             // invalidMessage={errors.VENDOR_MOBILE?.message}
                             invalid={errors.VENDOR_MOBILE}
                             {...field}
@@ -641,7 +641,7 @@ const VendorMasterForm = (props: any) => {
                           })}
                           label={"Phone No"}
                           // require={true}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           // invalid={errors.VENDOR_PHONE}
                           // invalidMessage={errors.VENDOR_PHONE?.message}
                           {...field}
@@ -671,7 +671,7 @@ const VendorMasterForm = (props: any) => {
                           })}
                           label="Email Id"
                           require={true}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           invalid={errors.VENDOR_EMAIL}
                           // invalidMessage={errors?.VENDOR_EMAIL?.message}
                           {...field}
@@ -708,7 +708,7 @@ const VendorMasterForm = (props: any) => {
 
                   <Buttons
                     className="Primary_Button me-2"
-                    label={t("Add Contract")}
+                    label={ ("Add Contract")}
                     icon="pi pi-plus"
                     onClick={() => {
                       setAddVendor(true);
@@ -732,12 +732,12 @@ const VendorMasterForm = (props: any) => {
               <div>
                 <Buttons
                   className="Secondary_Button me-2"
-                  label={t("Cancel")}
+                  label={ ("Cancel")}
                   onClick={onCancel}
                 />
                 <Buttons
                   className="Primary_Button me-2"
-                  label={t("Save")}
+                  label={ ("Save")}
                   onClick={handleSubmit(onSubmitVendor)}
                 />
               </div>
@@ -760,7 +760,7 @@ const VendorMasterForm = (props: any) => {
                           label="Service/Product"
                           require={true}
                           setValue={setValue}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           invalid={errors.SERVICE_PRODUCT}
                           {...field}
                         />
@@ -784,7 +784,7 @@ const VendorMasterForm = (props: any) => {
                           label="Contract Cost"
                           require={false}
                           setValue={setValue}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           // invalid={errors.CONTRACT_COST}
                           {...field}
                         />
@@ -808,7 +808,7 @@ const VendorMasterForm = (props: any) => {
                           label="FY"
                           require={false}
                           setValue={setValue}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           // invalid={errors.CONTRACT_COST}
                           {...field}
                         />
@@ -833,7 +833,7 @@ const VendorMasterForm = (props: any) => {
                           label="Contract Name"
                           require={true}
                           setValue={setValue}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           invalid={errors.CONTRACT_NAME}
                           {...field}
                         />
@@ -902,7 +902,7 @@ const VendorMasterForm = (props: any) => {
                           label="PO Number"
                           require={false}
                           setValue={setValue}
-                          placeholder={t("Please_Enter")}
+                          placeholder={ ("Please_Enter")}
                           // invalid={errors.CONTRACT_COST}
                           {...field}
                         />
@@ -1043,7 +1043,7 @@ const VendorMasterForm = (props: any) => {
                                 {...register("SELECTED_ROLE_MASTER_LIST", {
                                   required:
                                     isRolewatch && isNotifywatch
-                                      ? t("Please fill the required fields.")
+                                      ?  ("Please fill the required fields.")
                                       : false,
                                 })}
                                 disabled={isRolewatch === false}
@@ -1098,7 +1098,7 @@ const VendorMasterForm = (props: any) => {
                                   userlist
                                 }
                                 // {...register("SELECTED_ROLE_MASTER_LIST", {
-                                //   required: toRoleCheckWatch === false ? "" : t("Please fill the required fields."),
+                                //   required: toRoleCheckWatch === false ? "" :  ("Please fill the required fields."),
                                 // })}
                                 // disabled={toRoleCheckWatch ? false : true}
                                 optionLabel="USER_NAME"

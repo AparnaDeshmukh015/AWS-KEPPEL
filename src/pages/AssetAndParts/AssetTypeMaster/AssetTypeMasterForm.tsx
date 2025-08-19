@@ -20,7 +20,7 @@ import { decryptData } from "../../../utils/encryption_decryption";
 import LoaderS from "../../../components/Loader/Loader";
 
 const AssetTypeMasterForm = (props: any) => {
-  const { t } = useTranslation();
+ 
   const [options, setOptions] = useState<any | null>([]);
   const { search } = useLocation();
   const [loading, setLoading] = useState<boolean>(false);
@@ -45,8 +45,8 @@ const AssetTypeMasterForm = (props: any) => {
       MODE: props?.selectedData || search === "?edit=" ? "E" : "A",
       PARA:
         props?.selectedData || search === "?edit="
-          ? { para1: `${props?.headerName}`, para2: t("Updated") }
-          : { para1: `${props?.headerName}`, para2: t("Added") },
+          ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+          : { para1: `${props?.headerName}`, para2:  ("Added") },
       ASSETTYPE_ID: props?.selectedData
         ? props?.selectedData?.ASSETTYPE_ID
         : search === "?edit="
@@ -130,7 +130,7 @@ const AssetTypeMasterForm = (props: any) => {
       (!isSubmitting && Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -165,10 +165,10 @@ const AssetTypeMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("ASSETTYPE_NAME", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                         validate: (value) =>
                           value.trim() !== "" ||
-                          t("Please fill the required fields."),
+                           ("Please fill the required fields."),
                       })}
                       require={true}
                       label="Type Name"
@@ -190,7 +190,7 @@ const AssetTypeMasterForm = (props: any) => {
                     <Select
                       options={options?.assetGroup}
                       {...register("ASSETGROUP_ID", {
-                        required: t("Please fill the required fields"),
+                        required:  ("Please fill the required fields"),
                       })}
                       label="Equipment Group"
                       require={true}

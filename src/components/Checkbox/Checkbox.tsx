@@ -21,7 +21,7 @@ const Checkboxs = (props: any) => {
                     // onBlur={e => false}
                     checked={props?.value}
                 ></Checkbox>
-                <label htmlFor={props?.name} className="ml-2 md:mt-7 Text_Secondary Input_Label"> {t(`${props?.label}`)}
+                <label htmlFor={props?.name} className="ml-2 md:mt-7 Text_Secondary Input_Label"> {(`${props?.label}`)}
                     {props?.require && <span className='text-red-600'> *</span>}</label>
             </div>
 

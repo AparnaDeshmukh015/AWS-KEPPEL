@@ -46,7 +46,7 @@ const EventMasterForm = (props: any) => {
   const [functionCode, setFunctionCode] = useState<any | null>(null);
   const [approveId, setApproveId] = useState<any | null>(null);
   const [statusId, setStatusId] = useState<any | null>(null);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [approveList, setApporveList] = useState<any | null>([]);
   const [, menuList]: any = useOutletContext();
@@ -648,13 +648,13 @@ const EventMasterForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (
       !isSubmitting &&
       Object?.values(errors)[0]?.type === "atLeastOneChecked"
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -682,7 +682,7 @@ const EventMasterForm = (props: any) => {
 
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Master Details")}</p>
+              <p>{ ("Master Details")}</p>
             </div>
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
               <Field
@@ -1096,7 +1096,7 @@ const EventMasterForm = (props: any) => {
                   >
                     <Column
                       field="PARA"
-                      header={t("Key")}
+                      header={ ("Key")}
                       sortable
                       //  onDragStart = {}
                       body={(rowData: any) => {
@@ -1119,7 +1119,7 @@ const EventMasterForm = (props: any) => {
                     ></Column>
                     <Column
                       field="PARA_DESC"
-                      header={t("Description")}
+                      header={ ("Description")}
                     ></Column>
                   </DataTable>
                 </div>
@@ -1128,7 +1128,7 @@ const EventMasterForm = (props: any) => {
                 <div className="noteContainer flex flex-wrap">
                   <div className="ml-3">
                     <p>
-                      {t(
+                      { (
                         "Note : Keys are event paramaters, you can drag and drop it in your event text"
                       )}
                     </p>
@@ -1313,7 +1313,7 @@ const EventMasterForm = (props: any) => {
                                             required:
                                               toWoCheckWatch === false
                                                 ? ""
-                                                : t(
+                                                :  (
                                                     "Please fill the required fields.."
                                                   ),
                                           }
@@ -1384,7 +1384,7 @@ const EventMasterForm = (props: any) => {
                                           required:
                                             toUSerCheckWatch === false
                                               ? ""
-                                              : t(
+                                              :  (
                                                   "Please fill the required fields.."
                                                 ),
                                         }
@@ -1452,7 +1452,7 @@ const EventMasterForm = (props: any) => {
                                             required:
                                               toRoleCheckWatch === false
                                                 ? ""
-                                                : t(
+                                                :  (
                                                     "Please fill the required fields."
                                                   ),
                                           }

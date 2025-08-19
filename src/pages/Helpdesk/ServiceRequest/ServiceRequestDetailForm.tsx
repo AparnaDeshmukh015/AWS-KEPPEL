@@ -50,7 +50,7 @@ const ServiceRequestDetailForm = (props: any) => {
   let [CURRENT_STATUS, setCurrentStatus] = useState<any>(0);
   const [selectedFacility, menuList]: any = useOutletContext();
   const [transactionStatus, setTransactionStatus] = useState<any | null>();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const navigate: any = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const [Descriptionlength, setDescriptionlength] = useState(0);
@@ -430,14 +430,14 @@ const ServiceRequestDetailForm = (props: any) => {
               para2: "Cancelled-Preconditional",
             }
           : buttonMode === "CANCEL"
-          ? { para1: `${t("Service Request")}`, para2: "Cancelled" }
+          ? { para1: `${ ("Service Request")}`, para2: "Cancelled" }
           : buttonMode === "CONVERT"
-          ? { para1: `${t("Work Order")}`, para2: "Generated" }
+          ? { para1: `${ ("Work Order")}`, para2: "Generated" }
           : search === "?edit="
-          ? { para1: `${t("Service Request")}`, para2: "Updated" }
+          ? { para1: `${ ("Service Request")}`, para2: "Updated" }
           : technicianStatus === "A"
-          ? { para1: `${t("Work Order")}`, para2: "Generated" }
-          : { para1: `${t("Service Request")}`, para2: "Created" };
+          ? { para1: `${ ("Work Order")}`, para2: "Generated" }
+          : { para1: `${ ("Service Request")}`, para2: "Created" };
 
       if (buttonMode === "CANCEL") {
         if (
@@ -462,7 +462,7 @@ const ServiceRequestDetailForm = (props: any) => {
         (f: any) => f.TEAM_ID === payload?.ASSIGN_TEAM_ID
       );
 
-      if (TECH_DATA?.length === technicianList?.length) {
+       if (TECH_DATA?.length === technicianList?.length) {
         const sameUserIds = TECH_DATA.map((t: any) => t.USER_ID)
           .sort((a: any, b: any) => a - b)
           .every(
@@ -808,7 +808,7 @@ const ServiceRequestDetailForm = (props: any) => {
       locationtypeOptions,
       search,
       props,
-      t,
+       ,
       currentMenu,
       decryptData,
       helperEventNotification,
@@ -1276,12 +1276,12 @@ const ServiceRequestDetailForm = (props: any) => {
       if (search === "?add=" && uploadSupportMandatory === true) {
         if (doclist?.length === 0) {
           const check: any = Object?.values(errors)[0]?.message;
-          toast?.error(t(check));
+          toast?.error( (check));
           setUploadError(true);
         }
       } else {
         const check: any = Object?.values(errors)[0]?.message;
-        toast?.error(t(check));
+        toast?.error( (check));
       }
       if (
         technicianStatus === "M" &&
@@ -1365,7 +1365,7 @@ const ServiceRequestDetailForm = (props: any) => {
                 </p>
                 {search === "?add=" && (
                   <h6 className=" Text_Primary Main_Service_Header_Text mb-1">
-                    {t("Add Service Request")}
+                    { ("Add Service Request")}
                   </h6>
                 )}
                 {search === "?edit=" && (
@@ -1589,7 +1589,7 @@ const ServiceRequestDetailForm = (props: any) => {
                   <Card>
                     <div className="flex flex-wrap justify-between mb-3">
                       <h6 className="Service_Header_Text">
-                        {t("Request Details")}
+                        { ("Request Details")}
                       </h6>
                     </div>
                     <div className=" grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-2">
@@ -1820,7 +1820,7 @@ const ServiceRequestDetailForm = (props: any) => {
 
                       <div className="col-span-2">
                         <label className="Text_Secondary Input_Label">
-                          {t("Description (max 400 characters)")}
+                          { ("Description (max 400 characters)")}
                         </label>
 
                         <Field
@@ -1852,7 +1852,7 @@ const ServiceRequestDetailForm = (props: any) => {
                               : "Text_Secondary"
                           } Helper_Text`}
                         >
-                          {t(`${Descriptionlength}/400 characters`)}
+                          { (`${Descriptionlength}/400 characters`)}
                         </label>
                       </div>
 
@@ -1880,7 +1880,7 @@ const ServiceRequestDetailForm = (props: any) => {
                   <Card className="mt-4">
                     <div className="flex flex-wrap justify-between mb-3">
                       <h6 className="Service_Header_Text">
-                        {t("Reporter Details")}
+                        { ("Reporter Details")}
                       </h6>
                     </div>
                     <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -1946,7 +1946,7 @@ const ServiceRequestDetailForm = (props: any) => {
                       <Card className="mt-3">
                         <div className="flex flex-wrap justify-between mb-3">
                           <h6 className="Service_Header_Text">
-                            {t("Service Request Details")}
+                            { ("Service Request Details")}
                           </h6>
                           {selectedDetails?.ISSERVICEREQ &&
                             selectedDetails?.ISEDITSRQ === 1 &&
@@ -1970,7 +1970,7 @@ const ServiceRequestDetailForm = (props: any) => {
                             <div className="">
                               <div className="flex flex-wrap ">
                                 <label className="Text_Secondary Helper_Text">
-                                  {t("Priority")}
+                                  { ("Priority")}
                                   {PriorityEditStatus && (
                                     <>
                                       <span className="text-red-600"> *</span>
@@ -2208,7 +2208,7 @@ const ServiceRequestDetailForm = (props: any) => {
                                           />
                                           <p className="mb-2 mt-2 text-sm ">
                                             <span className="Text_Primary Input_Label">
-                                              {t("No items to show")}{" "}
+                                              { ("No items to show")}{" "}
                                             </span>
                                           </p>
                                         </div>
@@ -2604,7 +2604,7 @@ const ServiceRequestDetailForm = (props: any) => {
                                               />
                                               <p className="mb-2 mt-2 text-sm ">
                                                 <span className="Text_Primary Service_Alert_Title">
-                                                  {t("No items to show")}{" "}
+                                                  { ("No items to show")}{" "}
                                                 </span>
                                               </p>
                                             </div>
@@ -2669,7 +2669,7 @@ const ServiceRequestDetailForm = (props: any) => {
                                               />
                                               <p className="mb-2 mt-2 text-sm ">
                                                 <span className="Text_Primary Service_Alert_Title">
-                                                  {t("No items to show")}{" "}
+                                                  { ("No items to show")}{" "}
                                                 </span>
                                               </p>
                                             </div>
@@ -2873,7 +2873,7 @@ const ServiceRequestDetailForm = (props: any) => {
                       <Card className="mt-4">
                         <div className="flex flex-wrap justify-between mb-3">
                           <h6 className="Service_Header_Text">
-                            {t("Reporter Details")}
+                            { ("Reporter Details")}
                           </h6>
                         </div>
                         <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -2955,7 +2955,7 @@ const ServiceRequestDetailForm = (props: any) => {
 
                                 <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                   <span className="Text_Primary Input_Label">
-                                    {t("No items to show")}{" "}
+                                    { ("No items to show")}{" "}
                                   </span>
                                 </p>
                               </div>
@@ -3042,7 +3042,7 @@ const ServiceRequestDetailForm = (props: any) => {
                 <>
                   <Card className="">
                     <h6 className="Service_Header_Text">
-                      {t("Assignees ")} <span className="text-red-600"> *</span>
+                      { ("Assignees ")} <span className="text-red-600"> *</span>
                     </h6>
                     <div className="items-center mt-2 justify-center w-full">
                       <label
@@ -3064,11 +3064,11 @@ const ServiceRequestDetailForm = (props: any) => {
 
                               <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                 <span className=" Text_Primary Input_Label">
-                                  {t("No assignees yet")}{" "}
+                                  { ("No assignees yet")}{" "}
                                 </span>
                               </p>
                               <label className="Text_Secondary Helper_Text mb-4">
-                                {t(
+                                { (
                                   "Add assignees to work on this service request."
                                 )}
                               </label>
@@ -3076,7 +3076,7 @@ const ServiceRequestDetailForm = (props: any) => {
                               <Buttons
                                 className="Secondary_Button"
                                 icon="pi pi-plus"
-                                label={t("Add Assignee")}
+                                label={ ("Add Assignee")}
                                 onClick={() => {
                                   OpenAssignUserPopUp();
                                 }}
@@ -3088,7 +3088,7 @@ const ServiceRequestDetailForm = (props: any) => {
 
                               <p className="mb-2 mt-2 text-sm text-gray-500  dark:text-gray-400">
                                 <div className="Text_Secondary Helper_Text">
-                                  {t("Technician will be added automatically")}{" "}
+                                  { ("Technician will be added automatically")}{" "}
                                 </div>
                               </p>
                             </>
@@ -3130,7 +3130,7 @@ const ServiceRequestDetailForm = (props: any) => {
                   technicianList?.length !== 0 &&
                   IsAssignAdd)) && (
                 <Card className="">
-                  <h6 className="Service_Header_Text">{t("Assign To")}</h6>
+                  <h6 className="Service_Header_Text">{ ("Assign To")}</h6>
                   <div className=" grid grid-cols-1 gap-x-3 gap-y-3 ">
                     <Field
                       controller={{
@@ -3249,7 +3249,7 @@ const ServiceRequestDetailForm = (props: any) => {
                             <Chip
                               label={tech?.USER_NAME}
                               removable
-                              onRemove={() => handleRemove(tech)}
+                              // onRemove={() => handleRemove(tech)}
                             />
                           </>
                         );
@@ -3260,7 +3260,7 @@ const ServiceRequestDetailForm = (props: any) => {
                         className="Text_Main Service_Alert_Title"
                         onClick={() => handleClearAll()}
                       >
-                        {t("Clear All Selection")}
+                        { ("Clear All Selection")}
                       </div>
                     )}
                   </div>
@@ -3274,7 +3274,7 @@ const ServiceRequestDetailForm = (props: any) => {
                   (technicianStatus === "M" && technicianList?.length > 0)) && (
                   <Card className="">
                     <h6 className="Service_Header_Text">
-                      {t("Assignees")} ({technicianList?.length})
+                      { ("Assignees")} ({technicianList?.length})
                     </h6>
                     <div className="ScrollViewAssigneeTab">
                       {technicianList?.map((tech: any, index: any) => {
@@ -3364,7 +3364,7 @@ const ServiceRequestDetailForm = (props: any) => {
                   Remarklength === 250 ? "text-red-600" : "Text_Secondary"
                 } Helper_Text`}
               >
-                {t(`${Remarklength}/250 characters.`)}
+                { (`${Remarklength}/250 characters.`)}
               </label>
             </div>
             <div className="flex justify-end mt-5">

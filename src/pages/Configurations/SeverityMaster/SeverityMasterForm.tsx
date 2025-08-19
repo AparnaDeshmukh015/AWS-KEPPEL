@@ -21,7 +21,7 @@ import Select from "../../../components/Dropdown/Dropdown";
 
 const UserMasterForm = (props: any) => {
   const [color, setColor] = useState("#ffffff");
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -241,7 +241,7 @@ const UserMasterForm = (props: any) => {
                   return (
                     <div>
                       <span className="Text_Secondary Input_Label">
-                        {t("Color")}
+                        { ("Color")}
                       </span>
                       <InputText
                         type={"color"}
@@ -251,7 +251,7 @@ const UserMasterForm = (props: any) => {
                         value={color}
                         onChange={(e: any) => setColor(e.target.value)}
                         className={"colorpicker"}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         {...field}
                       />
                     </div>

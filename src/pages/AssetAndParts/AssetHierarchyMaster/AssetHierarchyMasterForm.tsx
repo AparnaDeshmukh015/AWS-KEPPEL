@@ -19,7 +19,7 @@ const AssetHierarchyMasterForm = (props: any) => {
     const location = useLocation();
     const { selectedNode } = location.state || {}; // Access the selectedNode passed from the previous page
     const navigate: any = useNavigate();
-    const { t } = useTranslation();
+ 
     let { pathname } = useLocation();
     const [, menuList]: any = useOutletContext();
     const currentMenu = menuList
@@ -43,8 +43,8 @@ const AssetHierarchyMasterForm = (props: any) => {
     } = useForm({
         defaultValues: {
             PARA: props?.selectedData || search === '?edit='
-                ? { para1: "Equipment Hierarchy", para2: t("Updated") }
-                : { para1: "Equipment Hierarchy", para2: t("Added") },
+                ? { para1: "Equipment Hierarchy", para2:  ("Updated") }
+                : { para1: "Equipment Hierarchy", para2:  ("Added") },
             // ASSET_FOLDER_ID: props?.selectedData
             //     ? props?.selectedData?.ASSET_FOLDER_ID
             //     : search === '?edit='
@@ -128,7 +128,7 @@ const AssetHierarchyMasterForm = (props: any) => {
     useEffect(() => {
         if ((!isSubmitting && Object?.values(errors)[0]?.type === "required")) {
             const check: any = Object?.values(errors)[0]?.message;
-            toast?.error(t(check));
+            toast?.error( (check));
         }
     }, [isSubmitting]);
 
@@ -176,8 +176,8 @@ const AssetHierarchyMasterForm = (props: any) => {
                                         return (
                                             <InputField
                                                 {...register("ASSET_FOLDER_NAME", {
-                                                    required: t("Please fill required fields."),
-                                                    // validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                                    required:  ("Please fill required fields."),
+                                                    // validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                                 })}
                                                 require={true}
                                                 label="Equipment Folder Name"
@@ -199,7 +199,7 @@ const AssetHierarchyMasterForm = (props: any) => {
                                             <Select
                                                 options={options?.assestGroupOptions}
                                                 {...register("ASSETGROUP_ID", {
-                                                    required: t("Please fill the required fields."),
+                                                    required:  ("Please fill the required fields."),
                                                 })}
                                                 label="Equipment Gruop"
                                                 require={true}
@@ -225,7 +225,7 @@ const AssetHierarchyMasterForm = (props: any) => {
                                             <Select
                                                 options={assetTypes}
                                                 {...register("ASSETTYPE_ID", {
-                                                    required: t("Please fill the required fields."),
+                                                    required:  ("Please fill the required fields."),
                                                 })}
                                                 label="Equipment Type"
                                                 require={true}
@@ -251,7 +251,7 @@ const AssetHierarchyMasterForm = (props: any) => {
                                             <Select
                                                 options={options?.assetHierarchyList}
                                                 {...register("PARENT_ASSET_FOLDER_ID", {
-                                                    // required: t("Please fill the required fields."),
+                                                    // required:  ("Please fill the required fields."),
                                                 })}
                                                 label="Parent Folder Name"
                                                 // require={true}

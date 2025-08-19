@@ -36,7 +36,7 @@ const AddBuilding = () => {
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === location?.pathname)[0];
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [currencyList, setCurrencyList] = useState([]);
   const [timeZone, setTimeZone] = useState([]);
   const [dateFormatType, setDateFormatType] = useState([]);
@@ -99,8 +99,8 @@ const AddBuilding = () => {
       WO_ASSIGN: "",
       PARA:
         location?.state !== null
-          ? { para1: "Building set up", para2: t("Updated") }
-          : { para1: "Building set up", para2: t("created") },
+          ? { para1: "Building set up", para2:  ("Updated") }
+          : { para1: "Building set up", para2:  ("created") },
       // PPM_SCHEDULAR: PPM_SCHEDULAR,
       INHERIT_HOLIDAY: false,
       INHERIT_WORKING: false,
@@ -165,8 +165,8 @@ const AddBuilding = () => {
         // payload.OBEM_INTEG_REQUIRED = payload.OBEM_INTEG_REQUIRED;
         payload.PARA =
           location?.state !== null
-            ? { para1: "Building set up", para2: t("Updated") }
-            : { para1: "Building set up", para2: t("created") };
+            ? { para1: "Building set up", para2:  ("Updated") }
+            : { para1: "Building set up", para2:  ("created") };
         payload.FACILITY_ID =
           location?.state !== null ? location?.state.facilityId : 0;
         payload.MODE = location?.state !== null ? "E" : "A";
@@ -436,7 +436,7 @@ const AddBuilding = () => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -459,7 +459,7 @@ const AddBuilding = () => {
                     {currentMenu?.UPDATE_RIGHTS === "True" && (
                       <Button
                         className="Primary_Button  w-20 me-2"
-                        label={t("Save")}
+                        label={ ("Save")}
                         onClick={handleSubmit(onSubmit)}
                         disabled={IsSubmit}
                       />
@@ -470,7 +470,7 @@ const AddBuilding = () => {
                     {currentMenu?.ADD_RIGHTS === "True" && (
                       <Button
                         className="Primary_Button  w-20 me-2"
-                        label={t("Save")}
+                        label={ ("Save")}
                         onClick={handleSubmit(onSubmit)}
                         disabled={IsSubmit}
                       />
@@ -480,7 +480,7 @@ const AddBuilding = () => {
               </>
               <Button
                 className="Secondary_Button  w-20"
-                label={t("List")}
+                label={ ("List")}
                 onClick={() => showHandler()}
               />
             </div>
@@ -523,7 +523,7 @@ const AddBuilding = () => {
                     return (
                       <InputField
                         {...register("FACILITY_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label={"Building Name"}
                         require={true}
@@ -545,7 +545,7 @@ const AddBuilding = () => {
                     return (
                       <InputField
                         {...register("FACILITY_LEGAL_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         setValue={setValue}
                         require={true}
@@ -653,7 +653,7 @@ const AddBuilding = () => {
                         options={dateFormatType}
                         optionLabel="DATE_FORMAT"
                         {...register("DATEFORMAT", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label={"Date Format"}
                         findKey={"DATE_FORMAT"}
@@ -720,7 +720,7 @@ const AddBuilding = () => {
                     return (
                       <InputField
                         {...register("FACILITY_ADDRESS", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         require={true}
                         label={"Address"}
@@ -796,7 +796,7 @@ const AddBuilding = () => {
                     return (
                       <InputField
                         {...register("FACILITY_COUNTRY", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           validate: (fieldValue: any) => {
                             return validation?.onlyAlphabet(
                               fieldValue,
@@ -823,7 +823,7 @@ const AddBuilding = () => {
                     return (
                       <InputField
                         {...register("FACILITY_ZIP", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           validate: (fieldValue: any) => {
                             return validation?.onlyNumber(
                               fieldValue,
@@ -856,7 +856,7 @@ const AddBuilding = () => {
                         options={timeZone}
                         optionLabel="TIMEZONE_NAME"
                         {...register("TIMEZONE", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label={"Time Zone"}
                         require={true}
@@ -881,7 +881,7 @@ const AddBuilding = () => {
                     return (
                       <Select
                         {...register("WO_ASSIGN", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         options={assestTypeLabel}
                         label={"Work Order Assign"}
@@ -906,7 +906,7 @@ const AddBuilding = () => {
                       <MultiSelects
                         options={dashbaordConfigurationList}
                         {...register("KF_DASHBOARD_FACILITY_LIST", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label="Dashboard Configuartion"
                         optionLabel="DASHBOARD_BOX_NAME"
@@ -1128,7 +1128,7 @@ const AddBuilding = () => {
                 <div className=" grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3">
                   <div className="col-span-2 border-r">
                     <div className="">
-                      <h6>{t("Working Schedule")}</h6>
+                      <h6>{ ("Working Schedule")}</h6>
                     </div>
 
                     <HolidayList
@@ -1148,7 +1148,7 @@ const AddBuilding = () => {
                               options={weekList}
                               optionLabel="WEEKOFF_DESC"
                               {...register("WEEKOFF", {
-                                required: t("Please fill the required fields."),
+                                required:  ("Please fill the required fields."),
                               })}
                               require={true}
                               label={"Weekoff"}
@@ -1167,7 +1167,7 @@ const AddBuilding = () => {
                     <hr className="mt-2"></hr>
                     <div className="mb-2">
                       <label className="Text_Primary Table_Header">
-                        {t("If PPM schedule date is on week off or holiday")}
+                        { ("If PPM schedule date is on week off or holiday")}
                       </label>
                     </div>
 
@@ -1187,7 +1187,7 @@ const AddBuilding = () => {
                           htmlFor="WeekOff1"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Prepone A Day Before")}
+                          { ("Prepone A Day Before")}
                         </label>
                       </div>
 
@@ -1206,7 +1206,7 @@ const AddBuilding = () => {
                           htmlFor="WeekOff2"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Postpone A Day After")}
+                          { ("Postpone A Day After")}
                         </label>
                       </div>
 
@@ -1225,7 +1225,7 @@ const AddBuilding = () => {
                           htmlFor="WeekOff3"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Keep On Same Day")}
+                          { ("Keep On Same Day")}
                         </label>
                       </div>
                     </div>

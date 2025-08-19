@@ -13,7 +13,7 @@ import FormHeader from '../../../components/FormHeader/FormHeader';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { saveTracker } from '../../../utils/constants';
 const RectifyCommentMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const getId: any = localStorage.getItem("Id")
@@ -32,8 +32,8 @@ const RectifyCommentMasterForm = (props: any) => {
   } = useForm({
     defaultValues: {
       MODE: props?.selectedData || search === '?edit=' ? 'E' : 'A',
-      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": t('Updated') }
-        : { "para1": `${props?.headerName}`, "para2": t('Added') },
+      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2":  ('Updated') }
+        : { "para1": `${props?.headerName}`, "para2":  ('Added') },
       RECT_ID: props?.selectedData ? props?.selectedData?.RECT_ID : search === '?edit=' ? dataId?.RECT_ID : 0,
       COMMENT_DESC: props?.selectedData ? props?.selectedData?.COMMENT_DESC : search === '?edit=' ? dataId?.COMMENT_DESC : "",
       ACTIVE: search === "?edit=" ? dataId?.ACTIVE : true,
@@ -70,7 +70,7 @@ const RectifyCommentMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -92,7 +92,7 @@ const RectifyCommentMasterForm = (props: any) => {
           />
           <Card className='mt-2'>
             <div className={`${errors?.COMMENT_DESC ? "errorBorder" : ""}`}>
-              <label className="Text_Secondary Input_Label">{t("Comment")} <span className="text-red-600"> *</span></label>
+              <label className="Text_Secondary Input_Label">{ ("Comment")} <span className="text-red-600"> *</span></label>
               <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
                 <Field
                   controller={{
@@ -102,8 +102,8 @@ const RectifyCommentMasterForm = (props: any) => {
                       return (
                         <InputTextarea
                           {...register("COMMENT_DESC", {
-                            required: t("Please fill the required fields."),
-                            validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                            required:  ("Please fill the required fields."),
+                            validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                           })}
                           require={true}
                           label="Comment"

@@ -161,7 +161,7 @@ const VendorSorDialogBox = ({
                 <Button
                     type="button"
                     className="Primary_Button "
-                    label={t("Add Part")}
+                    label={("Add Part")}
                     onClick={() => setDialogVisible()}
                 />
             </div>
@@ -177,7 +177,7 @@ const VendorSorDialogBox = ({
 
                     <div className="">
                         <div className="flex flex-wrap justify-between mb-2">
-                            <h6>{t("Part Details")}</h6>
+                            <h6>{("Part Details")}</h6>
                             <div className="flex gap-2">
                                 <Field
                                     controller={{
@@ -250,7 +250,7 @@ const VendorSorDialogBox = ({
                             <DataTable
                                 value={part}
                                 showGridlines
-                                emptyMessage={t("No Data found.")}
+                                emptyMessage={("No Data found.")}
                                 selectionMode={rowClick ? null : "multiple"}
                                 selection={selectedParts}
                                 onSelectionChange={(e: any) => setSelectedParts(e.value)}
@@ -263,10 +263,10 @@ const VendorSorDialogBox = ({
                                     selectionMode="multiple"
                                     headerStyle={{ width: "3rem" }}
                                 ></Column>
-                                <Column field="PART_CODE" header={t("Part Code")}></Column>
-                                <Column field="PART_NAME" header={t("Part Name")} ></Column>
-                                <Column field="ASSETTYPE_NAME" header={t("Equipment Type")}></Column>
-                                <Column field="STORE_NAME" header={t("Store Name")} ></Column>
+                                <Column field="PART_CODE" header={("Part Code")}></Column>
+                                <Column field="PART_NAME" header={("Part Name")} ></Column>
+                                <Column field="ASSETTYPE_NAME" header={("Equipment Type")}></Column>
+                                <Column field="STORE_NAME" header={("Store Name")} ></Column>
                             </DataTable>
                         </div>
                     </div>
@@ -275,7 +275,7 @@ const VendorSorDialogBox = ({
                             <Button
                                 type="button"
                                 className="Primary_Button  w-28 me-2"
-                                label={t("Save")}
+                                label={("Save")}
                                 onClick={(e: any) => {
                                     handlerPartSave(e)
 
@@ -283,7 +283,7 @@ const VendorSorDialogBox = ({
                             />
                             <Button
                                 className="Secondary_Button w-28 "
-                                label={t("Cancel")}
+                                label={("Cancel")}
                                 onClick={handleCancel}
                             />
                         </div>

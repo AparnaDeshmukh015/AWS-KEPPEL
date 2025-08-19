@@ -161,7 +161,7 @@ const Table = (props: any) => {
         className="primeTable"
         value={filterData?.slice(first, first + rows)}
         showGridlines
-        emptyMessage={t("No Data found.")}
+        emptyMessage={("No Data found.")}
         dataKey={props?.dataKey}
         key={props?.dataKey}
         // loading={loading}
@@ -193,7 +193,7 @@ const Table = (props: any) => {
               <Column
                 key={title?.id}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 sortable
                 body={(rowData: any) => {
                   const rowItem: any = { ...rowData };
@@ -252,7 +252,7 @@ const Table = (props: any) => {
               <Column
                 key={title}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>
@@ -280,7 +280,7 @@ const Table = (props: any) => {
                 key={title}
                 field={title}
                 sortable
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>
@@ -302,7 +302,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return <>{formateDate(rowData?.WO_CREATED_TIME)}</>;
                 }}
@@ -314,7 +314,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return <>{formateDate(rowData?.WO_CREATED_TIME)}</>;
                 }}
@@ -326,7 +326,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return <>{onlyDateFormat(rowData?.DOC_DATE)}</>;
                 }}
@@ -338,7 +338,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>
@@ -359,7 +359,7 @@ const Table = (props: any) => {
                 key={title}
                 field={title}
                 sortable
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   if (
                     rowData[title] === "Y" ||
@@ -386,7 +386,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   if (rowData?.SEVERITY === "High") {
                     return (
@@ -434,7 +434,7 @@ const Table = (props: any) => {
                 key={title}
                 className="w-28"
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>{rowData[title] === true ? "Cancelled" : "Received"}</>
@@ -447,7 +447,7 @@ const Table = (props: any) => {
               <Column
                 key={title}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>{rowData[title] === "A" ? "Equipment" : "Soft Service"}</>
@@ -460,7 +460,7 @@ const Table = (props: any) => {
               <Column
                 key={title}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 body={(rowData: any) => {
                   return (
                     <>
@@ -509,7 +509,7 @@ const Table = (props: any) => {
               <Column
                 key={title}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={(`${customHeader[title]}`)}
                 sortable
               ></Column>
             );

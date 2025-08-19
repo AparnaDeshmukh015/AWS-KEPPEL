@@ -23,7 +23,7 @@ import { validation } from "../../../utils/validation";
 
 const UserRoleMasterForm = (props: any) => {
   
-  const { t } = useTranslation();
+  const {   } = useTranslation();
 
   let [roletypeOptions, setRoletypeOptions] = useState([]);
   const genericLabel = [
@@ -135,7 +135,7 @@ const UserRoleMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -158,7 +158,7 @@ const UserRoleMasterForm = (props: any) => {
                     return (
                       <InputField
                         {...register("ROLE_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           // 
                           validate: (fieldValue: any) => {
                             return validation?.onlyAlphaNumericWhiteSpace(fieldValue, "ROLE_NAME", setValue);
@@ -215,7 +215,7 @@ const UserRoleMasterForm = (props: any) => {
                       <>
                         <Radio
                           {...register("FACILITY_GENERIC", {
-                            required: t("Please fill the required fields."),
+                            required:  ("Please fill the required fields."),
                           })}
                           labelHead="Building Generic"
                           options={genericLabel}

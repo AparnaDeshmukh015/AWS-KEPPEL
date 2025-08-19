@@ -25,7 +25,7 @@ import { readUploadFile, TemplateBuildingDownload, TemplateDownload } from '../.
 import { FileUpload } from 'primereact/fileupload';
 import { PATH } from '../../../utils/pagePath';
 const NewInfraScheduleMaster = (props: any) => {
-    const { t } = useTranslation();
+    const {   } = useTranslation();
     let { pathname } = useLocation();
     const [selectedFacility, menuList]: any = useOutletContext();
     const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL).filter((detail: any) => detail.URL === pathname)[0]
@@ -308,8 +308,8 @@ const NewInfraScheduleMaster = (props: any) => {
             })),
             SCHEDULE_ID: selectedSchedule?.SCHEDULE_ID,
             PARA: hasAsset
-                ? { para1: `Equipment has been`, para2: t("Updated") }
-                : { para1: `Equipment has been`, para2: t("Added") },
+                ? { para1: `Equipment has been`, para2:  ("Updated") }
+                : { para1: `Equipment has been`, para2:  ("Added") },
         }
 
         // return
@@ -460,7 +460,7 @@ const NewInfraScheduleMaster = (props: any) => {
                             onClick={() => navigate(PATH.INFRA_SCHEDULE_ADD)}
                         />
                         <SplitButton
-                            label={t("Action")}
+                            label={ ("Action")}
                             className="Primary_SplitButton mr-2"
                             model={Actionitems}
                         />

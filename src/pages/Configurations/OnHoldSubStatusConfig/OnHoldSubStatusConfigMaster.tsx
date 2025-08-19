@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import FormHeader from "../../../components/FormHeader/FormHeader";
 
 const OnHoldSubStatusConfigMaster = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [IsSubmit, setIsSubmit] = useState<any|null>(false);
  
   const {
@@ -39,7 +39,7 @@ const OnHoldSubStatusConfigMaster = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -62,7 +62,7 @@ const OnHoldSubStatusConfigMaster = (props: any) => {
                   return (
                     <InputField
                       {...register("ON_HOLD_SUBSTATUS", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       require={true}
                       label="On Hold Substatus Name"

@@ -28,7 +28,7 @@ const AssetSchedule = ({
   task,
   setWeek,
 }: any) => {
-  const { t } = useTranslation();
+ 
   const watchScheduler = watchAll?.SCHEDULER;
   let scheduleWatch: any = watchAll?.SCHEDULE_ID;
   const [taskList, setTaskList] = useState<any | null>(task);
@@ -131,7 +131,7 @@ const AssetSchedule = ({
                     {...register(registerName,
 
                       {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                         validate: (fieldValue: any) => {
 
                           if (parseInt(fieldValue) === 0) {
@@ -264,7 +264,7 @@ const AssetSchedule = ({
                   <>
                     <Radio
                       {...register(registerName, {
-                        required: t("Please fill the required fields.."),
+                        required:  ("Please fill the required fields.."),
                       })}
                       options={options}
                       selectedData={selectedData}
@@ -539,7 +539,7 @@ const AssetSchedule = ({
       {/* Schedule List */}
       <Card className="mt-2">
         <h6 className=" Text_Primary mb-2" style={{ fontSize: "16px" }}>
-          {t("Create Schedule")}
+          { ("Create Schedule")}
         </h6>
         <div className=" flex justify-between">
 
@@ -558,7 +558,7 @@ const AssetSchedule = ({
             <div className="flex justify-start mb-2">
               <div className="w-36">
                 <label className="Text_Secondary Input_Label mr-2">
-                  {t("Repeat")}
+                  { ("Repeat")}
                   <span className="text-red-600"> *</span>
                 </label>
               </div>
@@ -577,7 +577,7 @@ const AssetSchedule = ({
                                 !watchAll?.SCHEDULE_ID &&
                                 !watchScheduler?.PERIOD
                               ) {
-                                return t("Please fill the required fields.");
+                                return  ("Please fill the required fields.");
                               }
                               return true;
                             },
@@ -931,7 +931,7 @@ const AssetSchedule = ({
                           return (
                             <InputField
                               {...register("SCHEDULER.RUN_HOURS", {
-                                required: t("Please fill the required fields."),
+                                required:  ("Please fill the required fields."),
                                 validate: (value: any) => {
                                   if (parseInt(value) === 0) {
                                     var val = validation?.NonZeroNumber(
@@ -1074,7 +1074,7 @@ const AssetSchedule = ({
         <>
           <Card className="col-span-2 mt-2">
             <h6 className=" Text_Primary mb-2" style={{ fontSize: "18px" }}>
-              {t("Task Details")}
+              { ("Task Details")}
             </h6>
             <div className="flex items-center mt-2 justify-center w-full">
               <label
@@ -1086,7 +1086,7 @@ const AssetSchedule = ({
                   <img src={noDataIcon} alt="" className="w-12" />
                   <p className="mb-2 mt-2 text-sm text-gray-500  dark:text-gray-400">
                     <span className="Text_Primary Input_Label">
-                      {t("No task to show")}{" "}
+                      { ("No task to show")}{" "}
                     </span>
                   </p>
                 </div>

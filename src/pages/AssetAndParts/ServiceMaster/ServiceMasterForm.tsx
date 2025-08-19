@@ -31,7 +31,7 @@ const ServiceMasterForm = (props: any) => {
   const { search } = useLocation();
   const navigate = useNavigate();
   const location: any = useLocation();
-  const { t } = useTranslation();
+  
   const [options, setOptions] = useState<any>({});
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
 
@@ -103,8 +103,8 @@ const ServiceMasterForm = (props: any) => {
       ASSET_NONASSET: "N",
       PARA:
         props?.selectedData || search === "?edit="
-          ? { para1: `${props?.headerName}`, para2: t("Updated") }
-          : { para1: `${props?.headerName}`, para2: t("Added") },
+          ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+          : { para1: `${props?.headerName}`, para2:  ("Added") },
       SCHEDULE_ID: 0,
       SCHEDULER: {
         ASSET_NONASSET: "N",
@@ -571,13 +571,13 @@ const ServiceMasterForm = (props: any) => {
         Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (
       !isSubmitting &&
       (firstError?.type === "required" || firstError?.type === "validate")
     ) {
       const check: any = firstError?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -592,7 +592,7 @@ const ServiceMasterForm = (props: any) => {
           <div className="flex justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {t(`${search === "?edit=" ? "Edit" : "Add"}`)}{" "}
+                { (`${search === "?edit=" ? "Edit" : "Add"}`)}{" "}
                 {props?.headerName}{" "}
               </h6>
             </div>
@@ -621,7 +621,7 @@ const ServiceMasterForm = (props: any) => {
 
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Service Details")}</p>
+              <p>{ ("Service Details")}</p>
             </div>
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
               <Field
@@ -633,7 +633,7 @@ const ServiceMasterForm = (props: any) => {
                       <Select
                         options={options?.location}
                         {...register("LOCATION", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label="Location"
                         require={true}
@@ -675,7 +675,7 @@ const ServiceMasterForm = (props: any) => {
                     return (
                       <InputField
                         {...register("ASSET_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label="Name"
                         require={true}
@@ -696,7 +696,7 @@ const ServiceMasterForm = (props: any) => {
                       <Select
                         options={options?.assetGroup}
                         {...register("GROUP", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           onChange: async (e: any) => {
 
                             await getRequestList(
@@ -729,7 +729,7 @@ const ServiceMasterForm = (props: any) => {
                       <Select
                         options={typeList}
                         {...register("TYPE", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           onChange: () => {
                             setAssetTypeState(true)
                             // setIdSchedule(0)
@@ -750,7 +750,7 @@ const ServiceMasterForm = (props: any) => {
                 }}
               />
               <div className="col-span-1">
-                <label className="Text_Secondary Input_Label">{t("Description")}</label>
+                <label className="Text_Secondary Input_Label">{ ("Description")}</label>
                 <Field
                   controller={{
                     name: "ASSET_DESC",
@@ -771,7 +771,7 @@ const ServiceMasterForm = (props: any) => {
                   }}
                 />
                 <label className={` ${Descriptionlength === 400 ? "text-red-600" : "Text_Secondary"} Helper_Text`}>
-                  {t(`Up to ${Descriptionlength}/400 characters.`)}
+                  { (`Up to ${Descriptionlength}/400 characters.`)}
                 </label>
               </div>
               <div className="flex align-items-center gap-4">
@@ -826,7 +826,7 @@ const ServiceMasterForm = (props: any) => {
                             {...register("AMC_EXPIRY_DATE", {
                               required:
                                 MANINTENANCE === true
-                                  ? t("Please Fill the Required Fields.")
+                                  ?  ("Please Fill the Required Fields.")
                                   : "",
                             })}
                             label="AMC Expiry Date"
@@ -856,7 +856,7 @@ const ServiceMasterForm = (props: any) => {
                             {...register("AMC_VENDOR", {
                               required:
                                 MANINTENANCE === true
-                                  ? t("Please fill the required fields.")
+                                  ?  ("Please fill the required fields.")
                                   : "",
                             })}
                             label="AMC Vendor"
@@ -971,7 +971,7 @@ const ServiceMasterForm = (props: any) => {
                     return (
                       <DateCalendar
                         {...register("COMMISSIONING_DATE", {})}
-                        label={t("Commissioning Date")}
+                        label={ ("Commissioning Date")}
                         showIcon
                         setValue={setValue}
                         {...field}

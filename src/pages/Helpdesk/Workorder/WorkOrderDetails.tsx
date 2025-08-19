@@ -3,13 +3,13 @@ import Table from "../../../components/Table/Table";
 import { useTranslation } from "react-i18next";
 
 export const WorkOrderDetails = ({ optionsDoc }: any) => {
-  const { t } = useTranslation();
+ 
   return (
     <>
       <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-2 lg:grid-cols-2">
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Workorder Documents")}</p>
+            <p>{ ("Workorder Documents")}</p>
           </div>
           <Table
             columnTitle={["DOC_NAME", "UPLOADEDBY"]}
@@ -21,7 +21,7 @@ export const WorkOrderDetails = ({ optionsDoc }: any) => {
         </Card>
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Asset Related Documents")}</p>
+            <p>{ ("Asset Related Documents")}</p>
           </div>
           <Table
             columnTitle={["DOC_NAME", "UPLOADEDBY"]}

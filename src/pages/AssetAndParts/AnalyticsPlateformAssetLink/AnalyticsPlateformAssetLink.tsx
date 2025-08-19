@@ -14,7 +14,7 @@ import { saveTracker } from '../../../utils/constants';
 import { useLocation, useOutletContext } from 'react-router-dom';
 
 const AnalyticsPlateformAssetLink = (props: any) => {
-    const { t } = useTranslation();
+    const {   } = useTranslation();
     let { pathname } = useLocation();
     const [, menuList]: any = useOutletContext();
     const currentMenu = menuList
@@ -34,8 +34,8 @@ const AnalyticsPlateformAssetLink = (props: any) => {
     } = useForm({
         defaultValues: {
             MODE: props?.selectedData || search === '?edit=' ? 'E' : 'A',
-            PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": t("Updated") }
-                : { "para1": `${props?.headerName}`, "para2": t("Added") },
+            PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2":  ("Updated") }
+                : { "para1": `${props?.headerName}`, "para2":  ("Added") },
 
             ACTIVE: search === '?edit=' ? dataId?.ACTIVE  : true,
             OBEM_ASSET_ID: props?.selectedData ? props?.selectedData?.OBEM_ASSET_ID : search === '?edit=' ? dataId?.OBEM_ASSET_ID : '',
@@ -87,7 +87,7 @@ const AnalyticsPlateformAssetLink = (props: any) => {
     useEffect(() => {
         if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
             const check: any = Object?.values(errors)[0]?.message;
-            toast?.error(t(check));
+            toast?.error( (check));
         }
     }, [isSubmitting]);
 
@@ -119,8 +119,8 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                         return (
                                             <InputField
                                                 {...register("OBEM_ASSET_ID", {
-                                                    required: t("Please fill required fields."),
-                                                    validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                                    required:  ("Please fill required fields."),
+                                                    validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                                 })}
                                                 require={true}
                                                 label="Obem Equipment Id"
@@ -140,8 +140,8 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                         return (
                                             <InputField
                                                 {...register("OBEM_ASSET_NAME", {
-                                                    required: t("Please fill required fields."),
-                                                    validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                                    required:  ("Please fill required fields."),
+                                                    validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                                 })}
                                                 require={true}
                                                 label="Obem Equipment Name"
@@ -160,8 +160,8 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                         return (
                                             <InputField
                                                 {...register("SPACE_ID", {
-                                                    required: t("Please fill required fields."),
-                                                    validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                                    required:  ("Please fill required fields."),
+                                                    validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                                 })}
                                                 require={true}
                                                 label="Space Id"
@@ -180,8 +180,8 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                         return (
                                             <InputField
                                                 {...register("SPACE_NAME", {
-                                                    required: t("Please fill required fields."),
-                                                    validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                                    required:  ("Please fill required fields."),
+                                                    validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                                 })}
                                                 require={true}
                                                 label="Space Name"
@@ -201,7 +201,7 @@ const AnalyticsPlateformAssetLink = (props: any) => {
                                             <Select
                                                 options={options?.assestOptions?.filter((f: any) => f?.ASSET_NONASSET === "A")}
                                                 {...register("ASSET", {
-                                                    required: t("Please fill the required fields."),
+                                                    required:  ("Please fill the required fields."),
                                                 })}
                                                 label="Equipment"
                                                 require={true}

@@ -134,7 +134,7 @@ const WoDocumentUpload = ({
             (doc: any) => doc?.DOC_NAME === file?.name && doc.UPLOAD_TYPE === uploadtype
           );
           if (sameFileName.length !== 0) {
-            toast.error(t("This file already exists"));
+            toast.error(("This file already exists"));
             e.target.value = null;
             setLoading(false)
             setIsSubmit(false)
@@ -159,20 +159,20 @@ const WoDocumentUpload = ({
                     DOC_SIZE: (file.size / 1024).toFixed(2),
                   });
                 } else {
-                  toast.error(t("The max file size is 5 Mb"));
+                  toast.error(("The max file size is 5 Mb"));
                   e.target.value = null;
                   setIsSubmit(false)
                   setLoading(false)
                   return;
                 }
               } else {
-                toast.error(t("Only 5 files are allowed"));
+                toast.error(("Only 5 files are allowed"));
                 setIsSubmit(false)
                 setLoading(false)
                 return;
               }
             } else {
-              toast.error(t("This file already exists"));
+              toast.error(("This file already exists"));
               e.target.value = null;
               setLoading(false)
               setIsSubmit(false)
@@ -185,7 +185,7 @@ const WoDocumentUpload = ({
           }
         } else {
 
-          toast.error(t("You can upload only JPG ,PNG ,Word ,Excel & Pdf files."));
+          toast.error(("You can upload only JPG ,PNG ,Word ,Excel & Pdf files."));
           setLoading(false)
           setIsSubmit(false)
         }
@@ -243,15 +243,15 @@ const WoDocumentUpload = ({
     e.preventDefault();
     e.stopPropagation();
     if (isDropping === true) {
-      toast.error(t("Please wait for the file to be scanned."));
+      toast.error(("Please wait for the file to be scanned."));
       return;
     }
     if (fileStatus === true) {
-      toast.error(t("Please wait for the file to be scanned."));
+      toast.error(("Please wait for the file to be scanned."));
       return;
     }
     if (fileStatus === true) {
-      toast.error(t("Please wait for the file to be scanned."));
+      toast.error(("Please wait for the file to be scanned."));
       return;
     }
     setIsSubmit(true);
@@ -272,7 +272,7 @@ const WoDocumentUpload = ({
 
     if (duplicateList.length > 0) {
       //e.target.value = null;
-      toast.error(t("This file already exists"));
+      toast.error(("This file already exists"));
       setLoading(false)
       setIsSubmit(false)
       setIsDropping(false)
@@ -322,7 +322,7 @@ const WoDocumentUpload = ({
                   });
                   setIsDropping(false)
                 } else {
-                  toast.error(t("The max file size is 5 Mb"));
+                  toast.error(("The max file size is 5 Mb"));
                   //  e.target.value = null;
                   setIsSubmit(false)
                   setLoading(false)
@@ -330,7 +330,7 @@ const WoDocumentUpload = ({
                   return;
                 }
               } else {
-                toast.error(t("Only 5 files are allowed"));
+                toast.error(("Only 5 files are allowed"));
                 setIsSubmit(false)
                 setLoading(false)
                 setIsDropping(false)
@@ -352,7 +352,7 @@ const WoDocumentUpload = ({
             }
           } else {
 
-            toast.error(t("You can upload only JPG ,PNG ,Word ,Excel & Pdf files."));
+            toast.error(("You can upload only JPG ,PNG ,Word ,Excel & Pdf files."));
             setLoading(false)
             setIsSubmit(false)
             setIsDropping(false)
@@ -395,7 +395,7 @@ const WoDocumentUpload = ({
         ) : (<>
         </>)}
         {CurrDocData?.length === 0 ? (
-          <><p className="Text_Secondary Input_Label"> {t(uploadLabel)}{uploadSupportMandatory === true ? <span className="text-red-600"> *</span> : <></>}</p></>
+          <><p className="Text_Secondary Input_Label"> {(uploadLabel)}{uploadSupportMandatory === true ? <span className="text-red-600"> *</span> : <></>}</p></>
         ) : (<> </>)}
         {CurrDocData?.length === 5 ? (
           <>
@@ -421,16 +421,16 @@ const WoDocumentUpload = ({
 
                 <p className="mb-2 mt-2 text-sm text-gray-500 cursor-pointer dark:text-gray-400">
                   <span className="Text_Primary Input_Label">
-                    {t("Upload your file")}{" "}
+                    {("Upload your file")}{" "}
                   </span>
                 </p>
                 <label className="Text_Secondary Helper_Text">
-                  {t("JPG, PNG, Word, Excel & Pdf formats")}
+                  {("JPG, PNG, Word, Excel & Pdf formats")}
 
                 </label>
                 <label className="Text_Secondary Helper_Text mb-4">
-                  {t("")}
-                  {t("Maximum file size of 5MB")}
+                  {("")}
+                  {("Maximum file size of 5MB")}
 
                 </label>
               </div>
@@ -466,7 +466,7 @@ const WoDocumentUpload = ({
         {CurrDocData?.length <= 0 ? (
           <>
             <label className="Text_Secondary Helper_Text">
-              {t("Up to 5 files are allowed")}
+              {("Up to 5 files are allowed")}
             </label></>
         ) : (<> </>)}
 

@@ -10,7 +10,7 @@ const Buttons = (props: any) => {
       type={props?.type || "button"}
       className={`${props?.className}`}
       disabled={props?.disabled ? props.disabled : false}
-      label={t(`${props?.label}`)}
+      label={(`${props?.label}`)}
     />
 
   );

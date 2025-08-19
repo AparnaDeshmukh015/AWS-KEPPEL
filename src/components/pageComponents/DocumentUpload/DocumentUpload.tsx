@@ -85,11 +85,11 @@ const DocumentUpload = ({
                 });
                 e.target.value = null;
               } else {
-                toast.error(t("Upload only 5 files"));
+                toast.error(("Upload only 5 files"));
               }
               setLoading(false);
             } else {
-              toast.error(t("Same file name can not upload"));
+              toast.error(("Same file name can not upload"));
             }
           } else {
             setLoading(false);
@@ -100,7 +100,7 @@ const DocumentUpload = ({
           toast.error(err);
         });
     } else {
-      toast.error(t("Can not upload this file "));
+      toast.error(("Can not upload this file "));
       setLoading(false);
     }
   };
@@ -116,7 +116,7 @@ const DocumentUpload = ({
   return (
     <div>
       <div className="headingConainer">
-        <p>{t("Document Upload")}</p>
+        <p>{("Document Upload")}</p>
       </div>
       <div className="mt-2">
         {loading ? (
@@ -150,11 +150,11 @@ const DocumentUpload = ({
                 <img src={FileUploads} alt="" className="w-40" />
                 <p className="mb-2 text-sm text-gray-500 cursor-pointer dark:text-gray-400">
                   <span className="Text_Primary Input_Label">
-                    {t("Upload your file")}{" "}
+                    {("Upload your file")}{" "}
                   </span>
                 </p>
                 <label className="Text_Secondary Helper_Text">
-                  {t("Document Format")}
+                  {("Document Format")}
                 </label>
               </div>
 

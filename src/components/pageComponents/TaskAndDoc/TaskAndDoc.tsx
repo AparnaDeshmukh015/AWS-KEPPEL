@@ -18,7 +18,7 @@ const TaskAndDoc = ({
   //   name: "SCHEDULER.SCHEDULE_TASK_D",
   //   control,
   // });
-  const { t } = useTranslation();
+ 
   //const [tasklist, setTasklistOptions] = useState<any | null>([]);
 
   
@@ -54,7 +54,7 @@ const TaskAndDoc = ({
       {tasklistOptions?.length !== 0 && (
         <div className="">
           <h6 className=" Text_Primary mb-2" style={{ fontSize: "18px" }}>
-            {t("Task Details")}
+            {("Task Details")}
           </h6>
 
           <div>

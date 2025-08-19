@@ -58,7 +58,7 @@ type FormErrors = {
 
 const IssueMaterialForm = (props: any) => {
   const { search } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [options, setOptions] = useState<any | null>([]);
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const [materialNo, setMaterialNO] = useState<[] | null>([]);
@@ -314,7 +314,7 @@ const IssueMaterialForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -399,7 +399,7 @@ const IssueMaterialForm = (props: any) => {
                       <Select
                         options={options?.storeList}
                         {...register("STORE_ID", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label="Store Name"
                         require={true}
@@ -523,7 +523,7 @@ const IssueMaterialForm = (props: any) => {
                           return (
                             <InputField
                               {...register("WO_NO", {
-                                required: t("Please fill the required fields."),
+                                required:  ("Please fill the required fields."),
                               })}
                               label="Work Order No"
                               setValue={setValue}
@@ -547,7 +547,7 @@ const IssueMaterialForm = (props: any) => {
                           return (
                             <InputField
                               {...register("ASSET_NAME", {
-                                required: t("Please fill the required fields."),
+                                required:  ("Please fill the required fields."),
                               })}
                               label="Equipment Name"
                               setValue={setValue}
@@ -580,14 +580,14 @@ const IssueMaterialForm = (props: any) => {
           </Card>
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Part Details")}</p>
+              <p>{ ("Part Details")}</p>
             </div>
             <div>
               <div>
                 <DataTable value={PART_LIST} showGridlines>
                   <Column
                     field="SR_NO"
-                    header={t("Sr No")}
+                    header={ ("Sr No")}
                     className="w-20"
                     body={(rowData, { rowIndex }) => {
                       return <>{rowIndex + 1}</>;
@@ -595,27 +595,27 @@ const IssueMaterialForm = (props: any) => {
                   ></Column>
                   <Column
                     field="PART_CODE"
-                    header={t("Part Code")}
+                    header={ ("Part Code")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="PART_NAME"
-                    header={t("Part Name")}
+                    header={ ("Part Name")}
                     className=""
                   ></Column>
                   <Column
                     field="STOCK"
-                    header={t("Stock Available")}
+                    header={ ("Stock Available")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="QTY"
-                    header={t("Requested Quantity")}
+                    header={ ("Requested Quantity")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="PENDING_QTY"
-                    header={t("Pending Quantity")}
+                    header={ ("Pending Quantity")}
                     className="w-40"
                     body={(rowData: any) => {
                       return (
@@ -627,7 +627,7 @@ const IssueMaterialForm = (props: any) => {
                   ></Column>
                   <Column
                     field="ISSUED_QTY"
-                    header={t("Issue Quantity")}
+                    header={ ("Issue Quantity")}
                     className="w-40"
                     body={(rowData, { rowIndex }) => {
                       return (
@@ -678,7 +678,7 @@ const IssueMaterialForm = (props: any) => {
                   ></Column>
                   <Column
                     field="CLOSE_IND"
-                    header={t("Close")}
+                    header={ ("Close")}
                     className="w-40"
                     body={(rowData: any, { rowIndex }) => {
                       return (

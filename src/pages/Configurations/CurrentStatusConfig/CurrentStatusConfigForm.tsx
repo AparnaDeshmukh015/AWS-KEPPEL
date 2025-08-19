@@ -13,7 +13,7 @@ import { saveTracker } from "../../../utils/constants";
 import { useLocation, useOutletContext } from "react-router-dom";
 
 const CurrentStatusConfigForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   //const [deleteItem, setDeleteItem] = useState(false);
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
@@ -90,7 +90,7 @@ const CurrentStatusConfigForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || ((!isSubmitting && Object?.values(errors)[0]?.type === "validate"))) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -121,7 +121,7 @@ const CurrentStatusConfigForm = (props: any) => {
                       <InputField
                         {...register("CS_DESC", {
                           required: "Please fill the required fields",
-                          validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                         })}
                         label="Status Description"
                         require={true}

@@ -301,7 +301,7 @@ const ServiceTypeMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("ASSETTYPE_NAME", {
-                        // required: t("Please fill the required fields."),
+                        // required:  ("Please fill the required fields."),
                       })}
                       label="Service Type Name"
                       // require={true}

@@ -14,7 +14,7 @@ const MultiSelects = (props: any) => {
     return (
         <>
             <label className='Text_Secondary Input_Label'>
-                {props?.label && t(`${props?.label}`)} {props?.require && <span className="text-red-600"> *</span>}
+                {props?.label && (`${props?.label}`)} {props?.require && <span className="text-red-600"> *</span>}
             </label>
             <div className={`${props?.invalid ? "errorBorder" : ""}`}>
                 <MultiSelect
@@ -22,7 +22,7 @@ const MultiSelects = (props: any) => {
                     options={props?.options}
                     optionLabel={props?.optionLabel}
                     filter
-                    placeholder={props?.isLocation ? t(`Select Location`) : t(`Please Select`)}
+                    placeholder={props?.isLocation ? (`Select Location`) : (`Please Select`)}
                     // maxSelectedLabels={props?.maxSelectedLabels || 4}
                     {...props}
                 />

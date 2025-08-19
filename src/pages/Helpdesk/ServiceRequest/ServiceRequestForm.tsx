@@ -31,7 +31,7 @@ import { dateFormat } from "../../../utils/constants";
 const ServiceRequest = (props: any) => {
   let { pathname } = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [selectedWoList, setSelectedWoList] = useState<any>(null);
   const [rowClick, setRowClick] = useState<boolean>(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -428,18 +428,18 @@ const ServiceRequest = (props: any) => {
       <>
         <div className="mb-4 flex flex-wrap justify-between">
           <div>
-            {/* <h6 className="Text_Primary mr-2">{t(props?.FUNCTION_DESC)}</h6> */}
+            {/* <h6 className="Text_Primary mr-2">{ (props?.FUNCTION_DESC)}</h6> */}
             <h6 className="Text_Primary mr-2">{"All Service Request"}</h6>
 
           </div>
           <div>
             <Buttons
               className="Secondary_Button me-2"
-              label={t("Export")}
+              label={ ("Export")}
             />
             <Buttons
               className="Primary_Button me-2"
-              label={t("Add Service Request")}
+              label={ ("Add Service Request")}
               icon="pi pi-plus"
               onClick={props?.isForm}
             />
@@ -450,7 +450,7 @@ const ServiceRequest = (props: any) => {
           header={tableHeaderFun}
           filters={filters}
           showGridlines
-          emptyMessage={t("No Data found.")}
+          emptyMessage={ ("No Data found.")}
           selectionMode={"checkbox"}
           globalFilterFields={[
             "LOCATION_NAME",

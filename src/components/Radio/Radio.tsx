@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import "./Radio.css"
 const Radio = (props: any) => {
-    const { t } = useTranslation();
+    const {   } = useTranslation();
     const [selectedCategory, setSelectedCategory] = useState<any>("");
     useEffect(() => {
         if (props?.selectedData) {
@@ -14,7 +14,7 @@ const Radio = (props: any) => {
 
     return (
         <>
-            <label className='Text_Secondary Input_Label'> {props?.labelHead && t(`${props?.labelHead}`)}</label>
+            <label className='Text_Secondary Input_Label'> {props?.labelHead && (`${props?.labelHead}`)}</label>
             <div className='flex flex-wrap gap-5 mt-1'>
                 {props?.options?.map((category: any) => {
                     return (
@@ -29,7 +29,7 @@ const Radio = (props: any) => {
                                 disabled={props?.disabled}
                                 checked={selectedCategory?.key === category?.key}
                             />
-                            <label htmlFor={category?.key} className="ml-2 Text_Secondary Input_Label">{t(`${category?.name}`)}</label>
+                            <label htmlFor={category?.key} className="ml-2 Text_Secondary Input_Label">{ (`${category?.name}`)}</label>
                         </div>
                     );
                 })}

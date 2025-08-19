@@ -34,7 +34,7 @@ import "../../../components/Calendar/Calendar.css";
 const InfraPpmScheduleDetails = (props: any) => {
   const location: any = useLocation();
   const navigate: any = useNavigate();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [options, setOptions] = useState<any | null>([]);
   const [assigneeStatus, setAssigneeStatus] = useState<any | null>(false);
   const [technicianList, setTechnicianList] = useState<any | null>([]);
@@ -193,7 +193,7 @@ const InfraPpmScheduleDetails = (props: any) => {
       (!isSubmitting && Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -348,7 +348,7 @@ const InfraPpmScheduleDetails = (props: any) => {
           </Card>
           {/* <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Equipment Details")}</p>
+              <p>{ ("Equipment Details")}</p>
             </div>
             <div className="mt-2 grid grid-cols-1 gap-x-2 gap-y-2 md:grid-cols-3 lg:grid-cols-3">
               <div className="flex">
@@ -525,7 +525,7 @@ const InfraPpmScheduleDetails = (props: any) => {
               <DataTable
                 value={options?.woDetails}
                 showGridlines
-                emptyMessage={t("No Data found.")}
+                emptyMessage={ ("No Data found.")}
                 scrollable
                 scrollHeight="400px"
               >
@@ -563,7 +563,7 @@ const InfraPpmScheduleDetails = (props: any) => {
               <DataTable
                 value={options?.scheduleDetails}
                 showGridlines
-                emptyMessage={t("No Data found.")}
+                emptyMessage={ ("No Data found.")}
                 scrollable
                 scrollHeight="400px"
               >
@@ -583,13 +583,13 @@ const InfraPpmScheduleDetails = (props: any) => {
           </Card> */}
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Equipment Documents")}</p>
+              <p>{ ("Equipment Documents")}</p>
             </div>
             <div>
               <DataTable
                 value={options?.assetDocDetails}
                 showGridlines
-                emptyMessage={t("No Data found.")}
+                emptyMessage={ ("No Data found.")}
                 scrollable
                 scrollHeight="400px"
               >

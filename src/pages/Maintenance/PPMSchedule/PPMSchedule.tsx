@@ -34,7 +34,7 @@ const PPMSchedule = (props: any) => {
   // const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const [showForm, setShowForm] = useState<any | null>(false)
   const [scheduleData, setScheduleData] = useState<any | null>([]);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const navigate: any = useNavigate();
   const [options, setOptions] = useState<any | false>([])
   const [locationtypeOptions, setlocationtypeOptions] = useState([]);
@@ -408,7 +408,7 @@ const PPMSchedule = (props: any) => {
                               <MultiSelects
                                 options={assetOption}
                                 {...register("ASSETNAME", {
-                                  required: t("Please fill the required fields.."),
+                                  required:  ("Please fill the required fields.."),
                                 })}
                                 label="Equipment/Service Name"
                                 className=" w-full"

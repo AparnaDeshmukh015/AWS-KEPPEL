@@ -51,7 +51,7 @@ const AssetMasterForm = (props: any) => {
   const dispatch = useDispatch();
   const scheduleTaskList = useSelector((state: any) => state.scheduleTaskList);
 
-  const { t } = useTranslation();
+
   const location = useLocation();
 
   const scheduleGroup = useSelector((state: any) => state.scheduleGroup);
@@ -404,8 +404,8 @@ const AssetMasterForm = (props: any) => {
         payload.MODE = search === "?edit=" ? "E" : "A";
         payload.PARA =
           search === "?edit="
-            ? { para1: `${props?.headerName}`, para2: t("Updated") }
-            : { para1: `${props?.headerName}`, para2: t("Added") };
+            ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+            : { para1: `${props?.headerName}`, para2:  ("Added") };
         payload.ASSIGN_LIST = payload?.ASSIGN_TO;
         payload.ASSET_FOLDER_ID =
           facility_type === "I"
@@ -830,13 +830,13 @@ const AssetMasterForm = (props: any) => {
           Object?.values(errors)[0]?.type === "validate")
       ) {
         const check: any = Object?.values(errors)[0]?.message;
-        toast?.error(t(check));
+        toast?.error( (check));
       } else if (
         !isSubmitting &&
         (firstError?.type === "required" || firstError?.type === "validate")
       ) {
         const check: any = firstError?.message;
-        toast?.error(t(check));
+        toast?.error( (check));
       }
     } else {
       const nestedErrors: any = errors?.SCHEDULER || {};
@@ -847,13 +847,13 @@ const AssetMasterForm = (props: any) => {
           Object?.values(errors)[0]?.type === "validate")
       ) {
         const check: any = Object?.values(errors)[0]?.message;
-        toast?.error(t(check));
+        toast?.error( (check));
       } else if (
         !isSubmitting &&
         (firstError?.type === "required" || firstError?.type === "validate")
       ) {
         const check: any = firstError?.message;
-        toast?.error(t(check));
+        toast?.error( (check));
       }
     }
   }, [isSubmitting, locationError]);
@@ -938,7 +938,7 @@ const AssetMasterForm = (props: any) => {
           <div className="flex justify-between mt-1">
             <div>
               <h6 className="Text_Primary">
-                {t(`${search === "?edit=" ? "Edit" : "Add"}`)}{" "}
+                { (`${search === "?edit=" ? "Edit" : "Add"}`)}{" "}
                 {props?.headerName}{" "}
               </h6>
             </div>
@@ -992,7 +992,7 @@ const AssetMasterForm = (props: any) => {
                       <Select
                         options={options?.location}
                         {...register("LOCATION", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           //This is Aparna Code
                           onChange: (e: any) => {
                             dispatch(clearScheduleLocation());
@@ -1075,7 +1075,7 @@ const AssetMasterForm = (props: any) => {
                 <>
                   <div className="col-span-1">
                     <label className="Text_Secondary Input_Label">
-                      {t("Description")}
+                      { ("Description")}
                     </label>
                     <Field
                       controller={{
@@ -1102,7 +1102,7 @@ const AssetMasterForm = (props: any) => {
                           : "Text_Secondary"
                       } Helper_Text`}
                     >
-                      {t(`Up to ${Descriptionlength}/400 characters.`)}
+                      { (`Up to ${Descriptionlength}/400 characters.`)}
                     </label>
                   </div>
                 </>
@@ -1315,7 +1315,7 @@ const AssetMasterForm = (props: any) => {
                 <>
                   <div className="col-span-1">
                     <label className="Text_Secondary Input_Label">
-                      {t("Description")}
+                      { ("Description")}
                     </label>
                     <Field
                       controller={{
@@ -1342,7 +1342,7 @@ const AssetMasterForm = (props: any) => {
                           : "Text_Secondary"
                       } Helper_Text`}
                     >
-                      {t(`Up to ${Descriptionlength}/400 characters.`)}
+                      { (`Up to ${Descriptionlength}/400 characters.`)}
                     </label>
                   </div>
                 </>
@@ -1459,7 +1459,7 @@ const AssetMasterForm = (props: any) => {
 
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Other Details")}</p>
+              <p>{ ("Other Details")}</p>
             </div>
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
               <div className=" flex flex-wrap">
@@ -1525,7 +1525,7 @@ const AssetMasterForm = (props: any) => {
                             onChange={(e: any) => {
                               field.onChange(e.value);
                             }}
-                            label={t("AMC expiry Date")}
+                            label={ ("AMC expiry Date")}
                             require={true}
                             invalid={fieldState?.error}
                             showIcon
@@ -1634,7 +1634,7 @@ const AssetMasterForm = (props: any) => {
                             return true;
                           },
                         })}
-                        label={t("Approximate Cost")}
+                        label={ ("Approximate Cost")}
                         invalidMessage={errors.ASSET_COST?.message}
                         {...field}
                       />
@@ -1748,7 +1748,7 @@ const AssetMasterForm = (props: any) => {
                         onChange={(e: any) => {
                           field.onChange(e.value);
                         }}
-                        label={t("Commissioning Date")}
+                        label={ ("Commissioning Date")}
                         require={true}
                         // invalid={errors.COMMISSIONING_DATE}
                         invalid={fieldState?.error}

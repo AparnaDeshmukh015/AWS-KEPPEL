@@ -1,10 +1,18 @@
 import React, { useRef, useState } from "react";
 import Button from "../../../../components/Button/Button";
 import { Dialog } from "primereact/dialog";
-import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import Field from "../../../../components/Field";
+import MultiSelects from "../../../../components/MultiSelects/MultiSelects";
+import { Chip } from "primereact/chip";
+import noDataIcon from "../../../../assest/images/nodatafound.png";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { SplitButton } from "primereact/splitbutton";
 import { Dropdown } from "primereact/dropdown";
+import SuccessDialog from "./SuccessDialog";
 import success from "../../../../assest/images/success.gif";
+import Select from "../../../../components/Dropdown/Dropdown";
 import { AutoComplete } from "primereact/autocomplete";
 
 const AssignWoDialog = ({
@@ -31,6 +39,7 @@ const AssignWoDialog = ({
   const [visibleSucessDialog, setVisibleSuccessDialog] =
     useState<boolean>(false);
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
+
   const [roles, setRoles] = useState<any>([]);
   const [loginName, setLoginName] = useState<any>([]);
   const [ptwDelete, setPtwDelete] = useState<any>(false);
@@ -41,6 +50,7 @@ const AssignWoDialog = ({
   const [selectedUser, setSelectedUser] = useState(null);
   const [filteredItems, setFilteredItems] = useState([]);
   const autoCompleteRef = useRef<AutoComplete>(null);
+  const inputEl = useRef<HTMLInputElement | null>(null); // ✅ direct input element ref
   const [techToRemove, setTechToRemove] = useState<any>([]);
 
   const OpenAssignPopUp = () => {
@@ -165,6 +175,7 @@ const AssignWoDialog = ({
     setTechToRemove(tech);
     setData("ACTION_ID", 106);
   };
+
   const RemoveAssigneeChangeList = (tech: any) => {
     let Data: any = assigneeTechList?.filter(
       (item: any) => item?.USER_ID !== tech?.USER_ID
@@ -183,7 +194,6 @@ const AssignWoDialog = ({
   };
 
   const ShowSuccessPopup = async () => {
-    debugger;
     if (!techToRemove || techToRemove?.length === 0) return;
 
     const updatedList = assigneeTechList?.filter(
@@ -194,11 +204,12 @@ const AssignWoDialog = ({
     setAssigneeTechList(updatedList);
     setValue("TECH_ID1", updatedList);
     setData("ACTION_ID", 106);
+
     setVisibleConfirmDialog(false);
     setVisibleChangePTWDialog(false);
     setVisibleConfirmDialog(false);
     setValue("TECH_ID1", selectedTechList);
-    setTechToRemove([]);
+    setTechToRemove([]); // clear
   };
   const CloseSuccessPopup = () => {
     setVisibleSuccessDialog(false);
@@ -239,9 +250,7 @@ const AssignWoDialog = ({
       handlerChangeAssignee(e.value);
       setSelectedUser(null);
       setTimeout(() => {
-        if (autoCompleteRef.current) {
-          autoCompleteRef.current.getInput().blur();
-        }
+        inputEl.current?.blur(); // ✅ use direct input ref
       }, 10);
     }
   };
@@ -255,11 +264,7 @@ const AssignWoDialog = ({
         icon={header === "Edit" && "pi pi-pencil"}
         onClick={OpenAssignPopUp}
       />
-      <Dialog
-        visible={visible}
-        style={{ width: "600px" }}
-        onHide={CloseAssignPopUp}
-      >
+      <Dialog visible={visible} style={{ width: "600px" }} onHide={CloseAssignPopUp}>
         <form>
           <div className="grid grid-cols-1 gap-3">
             <div>
@@ -267,21 +272,19 @@ const AssignWoDialog = ({
             </div>
             <div>
               <label className="Text_Secondary Input_Label">Team</label>
-              <p className="Text_Primary Alert_Title  ">{TEAM_NAME}</p>
+              <p className="Text_Primary Alert_Title">{TEAM_NAME}</p>
             </div>
-            {/* new code */}
 
+            {/* new code */}
             <div>
               <label className="Text_Secondary Input_Label">
                 Assignee <span className="text-red-600"> *</span>
               </label>
 
-              <div
-                className="custom-dropdown-wrapper"
-                style={{ position: "relative" }}
-              >
+              <div className="custom-dropdown-wrapper" style={{ position: "relative" }}>
                 <AutoComplete
                   ref={autoCompleteRef}
+                  inputRef={inputEl} // ✅ attach input ref
                   value={selectedUser}
                   suggestions={filteredItems}
                   completeMethod={search}
@@ -291,18 +294,15 @@ const AssignWoDialog = ({
                   forceSelection
                   onFocus={() => {
                     search({ query: "" });
-                    autoCompleteRef.current?.show();
+                    autoCompleteRef?.current?.show();
                   }}
                   onSelect={() => {
                     setSelectedUser(null);
                     setTimeout(() => {
-                      if (autoCompleteRef.current) {
-                        autoCompleteRef.current.getInput().blur();
-                      }
+                      inputEl.current?.blur(); // ✅ safe blur
                     }, 10);
                   }}
                 />
-
                 <i
                   className="pi pi-search custom-icon"
                   style={{
@@ -319,7 +319,7 @@ const AssignWoDialog = ({
           </div>
 
           <div className="grid grid-cols-1 pt-6 border-b-2 border-gray-200 pb-9">
-            <div className="ScrollViewAssigneeTab  mb-4 ">
+            <div className="ScrollViewAssigneeTab mb-4 ">
               {assigneeTechList?.length > 0 && (
                 <label className="Sub_Header_Text">SELECTED ASSIGNEES</label>
               )}
@@ -352,7 +352,6 @@ const AssignWoDialog = ({
                             name="ASSIGN_SUBROLE"
                             id={`ASSIGN_SUBROLE_${index}`}
                             value={tech?.sub_roles}
-                            // }
                             checkmark={true}
                             onChange={(e: any) => {
                               handleAssigneeChange(index, e.value);
@@ -406,7 +405,7 @@ const AssignWoDialog = ({
             />
             <Button
               name="Save"
-              className="Primary_Button w-28 "
+              className="Primary_Button w-28"
               type="submit"
               label={"Add"}
               onClick={saveAssignee}
@@ -415,6 +414,7 @@ const AssignWoDialog = ({
         </form>
       </Dialog>
 
+      {/* Confirm remove dialog */}
       <Dialog
         header=""
         visible={visibleConfirmDialog}
@@ -424,7 +424,7 @@ const AssignWoDialog = ({
       >
         <form>
           <div className="grid justify-items-center">
-            <div className="">
+            <div>
               {roles === "P" ? (
                 <>
                   <h6 className="Text_Primary text-center mb-3">
@@ -452,7 +452,7 @@ const AssignWoDialog = ({
             <div className="flex justify-end mt-[35px] gap-3">
               <Button
                 name="Cancel"
-                className="Cancel_Button "
+                className="Cancel_Button"
                 type="button"
                 label={"Cancel"}
                 onClick={() => CloseRemoveAssigneeChange()}
@@ -461,7 +461,6 @@ const AssignWoDialog = ({
                 name="Confirm"
                 className="Primary_Button"
                 type="button"
-                // label={roles === 'P' ? "Confirm & Restart Approval" : "Confirm"}
                 label="Confirm"
                 onClick={() => ShowSuccessPopup()}
               />
@@ -475,7 +474,7 @@ const AssignWoDialog = ({
               >
                 <form>
                   <div className="grid justify-items-center mb-3">
-                    <div className="">
+                    <div>
                       {<img src={success} alt="" height={60} width={60} />}
                     </div>
                     <div className="mt-3 ">
@@ -505,6 +504,7 @@ const AssignWoDialog = ({
         </form>
       </Dialog>
 
+      {/* Change PTW dialog */}
       <Dialog
         header=""
         visible={visibleChangePTWDialog}
@@ -514,22 +514,20 @@ const AssignWoDialog = ({
       >
         <form>
           <div className="grid justify-items-center">
-            <div className="">
-              <>
-                <h6 className="Text_Primary text-center mb-3">
-                  Confirm PTW Holder Change
-                </h6>
-                <p className="Input_Text text-center">
-                  You are about to change the PTW Holder to {loginName}. This
-                  will restart the approval process and reset the current work
-                  progress. Do you want to proceed?
-                </p>
-              </>
+            <div>
+              <h6 className="Text_Primary text-center mb-3">
+                Confirm PTW Holder Change
+              </h6>
+              <p className="Input_Text text-center">
+                You are about to change the PTW Holder to {loginName}. This will
+                restart the approval process and reset the current work progress.
+                Do you want to proceed?
+              </p>
             </div>
             <div className="flex justify-end mt-[35px] gap-3">
               <Button
                 name="Cancel"
-                className="Cancel_Button "
+                className="Cancel_Button"
                 type="button"
                 label={"Cancel"}
                 onClick={() => CloseChangePTW()}
@@ -538,7 +536,6 @@ const AssignWoDialog = ({
                 name="Confirm"
                 className="Primary_Button"
                 type="button"
-                // label={roles === 'P' ? "Confirm & Restart Approval" : "Confirm"}
                 label="Confirm & Restart Approval"
                 onClick={() => ShowSuccessPopup()}
               />

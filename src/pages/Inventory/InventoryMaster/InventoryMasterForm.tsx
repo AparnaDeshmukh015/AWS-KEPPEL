@@ -67,7 +67,7 @@ const InventoryMasterForm = (props: any) => {
   const [selectedParts, setSelectedParts] = useState<any | null>([]);
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -349,10 +349,10 @@ const InventoryMasterForm = (props: any) => {
     const firstError: any = Object?.values(nestedErrors)[0];
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (!isSubmitting && (firstError?.QTY?.type === "required" || firstError?.QTY?.type === "validate" || firstError?.RATE?.type === "required" || firstError?.RATE?.type === "validate")) {
       const check: any = firstError?.QTY?.message || firstError?.RATE?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -377,7 +377,7 @@ const InventoryMasterForm = (props: any) => {
         <div className="flex flex-wrap justify-between mt-1">
           <div>
             <h6 className="Text_Primary">
-              {t(`${search === "?edit=" ? "Cancel" : "Add"}`)} {t(`${props?.headerName}`)}-
+              { (`${search === "?edit=" ? "Cancel" : "Add"}`)} { (`${props?.headerName}`)}-
               {props?.selectedData ? props?.selectedData?.DOC_NO : ""}
             </h6>
           </div>
@@ -446,7 +446,7 @@ const InventoryMasterForm = (props: any) => {
                     <Select
                       options={storeOptions}
                       {...register("STORE", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Store Name"
                       require={true}
@@ -471,7 +471,7 @@ const InventoryMasterForm = (props: any) => {
                     <Select
                       options={vendorOptions}
                       {...register("VENDOR", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Vendor"
                       require={true}
@@ -495,13 +495,13 @@ const InventoryMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("BILL_NO", {
-                        required: t("Please fill the required fields."),
-                        validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        required:  ("Please fill the required fields."),
+                        validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
 
                       })}
                       label="Bill No"
                       require={true}
-                      placeholder={t("Please_Enter")}
+                      placeholder={ ("Please_Enter")}
                       invalid={errors.BILL_NO}
                       disabled={search === '?edit=' ? true : false}
                       {...field}
@@ -518,7 +518,7 @@ const InventoryMasterForm = (props: any) => {
                   return (
                     <DateCalendar
                       {...register("BILL_DATE", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Bill Date"
                       setValue={setValue}
@@ -536,7 +536,7 @@ const InventoryMasterForm = (props: any) => {
         </Card>
         <Card className="mt-2">
           <div className="headingConainer flex justify-between">
-            <p>{t("Part Details")}</p>
+            <p>{ ("Part Details")}</p>
             {search === '?add=' && (
               <div>
                 <PartDetailsDialogBox
@@ -556,7 +556,7 @@ const InventoryMasterForm = (props: any) => {
             showGridlines>
             <Column
               field="SR_NO"
-              header={t("Sr No")}
+              header={ ("Sr No")}
               className="w-20"
               body={(rowData, { rowIndex }) => {
                 return <>{rowIndex + 1}</>;
@@ -564,22 +564,22 @@ const InventoryMasterForm = (props: any) => {
             ></Column>
             <Column
               field="PART_CODE"
-              header={t("Part Code")}
+              header={ ("Part Code")}
               className="w-40"
             ></Column>
             <Column
               field="PART_NAME"
-              header={t("Part Name")}
+              header={ ("Part Name")}
               className=""
             ></Column>
             <Column
               field="STOCK"
-              header={t("Current Stock")}
+              header={ ("Current Stock")}
               className="w-40"
             ></Column>
             <Column
               field="REQ_QTY"
-              header={<>{t("Quantity")}
+              header={<>{ ("Quantity")}
                 <span className="text-red-500"> *</span>
               </>}
               className="w-40"
@@ -600,9 +600,9 @@ const InventoryMasterForm = (props: any) => {
                                   required: "Please fill the Required fields",
                                   validate: (value) => {
                                     if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                      return (t("Should be greater than 0"));
+                                      return ( ("Should be greater than 0"));
                                     } else if (parseInt(value, 10) === 0) {
-                                      return (t("Please enter the number"))
+                                      return ( ("Please enter the number"))
                                     } else {
                                       const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                       setValue(`PART_LIST.[${rowIndex}].QTY` as any, sanitizedValue);
@@ -632,7 +632,7 @@ const InventoryMasterForm = (props: any) => {
             ></Column>
             <Column
               field="RATE"
-              header={<>{t("Rate")}
+              header={<>{ ("Rate")}
                 <span className="text-red-500"> *</span>
               </>}
               className="w-40"
@@ -652,9 +652,9 @@ const InventoryMasterForm = (props: any) => {
                                   required: "Please fill the Required fields",
                                   validate: (value) => {
                                     if (parseFloat(value) < 0 || parseFloat(value) === 0) {
-                                      return (t("Should be greater than 0"));
+                                      return ( ("Should be greater than 0"));
                                       // } else if (parseInt(value, 10) === 0) {
-                                      //   return (t("Please enter the number"))
+                                      //   return ( ("Please enter the number"))
                                     } else {
                                       const sanitizedValue = value?.toString()?.replace(/[^0-9.]/g, "");
                                       setValue(`PART_LIST.[${rowIndex}].RATE` as any, sanitizedValue);
@@ -683,13 +683,13 @@ const InventoryMasterForm = (props: any) => {
             ></Column>
             <Column
               field="UOM_NAME"
-              header={t("UOM")}
+              header={ ("UOM")}
               className="w-40"
             ></Column>
             {props?.selectedData === undefined && (
               <Column
                 field="Action"
-                header={t("Action")}
+                header={ ("Action")}
                 className="w-40"
                 body={(rowData: any, { rowIndex }) => {
                   return (

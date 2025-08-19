@@ -117,7 +117,7 @@ interface FormValues {
 
 const WorkorderMasterForm = (props: any) => {
   const op: any = useRef(null);
-  const { t } = useTranslation();
+  const {    } = useTranslation();
   const navigate: any = useNavigate();
   const location: any = useLocation();
   let { search } = useLocation();
@@ -706,7 +706,7 @@ const WorkorderMasterForm = (props: any) => {
         }
       }
       if (error?.length > 0) {
-        toast?.error(t("Please fill the required fields."));
+        toast?.error(  ("Please fill the required fields."));
       }
     }
   }, [errors, isSubmitting]);
@@ -717,7 +717,7 @@ const WorkorderMasterForm = (props: any) => {
       const task = fields.pop();
       setValue("TASKDETAILS", watchTaskDetails);
     } else {
-      toast.error("You cann't delete data");
+      toast.error("You cann'   delete data");
     }
   };
 
@@ -889,7 +889,7 @@ const WorkorderMasterForm = (props: any) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex justify-between mt-1">
             <div>
-              <h6 className="Text_Primary">{t("Work Order Details")}</h6>
+              <h6 className="Text_Primary">{  ("Work Order Details")}</h6>
             </div>
             <div>
               <h6
@@ -1486,14 +1486,14 @@ const WorkorderMasterForm = (props: any) => {
                           <div>
                             <div className="flex justify-between">
                               <label className="Text_Secondary Input_Label">
-                                {t("Digital Signature")}{" "}
+                                {  ("Digital Signature")}{" "}
                                 <span className="text-red-600"> *</span>
                               </label>
                               <button
                                 className="ClearButton"
                                 onClick={clearSign}
                               >
-                                {t("Clear")}
+                                {  ("Clear")}
                               </button>
                             </div>
                             <div className="">
@@ -1517,7 +1517,7 @@ const WorkorderMasterForm = (props: any) => {
               {currentStatus === 7 && (
                 <div className="">
                   <label className="Text_Secondary Input_Label">
-                    {t("Digital Signature")}
+                    {  ("Digital Signature")}
                   </label>
                   <img src={imgSrc} className="signatureStyle" />
                 </div>
@@ -1527,13 +1527,13 @@ const WorkorderMasterForm = (props: any) => {
           {currentStatus !== 2 && currentStatus !== 1 && (
             <Card className="mt-2">
               <div className="headingConainer flex justify-between">
-                <p>{t("Task Details")}</p>
+                <p>{  ("Task Details")}</p>
                 <div>
                   {currentStatus !== 7 && (
                     <Buttons
                       name={"task"}
                       className="Primary_Button"
-                      label={t("Save Task")}
+                      label={  ("Save Task")}
                       type="submit"
                     />
                   )}
@@ -1548,7 +1548,7 @@ const WorkorderMasterForm = (props: any) => {
                     >
                       <div>
                         <label className="Text_Secondary Input_Label">
-                          {t("Task Name")}
+                          {  ("Task Name")}
                         </label>
 
                         <Field
@@ -1581,7 +1581,7 @@ const WorkorderMasterForm = (props: any) => {
                       </div>
                       <div>
                         <label className="Text_Secondary Input_Label">
-                          {t("Technician Name")}
+                          {  ("Technician Name")}
                         </label>
 
                         <Field
@@ -1614,7 +1614,7 @@ const WorkorderMasterForm = (props: any) => {
                       </div>
                       <div>
                         <label className="Text_Secondary Input_Label">
-                          {t("Time")}
+                          {  ("Time")}
                         </label>
 
                         {/* <Field
@@ -1671,7 +1671,7 @@ const WorkorderMasterForm = (props: any) => {
                                 )}
                                 label="Remarks"
                                 disabled={currentStatus === 7 ? true : false}
-                                placeholder={t("Please_Enter")}
+                                placeholder={  ("Please_Enter")}
                                 {...field}
                               />
                             );
@@ -1681,7 +1681,7 @@ const WorkorderMasterForm = (props: any) => {
                       />
                       <div>
                         <label className="Text_Secondary Input_Label">
-                          {t("Action")}
+                          {  ("Action")}
                         </label>
 
                         <Field
@@ -1747,7 +1747,7 @@ const WorkorderMasterForm = (props: any) => {
           {currentStatus !== 2 && currentStatus !== 1 && (
             <Card className="mt-2">
               <div className="headingConainer flex justify-between">
-                <p>{t("Part Details")}</p>
+                <p>{  ("Part Details")}</p>
                 <Field
                   controller={{
                     name: "PARTS_TYPE",
@@ -1778,7 +1778,7 @@ const WorkorderMasterForm = (props: any) => {
                     <Buttons
                       name="parts"
                       className="Primary_Button"
-                      label={t("Save Parts")}
+                      label={  ("Save Parts")}
                       type="submit"
                     />
                   )}
@@ -1796,7 +1796,7 @@ const WorkorderMasterForm = (props: any) => {
                 >
                   <Column
                     field="SR_NO"
-                    header={t("Sr No")}
+                    header={  ("Sr No")}
                     className="w-20"
                     body={(rowData, { rowIndex }) => {
                       return <>{rowIndex + 1}</>;
@@ -1804,22 +1804,22 @@ const WorkorderMasterForm = (props: any) => {
                   ></Column>
                   <Column
                     field="PART_ID"
-                    header={t("Part Code")}
+                    header={  ("Part Code")}
                     className="w-40"
                   ></Column>
                   <Column
                     field="PART_NAME"
-                    header={t("Part Name")}
+                    header={  ("Part Name")}
                     className=""
                   ></Column>
                   <Column
                     field="STOCK"
-                    header={t("Stock")}
+                    header={  ("Stock")}
                     className=""
                   ></Column>
                   <Column
                     field="REQ_QTY"
-                    header={t("Used Quantity")}
+                    header={  ("Used Quantity")}
                     className="w-40"
                     body={(rowData, { rowIndex }) => {
                       return (
@@ -1864,7 +1864,7 @@ const WorkorderMasterForm = (props: any) => {
                   ></Column>
                   <Column
                     field="UOM_NAME"
-                    header={t("UOM")}
+                    header={  ("UOM")}
                     className="w-40"
                   ></Column>
                 </DataTable>
@@ -1875,7 +1875,7 @@ const WorkorderMasterForm = (props: any) => {
           {currentStatus !== 1 && (
             <Card className="mt-2">
               <div className="headingConainer">
-                <p>{t("Material Request")}</p>
+                <p>{  ("Material Request")}</p>
               </div>
               <Table
                 columnTitle={[

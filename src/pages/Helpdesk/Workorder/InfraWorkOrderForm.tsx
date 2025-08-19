@@ -187,7 +187,7 @@ const InfraWorkOrderForm = (props: any) => {
   const [masterList, setmasterList] = useState<any | null>([]);
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const [MapButtons, setMapButtons] = useState<any>([]);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
   let { pathname } = useLocation();
@@ -1100,7 +1100,7 @@ const InfraWorkOrderForm = (props: any) => {
       (!isSubmitting && Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
   console.log(IsSubmit, "IsSubmit");
@@ -1252,7 +1252,7 @@ const InfraWorkOrderForm = (props: any) => {
 
                       {[125, 126]?.some((num) => MapButtons?.includes(num)) && (
                         <SplitButton
-                          label={t("More Action")}
+                          label={ ("More Action")}
                           className="Secondary_SplitButton mr-2"
                           model={Actionitems}
                         />
@@ -1964,7 +1964,7 @@ const InfraWorkOrderForm = (props: any) => {
                                     </div>
                                     <div className="mt-4">
                                       <label className="Text_Secondary Input_Label">
-                                        {t("Description (Max 400 characters)")}
+                                        { ("Description (Max 400 characters)")}
                                         <span className="text-red-600"> *</span>
                                       </label>
 
@@ -1999,7 +1999,7 @@ const InfraWorkOrderForm = (props: any) => {
                                           : "Text_Secondary"
                                           } Helper_Text`}
                                       >
-                                        {t(
+                                        { (
                                           `${Descriptionlength}/400 characters.`
                                         )}
                                       </label>
@@ -2473,7 +2473,7 @@ const InfraWorkOrderForm = (props: any) => {
                                             />
                                             <p className="mb-2 mt-2 text-sm ">
                                               <span className="Text_Primary Alert_Title">
-                                                {t("No items to show")}{" "}
+                                                { ("No items to show")}{" "}
                                               </span>
                                             </p>
                                           </div>
@@ -2940,11 +2940,11 @@ const InfraWorkOrderForm = (props: any) => {
                                             />
                                             <p className="mb-2 mt-2 text-sm text-gray-500  dark:text-gray-400">
                                               <span className="Text_Primary Alert_Title ">
-                                                {t("No items to show")}{" "}
+                                                { ("No items to show")}{" "}
                                               </span>
                                             </p>
                                             <label className="Text_Secondary Helper_Text mb-4">
-                                              {t(
+                                              { (
                                                 "No Resolution added to this work order."
                                               )}
                                             </label>
@@ -3325,7 +3325,7 @@ const InfraWorkOrderForm = (props: any) => {
                                                       />
                                                       <p className="mb-2 mt-2 text-sm ">
                                                         <span className="Text_Primary Alert_Title">
-                                                          {t(
+                                                          { (
                                                             "No items to show"
                                                           )}{" "}
                                                         </span>
@@ -3641,7 +3641,7 @@ const InfraWorkOrderForm = (props: any) => {
                                                       />
                                                       <p className="mb-2 mt-2 text-sm ">
                                                         <span className="Text_Primary Alert_Title">
-                                                          {t(
+                                                          { (
                                                             "No items to show"
                                                           )}{" "}
                                                         </span>
@@ -3835,7 +3835,7 @@ const InfraWorkOrderForm = (props: any) => {
                                   />
                                   <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                     <span className="Text_Primary Alert_Title  ">
-                                      {t("No items to show")}{" "}
+                                      { ("No items to show")}{" "}
                                     </span>
                                   </p>
                                 </div>
@@ -4001,7 +4001,7 @@ const InfraWorkOrderForm = (props: any) => {
                   <Card className="">
                     <div className="flex flex-wrap justify-between">
                       <h6 className="Header_Text pb-2">
-                        {t("Assignees")} ({technicianList?.length})
+                        { ("Assignees")} ({technicianList?.length})
                       </h6>
 
                       {/* <AssignWoDialog
@@ -4065,11 +4065,11 @@ const InfraWorkOrderForm = (props: any) => {
                             <img src={noDataIcon} alt="" className="w-12" />
                             <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                               <span className=" Text_Primary Input_Label">
-                                {t("No assignees yet")}{" "}
+                                { ("No assignees yet")}{" "}
                               </span>
                             </p>
                             <label className="Text_Secondary Helper_Text mb-4">
-                              {t(
+                              { (
                                 "Add assignees to work on this service request."
                               )}
                             </label>
@@ -4077,7 +4077,7 @@ const InfraWorkOrderForm = (props: any) => {
                             {/* <Buttons
                             className="Secondary_Button"
                             icon="pi pi-plus"
-                            label={t("Add Assignee")}
+                            label={ ("Add Assignee")}
                           /> */}
                           </div>
                         </label>

@@ -15,7 +15,7 @@ import { saveTracker } from '../../../utils/constants';
 import Select from "../../../components/Dropdown/Dropdown";
 
 const ReasonCommentMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const getId: any = localStorage.getItem("Id")
@@ -82,7 +82,7 @@ const ReasonCommentMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -195,7 +195,7 @@ return (
                       }}
                   />
                   <div className={`${errors?.REASON_DESCRIPTION ? "errorBorder" : ""}`}>
-                      <label className="Text_Secondary Input_Label">{t("Reason")}<span className="text-red-600"> *</span></label>
+                      <label className="Text_Secondary Input_Label">{ ("Reason")}<span className="text-red-600"> *</span></label>
                       <Field
 
                           controller={{
@@ -205,7 +205,7 @@ return (
                                   return (
                                       <InputTextarea
                                           {...register("REASON_DESCRIPTION", {
-                                              required: t("Please fill the required fields."),
+                                              required:  ("Please fill the required fields."),
                                           })}
                                           require={true}
                                         //  value={SEND_APP_TEXT}

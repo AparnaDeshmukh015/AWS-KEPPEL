@@ -33,7 +33,7 @@ import { get } from "http";
 import { debug } from "console";
 
 const UserMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id");
   const dataId = JSON.parse(getId);
@@ -712,13 +712,13 @@ const UserMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("USER_NAME", {
-                        required: t("Please fill the required fields."),
-                        validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        required:  ("Please fill the required fields."),
+                        validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
 
                       })}
                       label="User Name"
                       require={true}
-                      placeholder={t("Please Enter")}
+                      placeholder={ ("Please Enter")}
                       invalid={errors.USER_NAME}
                       // invalidMessage={errors.MOBILE_NO?.message}
                       {...field}
@@ -735,7 +735,7 @@ const UserMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("EMAIL_ID", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                         pattern: {
                           value: EMAIL_REGEX,
                           message: "Invalid email format",
@@ -747,7 +747,7 @@ const UserMasterForm = (props: any) => {
                       })}
                       label="Email Id"
                       require={true}
-                      placeholder={t("Please Enter")}
+                      placeholder={ ("Please Enter")}
                       invalid={errors.EMAIL_ID}
                       // invalidMessage={errors.EMAIL_ID?.message}
                       {...field}
@@ -781,7 +781,7 @@ const UserMasterForm = (props: any) => {
                         })}
                         label="Mobile"
                         require={true}
-                        placeholder={t("Please Enter")}
+                        placeholder={ ("Please Enter")}
                         invalid={error === false ? errors.MOBILE_NO : ''}
                         invalidMessage={errors.MOBILE_NO?.message}
                         {...field}
@@ -801,11 +801,11 @@ const UserMasterForm = (props: any) => {
                     <Select
                       options={userroleOptions}
                       {...register("USER_ROLE", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="User Role"
                       optionLabel="ROLE_NAME"
-                      placeholder={t("Please Select")}
+                      placeholder={ ("Please Select")}
                       require={true}
                       findKey={"ROLE_ID"}
                       selectedData={selectedDetails?.ROLE_ID}
@@ -826,7 +826,7 @@ const UserMasterForm = (props: any) => {
                     <MultiSelects
                       options={buildingOptions}
                       {...register("FACILITY_LIST", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Building Name"
                       optionLabel="FACILITY_NAME"
@@ -849,12 +849,12 @@ const UserMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("FACILITY_LIST1", {
-                        required: t(
+                        required:  (
                           "Please fill the required fields.111"
                         ),
                         // validate: (value) =>
                         //   value.trim() !== "" ||
-                        //   t("Please fill the required fields."),
+                        //    ("Please fill the required fields."),
                       })}
                       require={true}
                       label="Select Building"
@@ -882,11 +882,11 @@ const UserMasterForm = (props: any) => {
                     <Select
                       options={workforceOptions}
                       {...register("EMPLOYEE_VENDOR", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Workforce Type"
                       optionLabel="WORKFORCE_NAME"
-                      placeholder={t("Please Select")}
+                      placeholder={ ("Please Select")}
                       findKey={"WORKFORCE_TYPE"}
                       require={true}
                       selectedData={selectedDetails?.EMPLOYEE_VENDOR}
@@ -911,7 +911,7 @@ const UserMasterForm = (props: any) => {
                           //   required: "Please fill the required fields.",
                         })}
                         label="Employee Code"
-                        placeholder={t("Please Enter")}
+                        placeholder={ ("Please Enter")}
                         invalid={errors.EMPLOYEE_CODE}
                         {...field}
                       />
@@ -942,7 +942,7 @@ const UserMasterForm = (props: any) => {
                         label="Vendor Name"
                         options={vendorNameOptions}
                         optionLabel="VENDOR_NAME"
-                        placeholder={t("Please Select")}
+                        placeholder={ ("Please Select")}
                         findKey={"VENDOR_ID"}
                         require={true}
                         selectedData={selectedDetails?.VENDOR_CODE}
@@ -964,12 +964,12 @@ const UserMasterForm = (props: any) => {
                   return (
                     <Select
                       {...register("DEFAULT_LANGUAGE", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       options={languageOptions}
                       label="Default Language"
                       optionLabel="LANGUAGE_DESCRIPTION"
-                      placeholder={t("Please Select")}
+                      placeholder={ ("Please Select")}
                       findKey={"LANGUAGE_CODE"}
                       require={true}
                       selectedData={selectedDetails?.DEFAULT_LANGUAGE}
@@ -994,7 +994,7 @@ const UserMasterForm = (props: any) => {
                         <MultiSelects
                           options={locationtypeOptions}
                           {...register("LOCATION_LIST", {
-                            required: hasOccupant === true ? t("Please fill the required fields.") : false,
+                            required: hasOccupant === true ?  ("Please fill the required fields.") : false,
                           })}
                           label="Location"
                           optionLabel="LOCATION_DESCRIPTION"
@@ -1021,7 +1021,7 @@ const UserMasterForm = (props: any) => {
                     return (
                       <DateCalendar
                         {...register("VALIDITY_DATE", {
-                          required: hasOccupant === true ? t("Please fill the required fields.") : false,
+                          required: hasOccupant === true ?  ("Please fill the required fields.") : false,
                         })}
                         label="Validity Date"
                         setValue={setValue}
@@ -1051,7 +1051,7 @@ const UserMasterForm = (props: any) => {
                           // className="location-dropdown"
                           options={locationtypeOptions}
                           {...register("LOCATION_LIST", {
-                            required: USER_ROLE?.ROLETYPE_CODE === "O" ? t("Please fill the required fields.") : false,
+                            required: USER_ROLE?.ROLETYPE_CODE === "O" ?  ("Please fill the required fields.") : false,
                             // onChange: (e: any) => {
                             //   const selectedOptions = e.target.value;
                             //   const updatedLocations = selectedOptions.map((location: any) => ({
@@ -1092,7 +1092,7 @@ const UserMasterForm = (props: any) => {
                     <>
                       <Radio
                         {...register("USER_TYPE", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         labelHead="User Type"
                         options={userTypeLabel}
@@ -1157,7 +1157,7 @@ const UserMasterForm = (props: any) => {
                             <Select
                               options={buildingOptions}
                               {...register("FACILITY_LIST", {
-                                // required: t("Please fill the required fields."),
+                                // required:  ("Please fill the required fields."),
                                 onChange: (e: any) => {
 
                                   setselectedbuilding(e?.target?.value);
@@ -1199,7 +1199,7 @@ const UserMasterForm = (props: any) => {
                             <Select
                               options={buildingfilteredRoleList}
                               {...register("USER_ROLE", {
-                                // required: t("Please fill the required fields."),
+                                // required:  ("Please fill the required fields."),
                                 onChange: (e: any) => {
 
                                   setselectedrole(e?.target?.value);
@@ -1208,7 +1208,7 @@ const UserMasterForm = (props: any) => {
                               })}
                               label="User Role"
                               optionLabel="ROLE_NAME"
-                              placeholder={t("Please Select")}
+                              placeholder={ ("Please Select")}
                               require={true}
                               findKey={"ROLE_ID"}
                               // selectedData={selectedDetails?.ROLE_ID}
@@ -1248,7 +1248,7 @@ const UserMasterForm = (props: any) => {
                             // className="location-dropdown"
                             options={locationtypeOptions}
                             {...register("LOCATION_LIST", {
-                              // required: USER_ROLE?.ROLETYPE_CODE === "O" ? t("Please fill the required fields.") : false,
+                              // required: USER_ROLE?.ROLETYPE_CODE === "O" ?  ("Please fill the required fields.") : false,
                               onChange: (e: any) => {
                                 const selectedOptions = e.target.value;
                                 setselectedOccupLocation(e.target.value)

@@ -51,7 +51,7 @@ var clear_location: any = false;
 var clear_status: any = false;
 const WorkOrderMasterInfra = (props: any) => {
   let { pathname } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search }: any = useLocation();
   const navigate: any = useNavigate();
   const filterGroup = useSelector((state: any) => state.filterGroup);
@@ -1447,7 +1447,7 @@ const WorkOrderMasterInfra = (props: any) => {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between items-center p-4 px-[24px] py-[12px] border-t border-gray-200">
+                <div className="flex justify-between items-center p-4 px-[24px] py-[12px] border-  border-gray-200">
                   <a
                     className="status-subheading"
                     onClick={(e: any) => clearSelection(e)}
@@ -1551,14 +1551,14 @@ const WorkOrderMasterInfra = (props: any) => {
             <div className="flex flex-wrap justify-end mt-2">
               <Buttons
                 className="Secondary_Button me-2"
-                label={t("Cancel")}
+                label={ ("Cancel")}
                 onClick={() => {
                   setSelectedCustome(false);
                 }}
               />
               <Buttons
                 className="Primary_Button"
-                label={t("Select")}
+                label={ ("Select")}
                 onClick={async () => {
                   await handlerCustomDateRange();
                   // resetFilters();
@@ -1854,13 +1854,13 @@ const WorkOrderMasterInfra = (props: any) => {
         <div className="my-4 flex flex-wrap justify-between items-center">
           <div>
             <h6 className="Text_Primary mr-2">
-              {t(currentMenu?.FUNCTION_DESC)}
+              { (currentMenu?.FUNCTION_DESC)}
             </h6>
           </div>
           <div>
             <Buttons
               className="Secondary_Button me-2"
-              label={t("Export")}
+              label={ ("Export")}
               onClick={handlerDownload}
             />
             {currentMenu?.ADD_RIGHTS === "True" &&
@@ -1869,7 +1869,7 @@ const WorkOrderMasterInfra = (props: any) => {
                 ROLETYPECODE?.OCCUPANT && (
                 <Buttons
                   className="Primary_Button me-2"
-                  label={t("Add Service Request")}
+                  label={ ("Add Service Request")}
                   // icon="pi pi-plus"
                   onClick={handlerServiceRequest}
                 />
@@ -1879,7 +1879,7 @@ const WorkOrderMasterInfra = (props: any) => {
                 ROLETYPECODE?.OCCUPANT && (
                 <Buttons
                   className="Primary_Button me-2"
-                  label={t("Add Service Request")}
+                  label={ ("Add Service Request")}
                   // icon="pi pi-plus"
                   onClick={handlerServiceRequest}
                 />
@@ -1887,7 +1887,7 @@ const WorkOrderMasterInfra = (props: any) => {
           </div>
         </div>
         <div
-          className="p-4 bg-white rounded-t-lg border-t-4 border-x-4"
+          className="p-4 bg-white rounded- -lg border- -4 border-x-4"
           style={{
             borderWidth: "1px",
           }}
@@ -1925,7 +1925,7 @@ const WorkOrderMasterInfra = (props: any) => {
           <DataTable
             value={tableData}
             showGridlines
-            emptyMessage={t("No Data found")}
+            emptyMessage={ ("No Data found")}
             globalFilterFields={["SEVERITY"]}
             style={{ width: "100%" }}
             tableStyle={{ minWidth: "1200px" }}

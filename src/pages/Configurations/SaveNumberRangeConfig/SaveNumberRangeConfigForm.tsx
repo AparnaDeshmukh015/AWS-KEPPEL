@@ -36,7 +36,7 @@ interface FormData {
 }
  
 const SaveNumberRangeConfigForm: React.FC<any> = (props) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [configData, setconfigData] = useState([])
   const { search } = useLocation();
   const navigate: any = useNavigate();
@@ -229,7 +229,7 @@ const SaveNumberRangeConfigForm: React.FC<any> = (props) => {
  
 
   const onError: SubmitErrorHandler<FormData> = (errors, e) => {
-    toast.error(t("Please fill the required fields."))
+    toast.error( ("Please fill the required fields."))
   };
 
   useEffect(() => {
@@ -274,7 +274,7 @@ const SaveNumberRangeConfigForm: React.FC<any> = (props) => {
                     })}
                     label="Document Description"
                     require={true}
-                    placeholder={t("Please_Enter")}
+                    placeholder={ ("Please_Enter")}
                     // invalid={errors.DOC_DESC}
                     className={`${errors.DOC_DESC ? "errorBorder" : ""}`}
                     {...field}
@@ -294,7 +294,7 @@ const SaveNumberRangeConfigForm: React.FC<any> = (props) => {
                     })}
                     label="Document Type"
                     require={true}
-                    placeholder={t("Please_Enter")}
+                    placeholder={ ("Please_Enter")}
                     // invalid={errors.DOC_TYPE}
                     className={`${errors.DOC_TYPE ? "errorBorder" : ""}`}
                     {...field}
@@ -326,7 +326,7 @@ const SaveNumberRangeConfigForm: React.FC<any> = (props) => {
                     })}
                     label="Part Count"
                     require={true}
-                    placeholder={t("Please_Enter")}
+                    placeholder={ ("Please_Enter")}
                     // invalid={errors.PART_COUNT}
                     className={`${errors.PART_COUNT ? "errorBorder" : ""}`}
                     {...field}

@@ -21,7 +21,7 @@ import { appName } from "../../../utils/pagePath";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const AddLocation = () => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [, menuList]: any = useOutletContext();
   const { search } = useLocation();
   const [locationList, setLocationList] = useState([]);
@@ -71,11 +71,11 @@ const AddLocation = () => {
         location?.state?.addHeaderName === "Add Location"
           ? {
             para1: "Location Master",
-            para2: t("Added"),
+            para2:  ("Added"),
           }
           : {
             para1: "Location Master",
-            para2: t("Updated"),
+            para2:  ("Updated"),
           },
 
       EXTRA_COL_LIST: [""],
@@ -256,7 +256,7 @@ const AddLocation = () => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -273,13 +273,13 @@ const AddLocation = () => {
 
               <Button
                 className="Primary_Button  w-20 me-2"
-                label={t("Save")}
+                label={ ("Save")}
                 onClick={handleSubmit(onSubmit)}
                 disabled={IsSubmit}
               />
               <Button
                 className="Secondary_Button  w-20"
-                label={t("List")}
+                label={ ("List")}
                 onClick={(e) => showHandler(e)}
               />
             </div>
@@ -294,7 +294,7 @@ const AddLocation = () => {
                     return (
                       <InputField
                         {...register("LOCATION_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         placeholder={"Please enter"}
                         label="Location"
@@ -320,7 +320,7 @@ const AddLocation = () => {
                         options={locationList}
                         optionLabel="LOCATIONTYPE_NAME"
                         {...register("LOCATION", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         disabled={
                           location?.state?.addHeaderName === "Edit Location"
@@ -355,7 +355,7 @@ const AddLocation = () => {
                         {...register("GROSS_AREA", {
                           required: "",
                         })}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         label={"Gross Area"}
                         setValue={setValue}
                         invalid={""}
@@ -376,7 +376,7 @@ const AddLocation = () => {
                           required: "",
                         })}
                         label={"Max Occupancy"}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         setValue={setValue}
                         invalid={""}
                         {...field}
@@ -432,7 +432,7 @@ const AddLocation = () => {
                 <div className=" grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-3">
                   <div className="col-span-2 border-r">
                     <div className="">
-                      <h6>{t("Working Schedule")}</h6>
+                      <h6>{ ("Working Schedule")}</h6>
                     </div>
                     <div>
                       <div className="flex align-items-center">
@@ -470,9 +470,9 @@ const AddLocation = () => {
                                 options={weekList}
                                 optionLabel="WEEKOFF_DESC"
                                 {...register("WEEKOFF", {
-                                  required: !sameParent ? t("Please fill the required fields.") : "",
+                                  required: !sameParent ?  ("Please fill the required fields.") : "",
                                 })}
-                                // placeholder={t("Please_Enter")}
+                                // placeholder={ ("Please_Enter")}
                                 disabled={sameParent}
                                 findKey={"WEEKOFF_ID"}
                                 require={!sameParent ? true : false}
@@ -491,7 +491,7 @@ const AddLocation = () => {
                     <hr className="mt-2"></hr>
                     <div className="mb-2">
                       <label className="Text_Primary Table_Header">
-                        {t("If PPM schedule date is on week off or holiday")}
+                        { ("If PPM schedule date is on week off or holiday")}
                         {!sameParent ? (
                           <span className="text-red-600">*</span>
                         ) : (
@@ -515,7 +515,7 @@ const AddLocation = () => {
                           htmlFor="WeekOff1"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Prepone A Day Before")}
+                          { ("Prepone A Day Before")}
                         </label>
                       </div>
 
@@ -534,7 +534,7 @@ const AddLocation = () => {
                           htmlFor="WeekOff2"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Postpone A Day After")}
+                          { ("Postpone A Day After")}
                         </label>
                       </div>
                       <div className="flex align-items-center">
@@ -552,7 +552,7 @@ const AddLocation = () => {
                           htmlFor="WeekOff3"
                           className="ml-2 Text_Secondary Input_Label"
                         >
-                          {t("Keep On Same Day")}
+                          { ("Keep On Same Day")}
                         </label>
                       </div>
                     </div>

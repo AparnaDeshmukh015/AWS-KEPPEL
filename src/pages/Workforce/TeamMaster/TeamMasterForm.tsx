@@ -24,7 +24,7 @@ const TeamMasterForm = (props: any) => {
   const [teamList, setTeamList] = useState<any | null>([]);
   const [assetNon, setAssetNon] = useState<any | null>("A");
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const assestTypeLabel: any = [
     { name: "Equipment", key: "A" },
     { name: "Soft Services", key: "N" },
@@ -133,7 +133,7 @@ const TeamMasterForm = (props: any) => {
       (!isSubmitting && Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -346,7 +346,7 @@ const TeamMasterForm = (props: any) => {
         </Card>
         <div className="mt-2">
           <TabView className=" ">
-            <TabPanel header={t("Equipment Group to Team")}>
+            <TabPanel header={ ("Equipment Group to Team")}>
               <div className="p-4">
                 <Field
                   controller={{
@@ -385,7 +385,7 @@ const TeamMasterForm = (props: any) => {
                 />
               </div>
             </TabPanel>
-            <TabPanel header={t("Assignee to Team")}>
+            <TabPanel header={ ("Assignee to Team")}>
               <MultiSelectCheckbox
                 teamMasterCheckbox={teamMasterCheckbox}
                 setTeamMasterCheckbox={setTeamMasterCheckbox}

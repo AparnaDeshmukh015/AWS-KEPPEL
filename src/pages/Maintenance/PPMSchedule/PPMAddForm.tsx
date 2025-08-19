@@ -23,7 +23,7 @@ import { decryptData } from "../../../utils/encryption_decryption";
 
 const PPMAddForm = (props: any) => {
   let { pathname } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [, menuList]: any = useOutletContext();
   const[selectedDetails, setSelectedDetails]=useState<any|null>()
   const currentMenu = menuList
@@ -54,7 +54,7 @@ const PPMAddForm = (props: any) => {
       ASSET_NONASSET: "",
       LOCATION_ID: "",
       ASSET_ID: "",
-      PARA: { para1: `${currentMenu?.FUNCTION_CODE}`, para2: t("Added") },
+      PARA: { para1: `${currentMenu?.FUNCTION_CODE}`, para2: ("Added") },
     },
   });
   const ASSET_NONASSET: any = watch("ASSET_NONASSET");
@@ -172,7 +172,7 @@ const PPMAddForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error((check));
     }
   }, [isSubmitting]);
 
@@ -182,7 +182,7 @@ const PPMAddForm = (props: any) => {
         <div className="flex justify-between mt-1">
           <div>
             <h6 className="Text_Primary">
-              {t("Add")} {currentMenu?.FUNCTION_DESC}{" "}
+              {("Add")} {currentMenu?.FUNCTION_DESC}{" "}
             </h6>
           </div>
           <div className="flex">
@@ -204,7 +204,7 @@ const PPMAddForm = (props: any) => {
         </div>
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Schedule Details")}</p>
+            <p>{("Schedule Details")}</p>
           </div>
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
             <Field
@@ -330,7 +330,7 @@ const PPMAddForm = (props: any) => {
                       })}
                       require={true}
                       invalid={errors?.TIME}
-                      label={t("Time")}
+                      label={("Time")}
                       setValue={setValue}
                       {...field}
                     />

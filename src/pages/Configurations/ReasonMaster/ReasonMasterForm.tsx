@@ -15,7 +15,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { saveTracker } from "../../../utils/constants";
 
 const ReasonMasterForm = (props: any) => {
-    const { t } = useTranslation();
+    const {   } = useTranslation();
     let { pathname } = useLocation();
     const { search } = useLocation();
     const [, menuList]: any = useOutletContext();
@@ -92,7 +92,7 @@ const ReasonMasterForm = (props: any) => {
     useEffect(() => {
         if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
             const check: any = Object?.values(errors)[0]?.message
-            toast?.error(t(check));
+            toast?.error( (check));
         } else {
         }
     }, [isSubmitting])
@@ -135,7 +135,7 @@ const ReasonMasterForm = (props: any) => {
                             }}
                         />
                         <div className={`${errors?.REASON_DESC ? "errorBorder" : ""}`}>
-                            <label className="Text_Secondary Input_Label">{t("Reason")}<span className="text-red-600"> *</span></label>
+                            <label className="Text_Secondary Input_Label">{ ("Reason")}<span className="text-red-600"> *</span></label>
                             <Field
 
                                 controller={{
@@ -145,7 +145,7 @@ const ReasonMasterForm = (props: any) => {
                                         return (
                                             <InputTextarea
                                                 {...register("REASON_DESC", {
-                                                    required: t("Please fill the required fields."),
+                                                    required:  ("Please fill the required fields."),
                                                 })}
                                                 require={true}
                                                 value={SEND_APP_TEXT}

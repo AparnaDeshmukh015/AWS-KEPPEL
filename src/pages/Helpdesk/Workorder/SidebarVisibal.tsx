@@ -32,7 +32,7 @@ const SidebarVisibal = ({
   const [matvisibleDecline, setmatVisibleDecline] = useState(false);
   const [value, setValue] = useState("");
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
-  const { t } = useTranslation();
+  
   const [FilterMatlist, setFilterMatlist] = useState([]);
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
@@ -82,7 +82,7 @@ const SidebarVisibal = ({
     payload.STORE_ID = MATERIAL_LIST[0]["STORE_ID"];
     payload.PART_LIST = FilterMatlist;
     payload.MODE = m;
-    payload.PARA = { para1: "Material Requisition", para2: t };
+    payload.PARA = { para1: "Material Requisition", para2: "" };
     payload.MATREQ_ID = MATERIAL_LIST[0]["MATREQ_ID"];
     payload.WO_NO = MATERIAL_LIST[0]["WO_NO"];
     payload.WO_ID = MATERIAL_LIST[0]["WO_ID"];
@@ -454,7 +454,7 @@ const SidebarVisibal = ({
                 <DataTable
                   value={FilterMatlist}
                   showGridlines
-                  emptyMessage={t("No Data found.")}
+                  emptyMessage={("No Data found.")}
                 >
                   <Column
                     field="PART_NAME"
@@ -521,7 +521,7 @@ const SidebarVisibal = ({
           setIsSubmit(false)
         }}
       >
-        <label className="Text_Secondary Input_Label">{t("Remarks")}<span className="text-red-600"> *</span></label>
+        <label className="Text_Secondary Input_Label">{("Remarks")}<span className="text-red-600"> *</span></label>
         <InputTextarea
           value={value}
           placeholder="Enter Remarks"
@@ -563,7 +563,7 @@ const SidebarVisibal = ({
         }}
       >
         <label className="Text_Secondary Input_Label">
-          {t("Remarks")}
+          {("Remarks")}
           <span className="text-red-600"> *</span>
         </label>
         <InputTextarea

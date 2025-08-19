@@ -29,11 +29,11 @@ const TemplateUploadDialogBox = () => {
             </svg>
             <p className="mb-2 text-sm text-gray-500 cursor-pointer dark:text-gray-400">
               <span className="Text_Primary Input_Text">
-                {t("Upload your file")}{" "}
+                {("Upload your file")}{" "}
               </span>
             </p>
             <label className="Text_Secondary Helper_Text">
-              {t("Document Format")}
+              {("Document Format")}
             </label>
           </div>
         

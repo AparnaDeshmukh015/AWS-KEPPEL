@@ -30,7 +30,7 @@ const DateCalendar = (props: any) => {
       <div className={twMerge(props?.containerclassname)}>
         <span className="p-input-icon-left w-full">
           <label className="Text_Secondary Input_Label" htmlFor={props?.id}>
-            {t(`${props?.label}`)}
+            {(`${props?.label}`)}
             {props?.require && <span className="text-red-600"> *</span>}
           </label>
           <div className="invalid">

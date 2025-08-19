@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { saveTracker } from "../../../utils/constants";
 
 const AssetMasterConfiguration = () => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [, menuList] = useOutletContext<any | null>();
   
@@ -209,7 +209,7 @@ const AssetMasterConfiguration = () => {
 
  
   const onError: SubmitErrorHandler<FormData> = () => {
-    toast.error(t("Please fill the required fields."))
+    toast.error( ("Please fill the required fields."))
   };
   // useEffect(() => {
    
@@ -220,7 +220,7 @@ const AssetMasterConfiguration = () => {
         <div className="flex justify-between mt-1">
           <div>
             <h6 className="Text_Primary">
-              {t(`${currentMenu?.FUNCTION_DESC}`)}{" "}
+              { (`${currentMenu?.FUNCTION_DESC}`)}{" "}
             </h6>
           </div>
           <div className="flex">
@@ -299,7 +299,7 @@ const AssetMasterConfiguration = () => {
                               {...register(
                                 `CONFIGLIST.${index}.COLUMN_CAPTION`,
                                 {
-                                  required: checkStatus ? t("Please fill the required fields.") : false,
+                                  required: checkStatus ?  ("Please fill the required fields.") : false,
 
                                   onBlur: (e: any) => {
                                     handleChangeColumn(e, index);

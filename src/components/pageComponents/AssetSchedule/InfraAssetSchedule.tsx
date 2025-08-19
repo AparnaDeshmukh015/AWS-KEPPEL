@@ -1015,8 +1015,8 @@ const InfraAssetSchedule = ({
         FUNCTION_CODE: currentMenu[0]?.FUNCTION_CODE,
         PARA:
           (search === "?edit=")
-            ? { para1: `Schedule has been `, para2: t("updated") }
-            : { para1: `Schedule has been `, para2: t("added") },
+            ? { para1: `Schedule has been `, para2: ("updated") }
+            : { para1: `Schedule has been `, para2: ("added") },
       };
       console.log(payload1, "payload1")
       // return
@@ -1454,13 +1454,13 @@ const InfraAssetSchedule = ({
                           return (
                             <InputField
                               {...register("REQ_DESC", {
-                                required: t("Please fill the required fields."),
+                                required: ("Please fill the required fields."),
                                 onChange: (e: any) => {
                                   setIssueLength(e?.target?.value?.length);
                                 },
                                 validate: (value) =>
                                   value.trim() !== "" ||
-                                  t("Please fill the required fields."),
+                                  ("Please fill the required fields."),
                               })}
                               require={true}
                               label="Issue (Max 100 characters)"
@@ -1479,13 +1479,13 @@ const InfraAssetSchedule = ({
                       className={` ${issueLength === 100 ? "text-red-600" : "Text_Secondary"
                         } Helper_Text`}
                     >
-                      {t(`${issueLength}/100 characters`)}
+                      {(`${issueLength}/100 characters`)}
                     </label>
                   </div>
                   {/* new code close */}
                   <div className="col-span-2">
                     <label className="Text_Secondary Input_Label">
-                      {t("Description (Max 400 characters)")}
+                      {("Description (Max 400 characters)")}
                     </label>
 
                     <Field
@@ -1519,7 +1519,7 @@ const InfraAssetSchedule = ({
                         : "Text_Secondary"
                         } Helper_Text`}
                     >
-                      {t(`Up to ${Descriptionlength}/400 characters.`)}
+                      {(`Up to ${Descriptionlength}/400 characters.`)}
                     </label>
                   </div>
                 </div>
@@ -1575,7 +1575,7 @@ const InfraAssetSchedule = ({
                                     }
                                   )}
                                   require={true}
-                                  label={t("Preferred Time")}
+                                  label={("Preferred Time")}
                                   setValue={setValue}
                                   {...field}
                                 />
@@ -1939,7 +1939,7 @@ const InfraAssetSchedule = ({
                               return (
                                 <Select
                                   {...register("REPEAT_UNTIL", {
-                                    required: t(
+                                    required: (
                                       "Please fill the required fields."
                                     ),
                                     onChange(event: any) {
@@ -1997,7 +1997,7 @@ const InfraAssetSchedule = ({
                           <div className="col mb-2">
                             <div className="w-36">
                               <label className="Text_Secondary Input_Label mr-2">
-                                {t("No. of Occurance")}
+                                {("No. of Occurance")}
                                 <span className="text-red-600"> *</span>
                               </label>
                             </div>

@@ -205,7 +205,7 @@ const BuildingSet = (props: any) => {
   const currentMenu = menuList
     ?.flatMap((menu: any) => menu?.DETAIL)
     .filter((detail: any) => detail.URL === pathname)[0];
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const FACILITY: any = localStorage.getItem("FACILITYID");
   const FACILITYID: any = JSON.parse(FACILITY);
 
@@ -546,7 +546,7 @@ const BuildingSet = (props: any) => {
                   className=" border rounded  h-10  mr-2 border-gray-300 p-2"
                 />
                 <SplitButton
-                  label={t("Action")}
+                  label={ ("Action")}
                   className="Primary_SplitButton mr-2"
                   model={Actionitems}
                 />
@@ -635,7 +635,7 @@ const BuildingSet = (props: any) => {
 
                 <div
                   ref={scrollContentRef}
-                  className={`flex tree-container border-t-2  border-slate-400 ${
+                  className={`flex tree-container border- -2  border-slate-400 ${
                     contentWidth > 1860 ? "m-5 p-2" : "m-2 p-1"
                   }`}
                   style={{ maxWidth: "99%" }}

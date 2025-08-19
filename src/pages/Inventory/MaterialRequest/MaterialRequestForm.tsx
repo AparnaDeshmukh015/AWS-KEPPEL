@@ -51,7 +51,7 @@ type FormErrors = {
 };
  
 const MaterialRequestForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   const navigate: any = useNavigate();
   const [selectedParts, setSelectedParts] = useState<any>([]);
@@ -98,8 +98,8 @@ const MaterialRequestForm = (props: any) => {
       PART_LIST: [],
       MODE: search === "?edit=" ? "E" : "A",
       PARA: search === "?edit="
-        ? { para1: t('Material Requisition'), para2: "Updated" }
-        : { para1: t('Material Requisition'), para2: "Added" },
+        ? { para1:  ('Material Requisition'), para2: "Updated" }
+        : { para1:  ('Material Requisition'), para2: "Added" },
       MATREQ_ID: search === "?edit=" ? dataId.MATREQ_ID : 0,
     },
     mode: "all",
@@ -274,8 +274,8 @@ const MaterialRequestForm = (props: any) => {
           : buttonMode === "CONVERT"
             ? { para1: `${props?.headerName}`, para2: "Approved" }
             : search === "?edit="
-              ? { para1: t('Material Requisition'), para2: "Updated" }
-              : { para1: t('Material Requisition'), para2: "Added" };
+              ? { para1:  ('Material Requisition'), para2: "Updated" }
+              : { para1:  ('Material Requisition'), para2: "Added" };
       delete payload.WORKORDER;
       payload.ISAPPROVED = payload.MODE === "AP" ? true : false;
  
@@ -360,7 +360,7 @@ const MaterialRequestForm = (props: any) => {
     location?.state,
     storeWatch?.STORE_NAME,
     search,
-    t,
+     ,
     User_Name,
     currentMenu?.FUNCTION_CODE,
   ]);
@@ -432,10 +432,10 @@ const MaterialRequestForm = (props: any) => {
     const firstError: any = Object?.values(nestedErrors)[0];
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (!isSubmitting && (firstError?.REQUESTED_QUANTITY?.type === "required")) {
       const check: any = firstError?.REQUESTED_QUANTITY?.message
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
  
@@ -465,7 +465,7 @@ const MaterialRequestForm = (props: any) => {
                 {props?.headerName === "Material Request Approve" ? (
                   ""
                 ) : (
-                  <>{t(`${search === "?edit=" ? "Edit" : "Add"}`)}</>
+                  <>{ (`${search === "?edit=" ? "Edit" : "Add"}`)}</>
                 )}{" "}
                 {props?.headerName}{" "}
               </h6>
@@ -505,7 +505,7 @@ const MaterialRequestForm = (props: any) => {
                   setValue={setValue}
                   register={register}
                   paragraph={
-                    t("Are you sure you want to reject the material request?")
+                     ("Are you sure you want to reject the material request?")
                   }
                   watch={watch}
                   REMARK={"REMARK"}
@@ -572,7 +572,7 @@ const MaterialRequestForm = (props: any) => {
                           required:
                             props?.headerName === "Material Request Approve"
                               ? ""
-                              : t("Please fill the required fields."),
+                              :  ("Please fill the required fields."),
                         })}
                         label="Request Date"
                         require={true}
@@ -608,7 +608,7 @@ const MaterialRequestForm = (props: any) => {
                                   ? ""
                                   : props?.selectedData !== undefined
                                     ? ""
-                                    : t("Please fill the required fields."),
+                                    :  ("Please fill the required fields."),
                             })}
                             label="Raised By"
                             require={true}
@@ -639,7 +639,7 @@ const MaterialRequestForm = (props: any) => {
                       <Select
                         options={options?.storeList}
                         {...register("STORE_ID", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label="Store Name"
                         require={true}
@@ -672,7 +672,7 @@ const MaterialRequestForm = (props: any) => {
                           <Select
                             options={options?.woList}
                             {...register("WORKORDER", {
-                              required: location?.state !== null ? t("Please fill the required fields.") : "",
+                              required: location?.state !== null ?  ("Please fill the required fields.") : "",
                             })}
                             label="Work Order No."
                             optionLabel="WO_NO"
@@ -717,7 +717,7 @@ const MaterialRequestForm = (props: any) => {
           </Card>
           <Card className="mt-2">
             <div className="headingConainer flex justify-between">
-              <p>{t("Part Details")}</p>
+              <p>{ ("Part Details")}</p>
               <div>
                 {search === "?add=" && (
                   <PartDetailsDialogBox
@@ -745,7 +745,7 @@ const MaterialRequestForm = (props: any) => {
               >
                 <Column
                   field="SR_NO"
-                  header={t("Sr No")}
+                  header={ ("Sr No")}
                   className="w-20"
                   body={(rowData, { rowIndex }) => {
  
@@ -755,19 +755,19 @@ const MaterialRequestForm = (props: any) => {
                 ></Column>
                 <Column
                   field="PART_CODE"
-                  header={t("Part Code")}
+                  header={ ("Part Code")}
                   className="w-40"
                 ></Column>
                 <Column
                   field="PART_NAME"
-                  header={t("Part Name")}
+                  header={ ("Part Name")}
                   className=""
                 ></Column>
-                <Column field="STOCK" header={t("Stock")} className=""></Column>
+                <Column field="STOCK" header={ ("Stock")} className=""></Column>
  
                 <Column
                   field="REQ_QTY"
-                  header={t("Quantity")}
+                  header={ ("Quantity")}
                   className="w-40"
                   body={(rowData, { rowIndex }) => {
                   setValue(`PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any, rowData?.REQUESTED_QUANTITY);
@@ -783,14 +783,14 @@ const MaterialRequestForm = (props: any) => {
                                   {...register(
                                     `PART_LIST.[${rowIndex}].REQUESTED_QUANTITY` as any,
                                     {
-                                      required: t("Please fill the required fields."),
+                                      required:  ("Please fill the required fields."),
                                       validate: (value) => {
  
  
                                         if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                          return (t("Should be greater than 0"));
+                                          return ( ("Should be greater than 0"));
                                         } else if (parseInt(value, 10) === 0) {
-                                          return (t("Please enter the number"))
+                                          return ( ("Please enter the number"))
  
                                         } else {
                                           const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
@@ -835,13 +835,13 @@ const MaterialRequestForm = (props: any) => {
                 ></Column>
                 <Column
                   field="UOM_NAME"
-                  header={t("UOM")}
+                  header={ ("UOM")}
                   className="w-40"
                 ></Column>
                 {search === "?add=" && (
                   <Column
                     field="Action"
-                    header={t("Action")}
+                    header={ ("Action")}
                     className="w-40"
                     body={(rowData: any, { rowIndex }) => {
                       return (

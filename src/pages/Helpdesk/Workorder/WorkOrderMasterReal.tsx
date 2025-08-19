@@ -56,7 +56,7 @@ const WorkOrderMasterReal = (props: any) => {
     var facility_type: any = FACILITYID?.FACILITY_TYPE;
   }
   let { pathname } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const location: any = useLocation();
   const { search }: any = useLocation();
   const navigate: any = useNavigate();
@@ -1756,7 +1756,7 @@ const WorkOrderMasterReal = (props: any) => {
             <div className="flex flex-wrap justify-end mt-2">
               <Buttons
                 className="Secondary_Button me-2"
-                label={t("Cancel")}
+                label={ ("Cancel")}
                 onClick={() => {
                   // setWODate(null)
                   setSelectedCustome(false);
@@ -1767,7 +1767,7 @@ const WorkOrderMasterReal = (props: any) => {
               />
               <Buttons
                 className="Primary_Button"
-                label={t("Select")}
+                label={ ("Select")}
                 onClick={async () => {
                   await handlerCustomDateRange();
                   // resetFilters();
@@ -1831,18 +1831,18 @@ const WorkOrderMasterReal = (props: any) => {
           <>
             <div className="mb-4 flex flex-wrap justify-between">
               <div>
-                <h6 className="Text_Primary mr-2">{t(currentMenu?.FUNCTION_DESC)}</h6>
+                <h6 className="Text_Primary mr-2">{ (currentMenu?.FUNCTION_DESC)}</h6>
               </div>
               <div>
                 <Buttons
                   className="Secondary_Button me-2"
-                  label={t("Export")}
+                  label={ ("Export")}
                   onClick={handlerDownload}
                 />
                 {currentMenuService?.ADD_RIGHTS === "True" && (
                   <Buttons
                     className="Primary_Button me-2"
-                    label={t("Add Service Request")}
+                    label={ ("Add Service Request")}
                     // icon="pi pi-plus"
                     onClick={handlerServiceRequest}
                   />
@@ -1855,7 +1855,7 @@ const WorkOrderMasterReal = (props: any) => {
               value={tableData?.slice(first, first + rows)}
               header={tableHeaderFun}
               showGridlines
-              emptyMessage={t("No Data found")}
+              emptyMessage={ ("No Data found")}
               selectionMode={"checkbox"}
               globalFilterFields={[
                 "LOCATION_DESCRIPTION",

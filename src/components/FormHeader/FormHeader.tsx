@@ -15,7 +15,7 @@ const FormHeader = (props: any) => {
         <div className="flex flex-wrap justify-between mt-1">
             <div>
                 <h6 className="Text_Primary">
-                    {t(`${search === "?edit=" ? "Edit" : "Add"}`)} {props?.headerName}  {location?.pathname === PATH?.CURRENTSTATUSCONFIG
+                    {(`${search === "?edit=" ? "Edit" : "Add"}`)} {props?.headerName}  {location?.pathname === PATH?.CURRENTSTATUSCONFIG
                         || location?.pathname === PATH?.ASSETMASTERCONFIGURATION
                         || location?.pathname === PATH?.SAVENUMBERRANGECONFIG
                         ? "Configuration" : ""}{" "}

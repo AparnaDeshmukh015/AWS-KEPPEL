@@ -408,7 +408,7 @@ Remarks <span className="text-red-600"> *</span></label>
                         <div>
                           <div className="flex justify-between">
                             <label className="Text_Secondary Input_Label">
-                              {t("Digital Signature")}
+                              {("Digital Signature")}
                               <span className="text-red-600"> *</span>
                             </label>
                             <button
@@ -420,7 +420,7 @@ Remarks <span className="text-red-600"> *</span></label>
 
                               }}
                             >
-                              {t("Clear")}
+                              {("Clear")}
                             </button>
                           </div>
                           <div className={`${event && !signature ? "errorBorder" : ""}` }>
@@ -547,7 +547,7 @@ Remarks <span className="text-red-600"> *</span></label>
                             : "Text_Secondary"
                             } Helper_Text`}
                         >
-                          {t(` ${Descriptionlength}/250 characters.`)}
+                          {(` ${Descriptionlength}/250 characters.`)}
                         </label>
                 </div>
               }

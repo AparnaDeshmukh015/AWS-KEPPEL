@@ -346,7 +346,7 @@ const WorkorderRedirectDialogBox = ({
       (Object?.values(errors)[0] as any)?.type === "required"
     ) {
       const check: any = (Object?.values(errors)[0] as any)?.message;
-      toast?.error(t(check));
+      toast?.error((check));
     }
   }, [isSubmitting]);
 
@@ -674,7 +674,7 @@ const WorkorderRedirectDialogBox = ({
               className={` ${Remarklength === 250 ? "text-red-600" : "Text_Secondary"
                 } Helper_Text`}
             >
-              {t(`${Remarklength}/250 characters.`)}
+              {(`${Remarklength}/250 characters.`)}
             </label>
           </div>
 

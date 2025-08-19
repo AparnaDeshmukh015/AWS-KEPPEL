@@ -58,7 +58,7 @@ const ServiceRequestReal = (props: any) => {
   var gloabalStatus: boolean = false;
   const navigate: any = useNavigate();
   const [selectedFacility, menuList]: any = useOutletContext();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [filterData, setFilterData] = useState<any | null>([])
   const [selectedWoList, setSelectedWoList] = useState<any>(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -1222,7 +1222,7 @@ const ServiceRequestReal = (props: any) => {
             <div className="flex flex-wrap justify-end mt-2">
               <Buttons
                 className="Secondary_Button me-2"
-                label={t("Cancel")}
+                label={ ("Cancel")}
                 onClick={() => {
                   setSelectedCustome(false);
                   resetFilters();
@@ -1230,7 +1230,7 @@ const ServiceRequestReal = (props: any) => {
               />
               <Buttons
                 className="Primary_Button"
-                label={t("Select")}
+                label={ ("Select")}
                 onClick={() => {
                   (async function () {
                     await handlerCustomDateRange()
@@ -1393,12 +1393,12 @@ const ServiceRequestReal = (props: any) => {
           <div>
             <Buttons
               className="Secondary_Button me-2"
-              label={t("Export")}
+              label={ ("Export")}
               onClick={handlerDownload}
             />
             {currentMenu?.ADD_RIGHTS === "True" && (<Buttons
               className="Primary_Button me-2"
-              label={t("Add Service Request")}
+              label={ ("Add Service Request")}
               onClick={() => {
                 navigate(`${appName}/servicerequestlist?add=`);
               }}
@@ -1411,7 +1411,7 @@ const ServiceRequestReal = (props: any) => {
           value={tableData?.slice(first, first + rows)}
           header={tableHeaderFun}
           showGridlines
-          emptyMessage={t("No Data found.")}
+          emptyMessage={ ("No Data found.")}
           selectionMode={"checkbox"}
           globalFilterFields={[
             "LOCATION_DESCRIPTION",

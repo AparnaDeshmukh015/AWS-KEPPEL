@@ -28,7 +28,7 @@ const AssetScheduleMasterForm = (props: any) => {
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
 
-  const { t } = useTranslation();
+
   let { pathname } = useLocation();
   const [week, setWeek] = useState<{
     week: { DAY_CODE: number; DAY_DESC: string };
@@ -418,13 +418,13 @@ const AssetScheduleMasterForm = (props: any) => {
         Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (
       !isSubmitting &&
       (firstError?.type === "required" || firstError?.type === "validate")
     ) {
       const check: any = firstError?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
   return (

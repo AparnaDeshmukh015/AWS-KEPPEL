@@ -6,7 +6,7 @@ const MultiSelectCheckbox = ({ teamMasterCheckbox, setTeamMasterCheckbox, select
   assetNonAsset, setWorkforceTypes,
   workForceTypes
 }: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [isCheckAll, setIsCheckAll] = useState<any>(false);
   const [list, setList] = useState<any>([]);
 
@@ -134,7 +134,7 @@ const MultiSelectCheckbox = ({ teamMasterCheckbox, setTeamMasterCheckbox, select
                   onChange={handleSelectAll}
                   checked={isCheckAll}
                 />
-                <label htmlFor="selectAll" className="ml-2">{t("Select All")}</label>
+                <label htmlFor="selectAll" className="ml-2">{ ("Select All")}</label>
               </div>
               <hr className="mb-2"></hr>
               <div className="flex w-full flex-wrap ">

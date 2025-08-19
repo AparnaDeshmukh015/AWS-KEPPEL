@@ -14,7 +14,7 @@ import { useLocation, useOutletContext } from 'react-router-dom';
 
 
 const WorkOrderStatusForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [color, setColor] = useState("000");
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
@@ -132,7 +132,7 @@ const WorkOrderStatusForm = (props: any) => {
                   return (
                     <div>
                       <span className="Text_Secondary Input_Label">
-                        {t("Color")}{" "}
+                        { ("Color")}{" "}
                       </span>
                       <InputText
                         type={"color"}
@@ -143,7 +143,7 @@ const WorkOrderStatusForm = (props: any) => {
                         value={color}
                         onChange={(e: any) => setColor(e.target.value)}
                         className={"colorpicker"}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         {...field}
                       />
                     </div>

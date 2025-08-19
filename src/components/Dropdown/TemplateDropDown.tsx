@@ -41,7 +41,7 @@ const SelectTemplate = (props: any) => {
           className={`${props?.className} w-full`}
           valueTemplate={selectedDropDownTemplate}
           itemTemplate={selectOptionTemplate}
-          placeholder={t(`Please Select`)}
+          placeholder={(`Please Select`)}
           filter
           {...props}
           options={props?.options || []}

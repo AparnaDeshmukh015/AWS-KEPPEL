@@ -21,7 +21,7 @@ import { decryptData } from "../../../utils/encryption_decryption";
 const ServiceTypeMasterForm = (props: any) => {
   const [options, setOptions] = useState<any | null>([]);
   const [IsSubmit, setIsSubmit] = useState<any|null>(false);
-  const { t } = useTranslation();
+ 
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
@@ -41,8 +41,8 @@ const ServiceTypeMasterForm = (props: any) => {
     defaultValues: {
       MODE: props?.selectedData || search === '?edit=' ? "E" : "A",
       PARA: props?.selectedData || search === '?edit='
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       ASSETTYPE_ID: props?.selectedData ? props?.selectedData?.ASSETTYPE_ID : search === '?edit=' ? dataId?.ASSETTYPE_ID : 0,
       ASSETTYPE: "N",
       ASSETTYPE_NAME: props?.selectedData ? props?.selectedData?.ASSETTYPE_NAME : search === '?edit=' ? dataId?.ASSETTYPE_NAME : '',
@@ -101,7 +101,7 @@ const ServiceTypeMasterForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -131,7 +131,7 @@ const ServiceTypeMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("ASSETTYPE_NAME", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Service Type Name"
                       require={true}
@@ -152,7 +152,7 @@ const ServiceTypeMasterForm = (props: any) => {
                     <Select
                       options={options?.assetGroup}
                       {...register("ASSETGROUP_ID", {
-                        required: t("Please fill the required fields.")
+                        required:  ("Please fill the required fields.")
                       })}
                       label="Service Group"
                       require={true}

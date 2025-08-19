@@ -82,7 +82,7 @@ const SaveNumberRangeConfig = () => {
       })();
     }
   }, [selectedFacility, currentMenu, facility_type]);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
 
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
 
@@ -375,7 +375,7 @@ const SaveNumberRangeConfig = () => {
                         })}
                         label="Document Description"
                         require={true}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         className={`${errors.DOC_DESC ? "errorBorder" : ""}`}
                         {...field}
                       />
@@ -395,7 +395,7 @@ const SaveNumberRangeConfig = () => {
                         label="Document Type"
                         // selectedData={selectedData?.DOC_TYPE}
                         require={true}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         // invalid={errors.DOC_TYPE}
 
                         className={`${errors.DOC_TYPE1 ? "errorBorder" : ""}`}
@@ -428,7 +428,7 @@ const SaveNumberRangeConfig = () => {
                         })}
                         label="Part Count"
                         require={true}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         // invalid={errors.PART_COUNT}
                         className={`${errors.PART_COUNT ? "errorBorder" : ""}`}
                         {...field}

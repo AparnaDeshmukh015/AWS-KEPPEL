@@ -18,7 +18,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const ModelMasterForm = (props: any) => {
-  const { t } = useTranslation();
+
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -39,8 +39,8 @@ const ModelMasterForm = (props: any) => {
     defaultValues: {
       MODE: props?.selectedData || search === '?edit=' ? "E" : "A",
       PARA: props?.selectedData || search === '?edit='
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       MODEL_ID: props?.selectedData ? props?.selectedData?.MODEL_ID : 0,
       MODEL_NAME: props?.selectedData ? props?.selectedData?.MODEL_NAME : search === '?edit=' ? dataId?.MODEL_NAME : "",
       ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
@@ -85,7 +85,7 @@ const ModelMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -114,8 +114,8 @@ const ModelMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("MODEL_NAME", {
-                        required: t("Please fill the required fields."),
-                        validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        required:  ("Please fill the required fields."),
+                        validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                       })}
                       label="Model Name"
                       require={true}

@@ -57,7 +57,7 @@ const ServiceRequestInfra = (props: any) => {
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
   const [selectedFacility, menuList]: any = useOutletContext();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [filterData, setFilterData] = useState<any | null>([])
   const [selectedWoList, setSelectedWoList] = useState<any>(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -590,14 +590,14 @@ const ServiceRequestInfra = (props: any) => {
             <div className="flex flex-wrap justify-end mt-2">
               <Buttons
                 className="Secondary_Button me-2"
-                label={t("Cancel")}
+                label={ ("Cancel")}
                 onClick={() => {
                   setSelectedCustome(false);
                 }}
               />
               <Buttons
                 className="Primary_Button"
-                label={t("Select")}
+                label={ ("Select")}
                 onClick={async () => {
                   await handlerCustomDateRange();
                   // resetFilters();
@@ -745,12 +745,12 @@ const ServiceRequestInfra = (props: any) => {
         <div>
           <Buttons
             className="Secondary_Button me-2"
-            label={t("Export")}
+            label={ ("Export")}
             onClick={handlerDownload}
           />
           {currentMenu?.ADD_RIGHTS === "True" && (<Buttons
             className="Primary_Button me-2"
-            label={t("Add Service Request")}
+            label={ ("Add Service Request")}
             onClick={() => {
               navigate(`${appName}/servicerequestlist?add=`);
 
@@ -765,7 +765,7 @@ const ServiceRequestInfra = (props: any) => {
         value={tableData}
         header={tableHeaderFun}
         showGridlines
-        emptyMessage={t("No Data found.")}
+        emptyMessage={ ("No Data found.")}
         selectionMode={"checkbox"}
         globalFilterFields={[
           "LOCATION_DESCRIPTION",

@@ -1880,7 +1880,7 @@ const WorkOrderDetailForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error((check));
     }
   }, [isSubmitting]);
 
@@ -2558,7 +2558,7 @@ const WorkOrderDetailForm = (props: any) => {
                                             />
                                             <p className="mb-2 mt-2 text-sm ">
                                               <span className="Text_Primary Service_Alert_Title">
-                                                {t("No items to show")}{" "}
+                                                {("No items to show")}{" "}
                                               </span>
                                             </p>
                                           </div>
@@ -2816,7 +2816,7 @@ const WorkOrderDetailForm = (props: any) => {
                                                   />
                                                   <p className="mb-2 mt-2 text-sm ">
                                                     <span className="Text_Primary Service_Alert_Title">
-                                                      {t("No items to show")}{" "}
+                                                      {("No items to show")}{" "}
                                                     </span>
                                                   </p>
                                                 </div>
@@ -2877,7 +2877,7 @@ const WorkOrderDetailForm = (props: any) => {
                                                   />
                                                   <p className="mb-2 mt-2 text-sm ">
                                                     <span className="Text_Primary Service_Alert_Title">
-                                                      {t("No items to show")}{" "}
+                                                      {("No items to show")}{" "}
                                                     </span>
                                                   </p>
                                                 </div>
@@ -3097,11 +3097,11 @@ const WorkOrderDetailForm = (props: any) => {
 
                                       <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                         <span className="Text_Primary Service_Alert_Title">
-                                          {t("No items to show")}{" "}
+                                          {("No items to show")}{" "}
                                         </span>
                                       </p>
                                       <label className="Text_Secondary Helper_Text mb-4">
-                                        {t(
+                                        {(
                                           "Add equipment to access related tasks and resources."
                                         )}
                                       </label>
@@ -3888,7 +3888,7 @@ const WorkOrderDetailForm = (props: any) => {
                         <Card className="mt-4">
                           <div className="flex flex-wrap justify-between mb-3">
                             <h6 className="Service_Header_Text">
-                              {t("Reporter Details")}
+                              {("Reporter Details")}
                             </h6>
 
                             {(selectedDetails?.SF_CASE_NO !== "" && salcedorecedetails?.CaseId === undefined) && <div>  <i className="pi pi-eye
@@ -4029,7 +4029,7 @@ const WorkOrderDetailForm = (props: any) => {
                                 activeIndex={activeTaskIndex}
                                 onTabChange={(e) => setActiveTaskIndex(e.index)}
                               >
-                                <TabPanel header={t("Tasks")}>
+                                <TabPanel header={("Tasks")}>
                                   {0 === 0 ? (
                                     <>
                                       {taskList.map(
@@ -4138,7 +4138,7 @@ const WorkOrderDetailForm = (props: any) => {
                                     <>No Data Found</>
                                   )}
                                 </TabPanel>
-                                <TabPanel header={t("Resources")}>
+                                <TabPanel header={("Resources")}>
                                   {assetDocList?.length > 0 ? (
                                     <>
                                       {assetDocList.map(
@@ -4190,11 +4190,11 @@ const WorkOrderDetailForm = (props: any) => {
                                         />
                                         <p className="mb-2 mt-2 text-sm text-gray-500  dark:text-gray-400">
                                           <span className="Text_Primary Service_Alert_Title ">
-                                            {t("No items to show")}{" "}
+                                            {("No items to show")}{" "}
                                           </span>
                                         </p>
                                         <label className="Text_Secondary Helper_Text mb-4">
-                                          {t(
+                                          {(
                                             "No materials added to this work order."
                                           )}
                                         </label>
@@ -4380,7 +4380,7 @@ const WorkOrderDetailForm = (props: any) => {
                                 <DataTable
                                   value={partMatOptions}
                                   showGridlines
-                                  emptyMessage={t("No Data found.")}
+                                  emptyMessage={("No Data found.")}
                                   footer={footer}
                                 >
                                   <Column
@@ -4405,7 +4405,7 @@ const WorkOrderDetailForm = (props: any) => {
 
                                   <Column
                                     field="MATREQ_NO"
-                                    header={t("Mat Req No")}
+                                    header={("Mat Req No")}
                                     className="w-30"
                                     body={(rowData: any) => {
                                       return (
@@ -4489,7 +4489,7 @@ const WorkOrderDetailForm = (props: any) => {
                                   />
                                   <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                     <span className="Text_Primary Service_Alert_Title  ">
-                                      {t("No items to show")}{" "}
+                                      {("No items to show")}{" "}
                                     </span>
                                   </p>
                                 </div>
@@ -4594,7 +4594,7 @@ const WorkOrderDetailForm = (props: any) => {
                   <Card className=" mt-2">
 
                     <h6 className="Service_Header_Text ">
-                      {t("Assignees")} ({technicianList?.length})
+                      {("Assignees")} ({technicianList?.length})
                     </h6>
                     <div className="ScrollViewAssigneeTab" style={
                       {

@@ -15,7 +15,7 @@ import { saveTracker } from '../../../utils/constants';
 import { InputTextarea } from 'primereact/inputtextarea';
 
 const AnanlyticsFddMasterForm = (props: any) => {
-  const { t } = useTranslation();
+
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -38,8 +38,8 @@ const AnanlyticsFddMasterForm = (props: any) => {
       MODE: props?.selectedData || search === "?edit=" ? "E" : "A",
       PARA:
         props?.selectedData || search === "?edit="
-          ? { para1: `${props?.headerName}`, para2: t("Updated") }
-          : { para1: `${props?.headerName}`, para2: t("Added") },
+          ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+          : { para1: `${props?.headerName}`, para2:  ("Added") },
       FDD_ID: props?.selectedData
         ? props?.selectedData?.FDD_ID
         : search === "?edit="
@@ -112,7 +112,7 @@ const AnanlyticsFddMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -136,7 +136,7 @@ const AnanlyticsFddMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("FDD_ID", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                         validate: (fieldValue: any) => {
                           const sanitizedValue = fieldValue
                             ?.toString()
@@ -164,10 +164,10 @@ const AnanlyticsFddMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("FDD_NAME", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                         validate: (value) =>
                           value.trim() !== "" ||
-                          t("Please fill the required fields."),
+                           ("Please fill the required fields."),
                       })}
                       require={true}
                       label="FDD Name"
@@ -188,10 +188,10 @@ const AnanlyticsFddMasterForm = (props: any) => {
                     return (
                       <InputTextarea
                         {...register("FDD_DESC", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           validate: (value) =>
                             value.trim() !== "" ||
-                            t("Please fill the required fields."),
+                             ("Please fill the required fields."),
                         })}
                         require={true}
                         label="FDD Description"
@@ -212,7 +212,7 @@ const AnanlyticsFddMasterForm = (props: any) => {
                     <Select
                       options={options?.assestOptions?.filter((f: any) => f?.ASSETTYPE === "A")}
                       {...register("TYPE", {
-                        required: t("Please fill the required fields"),
+                        required:  ("Please fill the required fields"),
                       })}
                       label="Equipment Type"
                       require={true}

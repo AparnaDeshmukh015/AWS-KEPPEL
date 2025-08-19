@@ -12,7 +12,7 @@ import { saveTracker } from "../../../utils/constants";
 import { useLocation, useOutletContext } from "react-router-dom";
 
 const ActionSetupConfigForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   //const [deleteItem, setDeleteItem] = useState(false);
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
@@ -111,7 +111,7 @@ const ActionSetupConfigForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || ((!isSubmitting && Object?.values(errors)[0]?.type === "validate"))) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -161,7 +161,7 @@ const ActionSetupConfigForm = (props: any) => {
                       <InputField
                         {...register("ACTION_DISPLAY_DESC", {
                           required: "Please fill the required fields",
-                          validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                         })}
                         label="Action Display Description"
                         require={true}
@@ -183,7 +183,7 @@ const ActionSetupConfigForm = (props: any) => {
                       <InputField
                         // {...register("ACTION_STATUS_DESC", {
                         //   required: "Please fill the required fields",
-                        //   validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        //   validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                         // })}
                         label=" Status Description"
                         require={false}
@@ -207,7 +207,7 @@ const ActionSetupConfigForm = (props: any) => {
                       <InputField
                         {...register("ACTION_STATUS_DISPLAY_DESC", {
                           required: "Please fill the required fields",
-                          validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                         })}
                         label="Action Status Description"
                         require={true}

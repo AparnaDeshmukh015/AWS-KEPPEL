@@ -4,7 +4,7 @@ import { TreeTable } from "primereact/treetable";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [nodeList, setNodeList] = useState<any>([]);
   const [showColumn, setShowColumn] = useState<any>(false);
   
@@ -40,12 +40,12 @@ const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
           <Column
             field="name"
             className="w-80"
-            header={t("Module Name")}
+            header={ ("Module Name")}
             expander
           ></Column>
           <Column
             field="noAccess"
-            header={t("No Access")}
+            header={ ("No Access")}
             className="w-36"
             body={(rowData) => {
               return (
@@ -60,7 +60,7 @@ const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
           ></Column>
           <Column
             field="view"
-            header={`${showColumn === true ? t("View") : t("Access")}`}
+            header={`${showColumn === true ?  ("View") :  ("Access")}`}
             className="w-36"
             body={(rowData) => {
               return (
@@ -77,7 +77,7 @@ const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
           {showColumn === true && (
             <Column
               field="add"
-              header={t("Add")}
+              header={ ("Add")}
               className="w-36"
               body={(rowData) => {
                 return (
@@ -94,7 +94,7 @@ const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
           {showColumn === true && (
             <Column
               field="update"
-              header={t("Update")}
+              header={ ("Update")}
               className="w-36"
               body={(rowData) => {
                 return (
@@ -112,7 +112,7 @@ const TreeTableRight = ({ nodes, newHandleChange, type }: any) => {
           {showColumn === true && (
             <Column
               field="delete"
-              header={t("Delete")}
+              header={ ("Delete")}
               className="w-40"
               body={(rowData) => {
                 return (

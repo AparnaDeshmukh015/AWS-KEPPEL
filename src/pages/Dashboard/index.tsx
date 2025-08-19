@@ -1483,7 +1483,7 @@ const Dashboard = () => {
     <>
       <div>
         <div>
-          <h6>{t("Dashboard")}</h6>
+          <h6>{("Dashboard")}</h6>
         </div>
 
         <div className="mt-2 dashboardTab">
@@ -1601,12 +1601,12 @@ const Dashboard = () => {
                   <div className="flex flex-wrap justify-end mt-2">
                     <Buttons
                       className="Secondary_Button me-2"
-                      label={t("Cancel")}
+                      label={("Cancel")}
                       onClick={() => setSelectedCustome(false)}
                     />
                     <Buttons
                       className="Primary_Button"
-                      label={t("Select")}
+                      label={("Select")}
                       onClick={() => onSubmitCustomDate()}
                     />
                   </div>

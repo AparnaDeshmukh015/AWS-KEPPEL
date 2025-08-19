@@ -77,7 +77,7 @@ type GetVendorSorDetailsProps = {
 
 const VendorManagementForm = (props: any) => {
   const { search } = useLocation();
-  const { t } = useTranslation();
+
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
   const [sorDate, setSORDate] = useState<(Date | null)[]>([]);
   const [isDateSelected, setisDateSelected] = useState<(boolean)>(true);
@@ -109,8 +109,8 @@ const VendorManagementForm = (props: any) => {
 
       ACTIVE: 1,
       SOR_ID: search === "?edit=" ? props?.selectedData?.SOR_ID : 0,
-      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": t('Updated') }
-        : { "para1": `${props?.headerName}`, "para2": t('Added') },
+      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": ('Updated') }
+        : { "para1": `${props?.headerName}`, "para2": ('Added') },
 
     },
     mode: "all",
@@ -324,10 +324,10 @@ const VendorManagementForm = (props: any) => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       setisDateSelected(false)
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error((check));
     } else if (!isSubmitting && (firstError?.MIN_QTY?.type === "required" || firstError?.MIN_QTY?.type === "validate" || firstError?.SOR?.type === "required" || firstError?.SOR?.type === "validate" || firstError?.WARRANTY_PERIOD?.type === "required" || firstError?.WARRANTY_PERIOD?.type === "validate")) {
       const check: any = firstError?.MIN_QTY?.message || firstError?.SOR?.message || firstError?.WARRANTY_PERIOD?.message;
-      toast?.error(t(check));
+      toast?.error((check));
     }
   }, [isSubmitting]);
 
@@ -413,12 +413,12 @@ const VendorManagementForm = (props: any) => {
               value={fields}
               key={fields?.length - 1}
               showGridlines
-              emptyMessage={t("No Data found.")}
+              emptyMessage={("No Data found.")}
 
             >
               <Column
                 field="SR_NO"
-                header={t("Sr No")}
+                header={("Sr No")}
                 className="w-40"
                 body={(rowData, { rowIndex }) => {
                   return <>{rowIndex + 1}</>;
@@ -427,12 +427,12 @@ const VendorManagementForm = (props: any) => {
               ></Column>
               <Column
                 field="PART_CODE"
-                header={t("Part Code")}
+                header={("Part Code")}
                 className="w-40"
               ></Column>
               <Column
                 field="PART_NAME"
-                header={t("Part Name")}
+                header={("Part Name")}
                 className=""
               ></Column>
 
@@ -440,7 +440,7 @@ const VendorManagementForm = (props: any) => {
                 field="SOR"
                 header={
                   <>
-                    {t("SOR")}
+                    {("SOR")}
                     <span className="text-red-500"> *</span>
                   </>
                 }
@@ -461,9 +461,9 @@ const VendorManagementForm = (props: any) => {
                                     required: "Please fill the Required fields",
                                     validate: (value) => {
                                       if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                        return (t("Should be greater than 0"));
+                                        return (("Should be greater than 0"));
                                       } else if (parseInt(value, 10) === 0) {
-                                        return (t("Please enter the number"))
+                                        return (("Please enter the number"))
                                       } else {
                                         const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                         setValue(`SOR_DETAILS.[${rowIndex}].SOR` as any, sanitizedValue);
@@ -494,7 +494,7 @@ const VendorManagementForm = (props: any) => {
                 field="QTY"
                 header={
                   <>
-                    {t("Min Qty")}
+                    {("Min Qty")}
                     <span className="text-red-500"> *</span>
                   </>
 
@@ -516,9 +516,9 @@ const VendorManagementForm = (props: any) => {
                                     required: "Please fill the Required fields",
                                     validate: (value) => {
                                       if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                        return (t("Should be greater than 0"));
+                                        return (("Should be greater than 0"));
                                       } else if (parseInt(value, 10) === 0) {
-                                        return (t("Please enter the number"))
+                                        return (("Please enter the number"))
                                       } else {
                                         const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                         setValue(`SOR_DETAILS.[${rowIndex}].MIN_QTY` as any, sanitizedValue);
@@ -548,7 +548,7 @@ const VendorManagementForm = (props: any) => {
                 field="WARRANTY_PERIOD"
                 header={
                   <>
-                    {t("Warranty Duration (In Months)")}
+                    {("Warranty Duration (In Months)")}
                     <span className="text-red-500"> *</span>
                   </>
 
@@ -570,9 +570,9 @@ const VendorManagementForm = (props: any) => {
                                     required: "Please fill the Required fields",
                                     validate: (value) => {
                                       if (parseInt(value, 10) < 0 || parseInt(value, 10) === 0) {
-                                        return (t("Should be greater than 0"));
+                                        return (("Should be greater than 0"));
                                       } else if (parseInt(value, 10) === 0) {
-                                        return (t("Please enter the number"))
+                                        return (("Please enter the number"))
                                       } else {
                                         const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                         setValue(`SOR_DETAILS.[${rowIndex}].WARRANTY_PERIOD` as any, sanitizedValue);
@@ -601,7 +601,7 @@ const VendorManagementForm = (props: any) => {
                 field="UOM_NAME"
                 header={
                   <>
-                    {t("UOM")}
+                    {("UOM")}
                     <span className="text-red-500"> *</span>
                   </>
                 }
@@ -623,7 +623,7 @@ const VendorManagementForm = (props: any) => {
                               <Select
                                 options={uomOptions}
                                 {...register(`SOR_DETAILS.${rowIndex}.UOM_ID`, {
-                                  required: t("Please fill the required fields."),
+                                  required: ("Please fill the required fields."),
                                 })}
 
                                 optionLabel="UOM_NAME"
@@ -650,7 +650,7 @@ const VendorManagementForm = (props: any) => {
               {props?.selectedData === undefined && (
                 <Column
                   field="Action"
-                  header={t("Action")}
+                  header={("Action")}
                   className="w-40"
                   body={(rowData: any, { rowIndex }) => {
                     return (

@@ -19,7 +19,7 @@ import { saveTracker } from "../../../utils/constants";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const AssetGroupMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { pathname } = useLocation();
   const [showLoader, setShowLoader] = useState<boolean>(false);
   const [IsSubmit, setIsSubmit] = useState<any|null>(false);
@@ -41,8 +41,8 @@ const AssetGroupMasterForm = (props: any) => {
     defaultValues: {
       MODE: props?.selectedData || search === '?edit=' ? "E" : "A",
       PARA: props?.selectedData || search === '?edit='
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       ASSETGROUP_ID: props?.selectedData ? props?.selectedData?.ASSETGROUP_ID : search === '?edit=' ? dataId?.ASSETGROUP_ID : 0,
       ASSETGROUP_NAME: props?.selectedData ? props?.selectedData?.ASSETGROUP_NAME : search === '?edit=' ? dataId?.ASSETGROUP_NAME : "",
       ACTIVE:search === '?edit=' ? dataId?.ACTIVE  : true,
@@ -91,7 +91,7 @@ const AssetGroupMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -124,8 +124,8 @@ const AssetGroupMasterForm = (props: any) => {
                     return (
                       <InputField
                         {...register("ASSETGROUP_NAME", {
-                          required: t("Please fill the required fields."),
-                          validate: value => value.trim() !== "" || t("Please fill the required fields")
+                          required:  ("Please fill the required fields."),
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields")
                         })}
                         label="Group Name"
                         require={true}

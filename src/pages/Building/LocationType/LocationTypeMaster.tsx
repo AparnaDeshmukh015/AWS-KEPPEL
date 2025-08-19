@@ -21,7 +21,7 @@ import { saveTracker } from "../../../utils/constants";
 import { appName } from "../../../utils/pagePath";
 
 const LocationTypeMaster = () => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { pathname }: any = useLocation();
   const [selectedFacility, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -74,7 +74,7 @@ const LocationTypeMaster = () => {
       MODE: edit ? "E" : "A",
       ACTIVE: checked ? 1 : 0,
 
-      PARA: edit ? { para1: "Location Type", para2: t(" Updated ") } : { para1: "Location Type", para2: t(" inserted ") },
+      PARA: edit ? { para1: "Location Type", para2:  (" Updated ") } : { para1: "Location Type", para2:  (" inserted ") },
     };
     try {
       const res = await callPostAPI(ENDPOINTS?.LOCATIONTYPE_SAVE, payload);
@@ -115,14 +115,14 @@ const LocationTypeMaster = () => {
       );
   
     } else {
-      toast.error(t("Please_select_Building"));
+      toast.error( ("Please_select_Building"));
     }
   }, [selectedFacility]);
 
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -143,7 +143,7 @@ const LocationTypeMaster = () => {
             <div className="flex">
               <Button
                 className="Primary_Button  w-20 me-2"
-                label={t("Save")}
+                label={ ("Save")}
                 onClick={handleSubmit(onSubmit)}
                 disabled={IsSubmit}
               />
@@ -160,7 +160,7 @@ const LocationTypeMaster = () => {
                       return (
                         <InputField
                           {...register("locationName", {
-                            required: t("Please fill the required fields."),
+                            required:  ("Please fill the required fields."),
                           })}
                           require={true}
                           label="Location"
@@ -181,7 +181,7 @@ const LocationTypeMaster = () => {
                       return (
                         <InputField
                           {...register("sequenceNo", {
-                            required: t("Please fill the required fields."),
+                            required:  ("Please fill the required fields."),
                           })}
                           require={true}
                           label="Sequence No"
@@ -195,7 +195,7 @@ const LocationTypeMaster = () => {
               </div>
               <div>
                 <span className="Text_Secondary Input_Label">
-                  {t("Color")}{" "}
+                  { ("Color")}{" "}
                 </span>
                 <InputText
                   type={"color"}
@@ -213,7 +213,7 @@ const LocationTypeMaster = () => {
                   className="md:mt-7"
 
                 ></Checkbox>
-                <label htmlFor="Active" className="ml-2 md:mt-7 Text_Secondary Input_Label">{t("Active")}</label>
+                <label htmlFor="Active" className="ml-2 md:mt-7 Text_Secondary Input_Label">{ ("Active")}</label>
               </div>
             </div>
           </Card>
@@ -231,7 +231,7 @@ const LocationTypeMaster = () => {
 };
 
 const LocationMasterTable = ({ locationMasterList, handleEditClick }: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   return (
     <DataTable
       dataKey="id"
@@ -246,13 +246,13 @@ const LocationMasterTable = ({ locationMasterList, handleEditClick }: any) => {
         "ACTIVE",
       ]}
       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      emptyMessage={t("No Data found.")}
+      emptyMessage={ ("No Data found.")}
       currentPageReportTemplate="Items per Page:-"
     >
       <Column
         field="LOCATIONTYPE_NAME"
         sortable
-        header={t("Location")}
+        header={ ("Location")}
         body={(rowData: any) => {
           return (
             <>
@@ -268,11 +268,11 @@ const LocationMasterTable = ({ locationMasterList, handleEditClick }: any) => {
           );
         }}
       ></Column>
-      <Column field="SEQ_NO" sortable header={t("Sequence No")}></Column>
+      <Column field="SEQ_NO" sortable header={ ("Sequence No")}></Column>
       <Column
         field="COLORS"
         sortable
-        header={t("Color")}
+        header={ ("Color")}
         body={(rowData: any) => {
           return (
             <>
@@ -290,7 +290,7 @@ const LocationMasterTable = ({ locationMasterList, handleEditClick }: any) => {
       <Column
         field="ACTIVE"
         sortable
-        header={t("Active")}
+        header={ ("Active")}
         body={(rowData: any) => {
           return <>{rowData?.ACTIVE === true ? "Yes" : "No"}</>;
         }}

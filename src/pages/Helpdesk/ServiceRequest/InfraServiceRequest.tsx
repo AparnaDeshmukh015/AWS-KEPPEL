@@ -41,7 +41,7 @@ import HierarchyDialog from "../../../components/HierarchyDialog/HierarchyDialog
 
 const InfraServiceRequest = (props: any) => {
   const { search } = useLocation();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const navigate: any = useNavigate();
   const [selectedFacility, menuList]: any = useOutletContext();
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
@@ -133,8 +133,8 @@ const InfraServiceRequest = (props: any) => {
       MODE: search === "?edit=" ? "E" : "A",
       PARA:
         props?.selectedData || search === "?edit="
-          ? { para1: `${"Service Request"}`, para2: t("Updated") }
-          : { para1: `${"Service Request"}`, para2: t("Added") },
+          ? { para1: `${"Service Request"}`, para2:  ("Updated") }
+          : { para1: `${"Service Request"}`, para2:  ("Added") },
       RAISEDBY_ID: decryptData(localStorage.getItem("USER_ID")),
       ASSET_NONASSET: "A",
       SEVERITY_CODE: "",
@@ -204,10 +204,10 @@ const InfraServiceRequest = (props: any) => {
         : payload?.DOC_LIST;
     payload.PARA =
       payload?.MODE === "E"
-        ? { para1: `${"Service Request"}`, para2: t("Updated") }
+        ? { para1: `${"Service Request"}`, para2:  ("Updated") }
         : payload?.MODE === "CANCEL"
-          ? { para1: `${"The service request has been "}`, para2: t("cancelled") }
-          : { para1: `${"Service Request"}`, para2: t("Added") };
+          ? { para1: `${"The service request has been "}`, para2:  ("cancelled") }
+          : { para1: `${"Service Request"}`, para2:  ("Added") };
     payload?.MODE === "E"
       ? setserviceReqStatus("updated")
       : setserviceReqStatus("cancelled");
@@ -276,7 +276,7 @@ const InfraServiceRequest = (props: any) => {
       (!isSubmitting && Object?.values(errors)[0]?.type === "validate")
     ) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -583,7 +583,7 @@ const InfraServiceRequest = (props: any) => {
                 </p>
                 {search === "?edit=" && editStatus && (
                   <h6 className=" Text_Primary Main_Header_Text mb-1">
-                    {t("Edit Service Request")}
+                    { ("Edit Service Request")}
                   </h6>
                 )}
                 {!editStatus && (
@@ -599,7 +599,7 @@ const InfraServiceRequest = (props: any) => {
                 </p>
                 {search === "?add=" && (
                   <h6 className=" Text_Primary Main_Header_Text mb-1">
-                    {t("Add Service Request")}
+                    { ("Add Service Request")}
                   </h6>
                 )}
               </div>
@@ -847,7 +847,7 @@ const InfraServiceRequest = (props: any) => {
                 <>
                   <Card>
                     <div className="flex flex-wrap justify-between mb-3">
-                      <h6 className="Header_Text">{t("Request Details")}</h6>
+                      <h6 className="Header_Text">{ ("Request Details")}</h6>
                     </div>
                     <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-2 lg:grid-cols-2">
                       {/* <div className="col-span-2">
@@ -944,12 +944,12 @@ const InfraServiceRequest = (props: any) => {
                                 return (
                                   <InputField
                                     {...register("EQUIPMENT_NAME", {
-                                      required: t(
+                                      required:  (
                                         "Please fill the required fields."
                                       ),
                                       validate: (value) =>
                                         value.trim() !== "" ||
-                                        t("Please fill the required fields."),
+                                         ("Please fill the required fields."),
                                     })}
                                     require={true}
                                     label="Equipment"
@@ -1046,7 +1046,7 @@ const InfraServiceRequest = (props: any) => {
                               return (
                                 <InputField
                                   {...register("ISSUE_DESCRIPTION", {
-                                    required: t(
+                                    required:  (
                                       "Please fill the required fields."
                                     ),
                                     onChange: (e: any) => {
@@ -1055,7 +1055,7 @@ const InfraServiceRequest = (props: any) => {
                                     },
                                     validate: (value) =>
                                       value.trim() !== "" ||
-                                      t("Please fill the required fields."),
+                                       ("Please fill the required fields."),
                                   })}
                                   require={true}
                                   label="Issue (Max 100 characters)"
@@ -1075,7 +1075,7 @@ const InfraServiceRequest = (props: any) => {
                             : "Text_Secondary"
                             } Helper_Text`}
                         >
-                          {t(`${issueLength}/100 characters`)}
+                          { (`${issueLength}/100 characters`)}
                         </label>
                       </div>
                       <div
@@ -1083,7 +1083,7 @@ const InfraServiceRequest = (props: any) => {
                           }`}
                       >
                         <label className="Text_Secondary Input_Label">
-                          {t("Description (Max 400 characters)")}
+                          { ("Description (Max 400 characters)")}
                           <span className="text-red-600"> *</span>
                         </label>
 
@@ -1095,7 +1095,7 @@ const InfraServiceRequest = (props: any) => {
                               return (
                                 <InputTextarea
                                   {...register("WO_DESCRIPTION", {
-                                    required: t(
+                                    required:  (
                                       "Please fill the required fields."
                                     ),
                                     onChange: (e: any) => handleInputChange(e),
@@ -1116,7 +1116,7 @@ const InfraServiceRequest = (props: any) => {
                             : "Text_Secondary"
                             } Helper_Text`}
                         >
-                          {t(`${Descriptionlength}/400 characters`)}
+                          { (`${Descriptionlength}/400 characters`)}
                         </label>
                       </div>
                       <div className="col-span-2">
@@ -1137,8 +1137,8 @@ const InfraServiceRequest = (props: any) => {
                   <Card className="mt-2">
                     <div className="flex flex-wrap justify-between mb-3">
                       <h6 className="Header_Text">
-                        {/* {t("Reporter Details (Optional)")} */}
-                        {t("Reporter Details")}
+                        {/* { ("Reporter Details (Optional)")} */}
+                        { ("Reporter Details")}
                       </h6>
                     </div>
                     <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-2 lg:grid-cols-2">
@@ -1208,7 +1208,7 @@ const InfraServiceRequest = (props: any) => {
                           <div className="flex flex-wrap justify-between mb-3">
                             <h6 className="Header_Text">
                               {" "}
-                              {t("Service Request Details")}
+                              { ("Service Request Details")}
                             </h6>
                             {curStatus !== 5 &&
                               selectedDetails?.ISSERVICEREQ &&
@@ -1233,7 +1233,7 @@ const InfraServiceRequest = (props: any) => {
                                 <div className=" flex flex-col gap-1">
                                   <div className="flex flex-wrap ">
                                     <label className="Text_Se condary Helper_Text">
-                                      {t("Priority")}
+                                      { ("Priority")}
                                     </label>
                                   </div>
 
@@ -1661,7 +1661,7 @@ const InfraServiceRequest = (props: any) => {
                                               />
                                               <p className="mb-2 mt-2 text-sm ">
                                                 <span className="Text_Primary Input_Label">
-                                                  {t("No items to show")}{" "}
+                                                  { ("No items to show")}{" "}
                                                 </span>
                                               </p>
                                             </div>
@@ -1959,7 +1959,7 @@ const InfraServiceRequest = (props: any) => {
                         <Card className="mt-4">
                           <div className="flex flex-wrap justify-between mb-3">
                             <h6 className="Header_Text">
-                              {t("Reporter Details")}
+                              { ("Reporter Details")}
                             </h6>
                           </div>
                           <div className=" grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
@@ -2064,7 +2064,7 @@ const InfraServiceRequest = (props: any) => {
 
                                   <p className="mb-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
                                     <span className="Text_Primary Input_Label">
-                                      {t("No items to show")}{" "}
+                                      { ("No items to show")}{" "}
                                     </span>
                                   </p>
                                 </div>
@@ -2126,7 +2126,7 @@ const InfraServiceRequest = (props: any) => {
                 <div className=" grid grid-cols-1 gap-x-3 gap-y-3 ">
                   <div>
                     <div className="pb-4">
-                      <h6 className="Header_Text">{t("Assign To")}</h6>
+                      <h6 className="Header_Text">{ ("Assign To")}</h6>
                     </div>
                     <Field
                       controller={{
@@ -2137,7 +2137,7 @@ const InfraServiceRequest = (props: any) => {
                             <Select
                               options={optiionList?.TEAMLIST}
                               {...register("ASSIGN_TEAM_ID", {
-                                required: t("Please fill the required fields."),
+                                required:  ("Please fill the required fields."),
                                 onChange: async (e: any) => { },
                               })}
                               label={"Team"}

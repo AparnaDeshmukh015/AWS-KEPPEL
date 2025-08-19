@@ -23,7 +23,7 @@ import { decryptData } from "../../../utils/encryption_decryption";
 
 const PartMasterForm = (props: any) => {
   let { search } = useLocation();
-  const { t } = useTranslation();
+
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
   const [IsSubmit, setIsSubmit] = useState<any | null>(false);
@@ -48,8 +48,8 @@ const PartMasterForm = (props: any) => {
     defaultValues: {
       MODE: search === "?edit=" ? "E" : "A",
       PARA: search === "?edit="
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       PART_ID:search === "?edit="? dataId.PART_ID :0,
       PART_CODE: "", PART_NAME: "",
       ASSETTYPE_ID: "",
@@ -249,7 +249,7 @@ const PartMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -266,7 +266,7 @@ const PartMasterForm = (props: any) => {
         />
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Part Details")}</p>
+            <p>{ ("Part Details")}</p>
           </div>
           <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
             <Field
@@ -301,8 +301,8 @@ const PartMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("PART_NAME", {
-                        required: t("Please fill the required fields."),
-                        validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        required:  ("Please fill the required fields."),
+                        validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
 
                       })}
                       label="Part Name"
@@ -323,7 +323,7 @@ const PartMasterForm = (props: any) => {
                     <Select
                       options={options?.assetGroup}
                       {...register("ASSETGROUP_ID", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label={assetNonAsset === "A" ? "Equipment Group" : "Soft Service Group"}
                       optionLabel="ASSETGROUP_NAME"
@@ -347,7 +347,7 @@ const PartMasterForm = (props: any) => {
                     <Select
                       options={typeList}
                       {...register("ASSETTYPE_ID", {
-                        required: t("Please fill the required fields.")
+                        required:  ("Please fill the required fields.")
                       })}
                       label={assetNonAsset === "A" ? "Equipment Type" : "Soft Service Type"}
                       optionLabel="ASSETTYPE_NAME"
@@ -500,7 +500,7 @@ const PartMasterForm = (props: any) => {
                       return (
                         <InputField
                           {...register("MIN_STOCK", {
-                            required: MAINTAIN_INVENTORY === true ? t("Please fill the required fields.") : "",
+                            required: MAINTAIN_INVENTORY === true ?  ("Please fill the required fields.") : "",
                             validate: (fieldValue: any) => {
                               return validation?.onlyNumber(
                                 fieldValue,
@@ -549,7 +549,7 @@ const PartMasterForm = (props: any) => {
                       return (
                         <InputField
                           {...register("REORDER_LEVEL", {
-                            required: MAINTAIN_INVENTORY === true ? t("Please fill the required fields.") : "",
+                            required: MAINTAIN_INVENTORY === true ?  ("Please fill the required fields.") : "",
                             validate: (fieldValue: any) => {
                               const sanitizedValue = fieldValue
                                 ?.toString()

@@ -18,7 +18,7 @@ import { eventNotification, helperEventNotification } from "../../../utils/event
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const RequestDescriptionMasterForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const { search } = useLocation();
   let { pathname } = useLocation();
   const [selected, menuList]: any = useOutletContext();
@@ -172,7 +172,7 @@ const RequestDescriptionMasterForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else {
     }
   }, [isSubmitting]);
@@ -196,7 +196,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("REQ_DESC", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Request Description"
                       require={true}
@@ -219,7 +219,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                     <>
                       <Radio
                         {...register("ASSET_NONASSET", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         labelHead="Type"
                         require={true}
@@ -249,7 +249,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                           : options?.softServicesOptions
                       }
                       {...register("ASSETTYPE", {
-                        required: t("Please fill the required fields"),
+                        required:  ("Please fill the required fields"),
                       })}
                       label={
                         ASSET_NONASSET?.key === "A"
@@ -278,7 +278,7 @@ const RequestDescriptionMasterForm = (props: any) => {
                     <Select
                       options={options?.skillOptions}
                       {...register("SKILL", {
-                        required: t("Please fill the required fields"),
+                        required:  ("Please fill the required fields"),
                       })}
                       label="Skill Name"
                       optionLabel="SKILL_NAME"

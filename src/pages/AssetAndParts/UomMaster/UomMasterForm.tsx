@@ -18,7 +18,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const UomMasterForm = (props: any) => {
-  const { t } = useTranslation();
+
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const currentMenu = menuList
@@ -83,7 +83,7 @@ const UomMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -111,8 +111,8 @@ const UomMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("UOM_NAME", {
-                        required: t("Please fill the required fields."),
-                        validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                        required:  ("Please fill the required fields."),
+                        validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                       })}
                       label="UOM Name"
                       require={true}

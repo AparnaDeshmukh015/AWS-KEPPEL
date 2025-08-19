@@ -13,7 +13,7 @@ import { useLocation, useOutletContext } from 'react-router-dom';
 import { saveTracker } from "../../../utils/constants";
 import Checkboxs from '../../../components/Checkbox/Checkbox';
 const WorkOrderForm = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [color, setColor] = useState("000");
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
@@ -102,7 +102,7 @@ const WorkOrderForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -131,7 +131,7 @@ const WorkOrderForm = (props: any) => {
                           required: "Please fill the required fields",
                         })}
                         maxLength={7}
-                        label={t("Type code")}
+                        label={ ("Type code")}
                         disabled={search === "?edit="}
                         invalid={errors.WO_CODE}
                         require={true}
@@ -155,7 +155,7 @@ const WorkOrderForm = (props: any) => {
                           required: "Please fill the required fields",
                         })}
                         disabled={search === '?edit=' && (facility_type === "I" && props?.selectedData?.FACILITY_ID === 0)}
-                        label={t("Description")}
+                        label={ ("Description")}
                         invalid={errors?.DESCRIPTION}
                         require={true}
                         setValue={setValue}
@@ -174,7 +174,7 @@ const WorkOrderForm = (props: any) => {
                   return (
                     <div>
                       <span className="Text_Secondary Input_Label">
-                        {t("Color")}{" "}
+                        { ("Color")}{" "}
                       </span>
                       <InputText
                         type={"color"}
@@ -187,7 +187,7 @@ const WorkOrderForm = (props: any) => {
                         className={"colorpicker"}
                         setValue={setValue}
                         disabled={search === '?edit=' && (facility_type === "I" && props?.selectedData?.FACILITY_ID === 0)}
-                        placeholder={t("Please_Enter")}
+                        placeholder={ ("Please_Enter")}
                         {...field}
                       />
                     </div>

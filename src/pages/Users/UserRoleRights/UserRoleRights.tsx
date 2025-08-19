@@ -22,7 +22,7 @@ import { saveTracker } from "../../../utils/constants";
 import { decryptData } from "../../../utils/encryption_decryption";
 
 const UserRoleRights = () => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [nodes, setNodes] = useState<any | null>([]);
   const { pathname }: any = useLocation();
   const [roleId, setRoleId] = useState();
@@ -352,7 +352,7 @@ const UserRoleRights = () => {
         });
           ExportCSV(updatedData, currentMenu?.FUNCTION_DESC, roleName);
         } else {
-          toast.error(t("Please select Role "))
+          toast.error( ("Please select Role "))
         }
       },
     },
@@ -372,7 +372,7 @@ const UserRoleRights = () => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -391,7 +391,7 @@ const UserRoleRights = () => {
               type="submit"
               // onClick={handleSubmit(onSubmit)}
             />
-            <SplitButtons label={t("Action")} model={ActionDownloaditems}
+            <SplitButtons label={ ("Action")} model={ActionDownloaditems}
             />
           </>
         </div>
@@ -417,7 +417,7 @@ const UserRoleRights = () => {
                       <Select
                         options={roles}
                         {...register("USER_ROLE", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                           onChange: async(e: any) => {
                            await handleChange(e);
                           },
@@ -439,14 +439,14 @@ const UserRoleRights = () => {
 
       <div className="mt-2">
         <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
-          <TabPanel header={t("Master Rights")}>
+          <TabPanel header={ ("Master Rights")}>
             <TreeTableRight
               nodes={nodes}
               newHandleChange={newHandleChange}
               type="nonWorkForce"
             />
           </TabPanel>
-         {/* <TabPanel header={t("Transaction Rights")}>
+         {/* <TabPanel header={ ("Transaction Rights")}>
             <TreeTableRight
               nodes={nodes}
               newHandleChange={newHandleChange}

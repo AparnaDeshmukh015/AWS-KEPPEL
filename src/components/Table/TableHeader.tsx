@@ -45,7 +45,7 @@ const TableHeader = (props: any) => {
   ]
 
   const location: any = useLocation();
-  const { t } = useTranslation();
+ 
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
   // const [globalValue, setglobalValue] = useState<string>("");
 
@@ -87,7 +87,7 @@ const TableHeader = (props: any) => {
   const Actionitems = [
     {
 
-      label: t("Upload Data"),
+      label: ("Upload Data"),
       icon: "pi pi-upload",
       visible: true,
       command: () => {
@@ -95,14 +95,14 @@ const TableHeader = (props: any) => {
       },
     },
     {
-      label: t("Download Template"),
+      label: ("Download Template"),
       icon: "pi pi-download",
       command: async () => {
         await getAPI();
       },
     },
     {
-      label: t("Download Data"),
+      label:  ("Download Data"),
       icon: "pi pi-download",
       command: async () => {
         await handlerDownload();
@@ -194,7 +194,7 @@ const TableHeader = (props: any) => {
     <>
       <div className="flex flex-wrap justify-between">
         <div>
-          <h6 className="Text_Primary mr-2">{t(props?.header)} {location?.pathname === PATH?.CURRENTSTATUSCONFIG
+          <h6 className="Text_Primary mr-2">{ (props?.header)} {location?.pathname === PATH?.CURRENTSTATUSCONFIG
             || location?.pathname === PATH?.ASSETMASTERCONFIGURATION
             || location?.pathname === PATH?.SAVENUMBERRANGECONFIG
             ? "Configuration" : ""}</h6>
@@ -209,7 +209,7 @@ const TableHeader = (props: any) => {
                 value={globalFilterValue}
                 onChange={onGlobalFilterChange}
                 className="w-80 Search-Input"
-                placeholder={t("Search")}
+                placeholder={ ("Search")}
               />
             </span>
           )}
@@ -231,7 +231,7 @@ const TableHeader = (props: any) => {
                       {currentMenu?.ADD_RIGHTS === "True" && (
                         <Buttons
                           className="Primary_Button me-2"
-                          label={t("Add New")}
+                          label={ ("Add New")}
                           icon="pi pi-plus"
                           onClick={props?.isClick}
                         />
@@ -272,7 +272,7 @@ const TableHeader = (props: any) => {
                               ""
                             ) : (
                               <SplitButtons
-                                label={t("Action")}
+                                label={ ("Action")}
                                 model={
                                   // location?.pathname === PATH?.EVENTMASTER ||
                                   //   location?.pathname === PATH?.ESCALATIONMATRIX ||

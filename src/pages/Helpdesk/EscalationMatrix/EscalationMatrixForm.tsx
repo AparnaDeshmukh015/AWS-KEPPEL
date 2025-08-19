@@ -65,7 +65,7 @@ type FormErrors = {
 };
 const EscalationMatrixForm = (props: any) => {
   const localData: any = localStorage.getItem('ALL_ASSETTYPE')
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [selectedDetails, setSelectedDetails] = useState<any>([]);
   const [options, setOptions] = useState<any | null>([]);
   const [statusTo, setStatusTo] = useState<any | null>([]);
@@ -99,10 +99,10 @@ const EscalationMatrixForm = (props: any) => {
       EVENT_ID: search === "?edit=" ? dataId?.EVENT_ID : 0,
       PARA:
         location?.state && location?.state?.OBJ_ID
-          ? { para1: `${props?.headerName}`, para2: t("Updated") }
+          ? { para1: `${props?.headerName}`, para2:  ("Updated") }
           : props?.selectedData
-            ? { para1: `${props?.headerName}`, para2: t("Updated") }
-            : { para1: `${props?.headerName}`, para2: t("Added") },
+            ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+            : { para1: `${props?.headerName}`, para2:  ("Added") },
       MODE:
         location?.state && location?.state?.OBJ_ID
           ? "E"
@@ -207,7 +207,7 @@ const EscalationMatrixForm = (props: any) => {
         setIsSubmit(false)
       }
     } else {
-      toast?.error(t("Please fill at least one escalation details"));
+      toast?.error( ("Please fill at least one escalation details"));
     }
 
   }, [IsSubmit, setIsSubmit, checked, search, selectedDetails, toast, currentMenu, User_Name, eventNotification, helperEventNotification, props]);
@@ -233,7 +233,7 @@ const EscalationMatrixForm = (props: any) => {
       };
       append(newField);
     } else {
-      toast.error(t("Please fill in the current row before adding a new one."));
+      toast.error( ("Please fill in the current row before adding a new one."));
     }
   };
 
@@ -345,10 +345,10 @@ const EscalationMatrixForm = (props: any) => {
     const firstError: any = Object?.values(nestedErrors)[0];
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     } else if (!isSubmitting && (firstError?.TIME?.type === "required" || firstError?.EVENT?.type === "required")) {
       const check: any = firstError?.TIME?.message || firstError?.EVENT?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -371,7 +371,7 @@ const EscalationMatrixForm = (props: any) => {
           />
           <Card className="mt-2">
             <div className="headingConainer">
-              <p>{t("Master Details")}</p>
+              <p>{ ("Master Details")}</p>
             </div>
             <div className="mt-1 grid grid-cols-1 gap-x-3 gap-y-3 md:grid-cols-3 lg:grid-cols-3">
               <Field
@@ -382,7 +382,7 @@ const EscalationMatrixForm = (props: any) => {
                     return (
                       <InputField
                         {...register("SLA_NAME", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         label="SLA Name"
                         require={true}
@@ -403,7 +403,7 @@ const EscalationMatrixForm = (props: any) => {
                       <Select
                         options={options?.woStatusList}
                         {...register("WO_TYPE", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         label="Work Order Type"
                         require={true}
@@ -427,7 +427,7 @@ const EscalationMatrixForm = (props: any) => {
                       <Select
                         options={options?.severityList}
                         {...register("SEVERITY_CODE", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         label="Severity"
                         require={true}
@@ -451,7 +451,7 @@ const EscalationMatrixForm = (props: any) => {
                       <Select
                         options={options?.statusFrom}
                         {...register("STATUS_FROM", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         label="Status From"
                         require={true}
@@ -475,7 +475,7 @@ const EscalationMatrixForm = (props: any) => {
                       <Select
                         options={statusTo}
                         {...register("STATUS_TO", {
-                          required: t("Please fill the required fields"),
+                          required:  ("Please fill the required fields"),
                         })}
                         label="Status To"
                         require={true}
@@ -518,7 +518,7 @@ const EscalationMatrixForm = (props: any) => {
 
                   checked={checked}
                 />
-                <label htmlFor="Active" className="ml-2 md:mt-7 Text_Secondary Input_Label">{t("All Equipment Type")}</label>
+                <label htmlFor="Active" className="ml-2 md:mt-7 Text_Secondary Input_Label">{ ("All Equipment Type")}</label>
                 {/* );
                     },
                   }} */}
@@ -536,7 +536,7 @@ const EscalationMatrixForm = (props: any) => {
                         <MultiSelects
                           options={options?.assetTypeList}
                           {...register("SELECTED_ASSET_LIST", {
-                            required: checked === false ? t("Please fill the required fields..") : "",
+                            required: checked === false ?  ("Please fill the required fields..") : "",
                           })}
                           label="Equipment Type"
                           //
@@ -582,11 +582,11 @@ const EscalationMatrixForm = (props: any) => {
           </Card>
           <Card className="mt-2">
             <div className="headingConainer flex justify-between">
-              <p>{t("Escalation Details")}</p>
+              <p>{ ("Escalation Details")}</p>
               <div>
                 <Buttons
                   className="Primary_Button"
-                  label={t("Add Level")}
+                  label={ ("Add Level")}
                   icon="pi pi-plus"
                   type={"button"}
                   onClick={() => handlerAdd()}
@@ -602,7 +602,7 @@ const EscalationMatrixForm = (props: any) => {
                   showGridlines
                 >
                   <Column
-                    header={t("Index")}
+                    header={ ("Index")}
                     body={(rowData, { rowIndex }) => {
                       return (
                         <>
@@ -617,7 +617,7 @@ const EscalationMatrixForm = (props: any) => {
                                     {...register(
                                       `ESC_DETAILS.${rowIndex}.ESC_LEVEL` as any
                                     )}
-                                    placeholder={t("Please Enter")}
+                                    placeholder={ ("Please Enter")}
                                     require={true}
                                     disabled={true}
                                     setValue={setValue}
@@ -635,7 +635,7 @@ const EscalationMatrixForm = (props: any) => {
 
                   <Column
                     field="Time"
-                    header={<>{t("Time (in Minutes)")}
+                    header={<>{ ("Time (in Minutes)")}
                       <span className="text-red-500">*</span>
                     </>}
 
@@ -652,14 +652,14 @@ const EscalationMatrixForm = (props: any) => {
                                   <InputField
                                     {...register(
                                       `ESC_DETAILS.${rowIndex}.TIME` as any, {
-                                      required: t("Please fill the required fields.."),
+                                      required:  ("Please fill the required fields.."),
 
                                       validate: (value) => {
 
                                         const sanitizedValue = value?.toString()?.replace(/[^0-9]/g, "");
                                         setValue(`ESC_DETAILS.[${rowIndex}].TIME` as any, sanitizedValue);
                                         if (sanitizedValue === '') {
-                                          return t('Please enter a valid number.');
+                                          return  ('Please enter a valid number.');
                                         } else {
                                           return true;
                                         }
@@ -667,7 +667,7 @@ const EscalationMatrixForm = (props: any) => {
 
                                       },
                                     })}
-                                    placeholder={t("Please Enter")}
+                                    placeholder={ ("Please Enter")}
                                     require={true}
                                     setValue={setValue}
                                     invalid={errors?.ESC_DETAILS?.[rowIndex]?.TIME}
@@ -687,7 +687,7 @@ const EscalationMatrixForm = (props: any) => {
                   ></Column>
                   <Column
                     field="Event"
-                    header={<>{t("Event")}
+                    header={<>{ ("Event")}
                       <span className="text-red-500">*</span>
                     </>}
                     body={(rowData, { rowIndex }) => {
@@ -704,7 +704,7 @@ const EscalationMatrixForm = (props: any) => {
                                   options={options?.eventList}
                                   {...register(`ESC_DETAILS.${rowIndex}.EVENT`, {
 
-                                    required: t("Please fill the required fields.")
+                                    required:  ("Please fill the required fields.")
 
                                   })}
                                   optionLabel="EVENT_NAME"
@@ -727,7 +727,7 @@ const EscalationMatrixForm = (props: any) => {
 
                   <Column
                     field="Action"
-                    header={t("Action")}
+                    header={ ("Action")}
                     className="w-60"
                     body={(rowData, { rowIndex }) => {
                       if (rowIndex === fields.length - 1) {

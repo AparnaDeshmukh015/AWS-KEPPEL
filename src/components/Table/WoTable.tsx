@@ -17,7 +17,7 @@ import { useLocation, useOutletContext } from "react-router-dom";
 import moment from "moment";
 import { decryptData } from "../../utils/encryption_decryption";
 const WoTable = (props: any) => {
-  const { t } = useTranslation();
+  const {   } = useTranslation();
 
   const [selectedWoList, setSelectedWoList] = useState<any>(null);
   const [rowClick, setRowClick] = useState<boolean>(true);
@@ -53,7 +53,7 @@ const WoTable = (props: any) => {
         className="primeTable"
         value={props?.columnData?.slice(first, first + rows)}
         showGridlines
-        emptyMessage={t("No Data found.")}
+        emptyMessage={ ("No Data found.")}
         dataKey={props?.dataKey}
         key={props?.dataKey}
         loading={loading}
@@ -95,7 +95,7 @@ const WoTable = (props: any) => {
               <Column
                 key={title?.id}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={ (`${customHeader[title]}`)}
                 sortable
                 body={(rowData: any) => {
                   const rowItem: any = { ...rowData };
@@ -149,7 +149,7 @@ const WoTable = (props: any) => {
               <Column
                 key={title}
                 field={title}
-                header={t(`${customHeader[title]}`)}
+                header={ (`${customHeader[title]}`)}
                 sortable
               ></Column>
             );

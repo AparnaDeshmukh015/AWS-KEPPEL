@@ -23,7 +23,7 @@ interface Options {
     reportList?: any[]
 }
 const ReportTemplateForm = (props: any) => {
-    const { t } = useTranslation();
+    const {   } = useTranslation();
     let { pathname } = useLocation();
     const [, menuList]: any = useOutletContext();
     const currentMenu = menuList
@@ -48,8 +48,8 @@ const ReportTemplateForm = (props: any) => {
     } = useForm({
         defaultValues: {
             MODE: search === '?edit=' ? "E" : "A",
-            PARA: search === '?edit=' ? { "para1": `${currentMenu?.FUNCTION_DESC}`, "para2": t('Updated') }
-                : { "para1": `${currentMenu?.FUNCTION_DESC}`, "para2": t('Added') },
+            PARA: search === '?edit=' ? { "para1": `${currentMenu?.FUNCTION_DESC}`, "para2":  ('Updated') }
+                : { "para1": `${currentMenu?.FUNCTION_DESC}`, "para2":  ('Added') },
             TEMPLATE_ID: search === '?edit=' ? selectedDatalist?.TEMPLATE_ID : 0,
             ACTIVE: search === '?edit=' ? selectedDatalist?.ACTIVE : 0,
             TEMPLATE_NAME: search === '?edit=' ? selectedDatalist?.TEMPLATE_NAME : "",
@@ -139,7 +139,7 @@ const ReportTemplateForm = (props: any) => {
     useEffect(() => {
         if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
             const check: any = Object?.values(errors)[0]?.message;
-            toast?.error(t(check));
+            toast?.error( (check));
         }
     }, [isSubmitting]);
 
@@ -200,7 +200,7 @@ const ReportTemplateForm = (props: any) => {
                                     return (
                                         <InputField
                                             {...register("TEMPLATE_NAME", {
-                                                required: t("Please fill the required fields."),
+                                                required:  ("Please fill the required fields."),
 
                                             })}
                                             require={true}
@@ -223,7 +223,7 @@ const ReportTemplateForm = (props: any) => {
                                         <Select
                                             options={options?.reportList}
                                             {...register("REPORT_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                                 onChange(event) {
                                                     filteredColumnlist(event?.target?.value?.REPORT_ID)
                                                 },
@@ -252,7 +252,7 @@ const ReportTemplateForm = (props: any) => {
                                         <MultiSelects
                                             options={filteredcolList ?? []}
                                             {...register("COL_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                             })}
                                             label="Columns"
                                             require={true}
@@ -278,7 +278,7 @@ const ReportTemplateForm = (props: any) => {
                                         <MultiSelects
                                             options={options?.wotypeList}
                                             {...register("WO_TYPE_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                             })}
                                             label="Wo Type"
                                             require={true}
@@ -303,7 +303,7 @@ const ReportTemplateForm = (props: any) => {
                                         <MultiSelects
                                             options={options?.statusList}
                                             {...register("STATUS_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                             })}
                                             label="Status"
                                             require={true}
@@ -328,7 +328,7 @@ const ReportTemplateForm = (props: any) => {
                                         <MultiSelects
                                             options={options?.teamList}
                                             {...register("TEAM_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                             })}
                                             label="Team"
                                             require={true}
@@ -352,7 +352,7 @@ const ReportTemplateForm = (props: any) => {
                                         <MultiSelects
                                             options={options?.priorityList}
                                             {...register("PRIORITY_LIST", {
-                                                required: t("Please fill the required fields"),
+                                                required:  ("Please fill the required fields"),
                                             })}
                                             label="Priority"
                                             require={true}

@@ -16,7 +16,7 @@ const BuildingSet = () => {
   const { pathname }: any = useLocation();
   const [selected, menuList]: any = useOutletContext();
   const currentMenu = menuList?.flatMap((menu: any) => menu?.DETAIL).filter((detail: any) => detail.URL === pathname)[0];
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const menuLeft: any = useRef(null);
   const navigate: any = useNavigate();
   const menu: any = useRef(null);
@@ -344,7 +344,7 @@ const BuildingSet = () => {
       ))
     }
     else {
-      toast.error(t('Please_select_Building'))
+      toast.error( ('Please_select_Building'))
     }
 
   }, [selected])
@@ -387,7 +387,7 @@ const BuildingSet = () => {
               <h6 className="Text_Primary mb-1">{currentMenu?.FUNCTION_DESC}</h6>
             </div>
             <div>
-              <SplitButton label={t("Action")} className='Primary_SplitButton' model={Actionitems} />
+              <SplitButton label={ ("Action")} className='Primary_SplitButton' model={Actionitems} />
             </div>
           </div>
 

@@ -25,7 +25,7 @@ import MultiSelects from "../../../components/MultiSelects/MultiSelects";
 const PPMScheduleDetails = (props: any) => {
   const location: any = useLocation()
   const navigate: any = useNavigate();
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   const [options, setOptions] = useState<any | null>([])
   const [assigneeStatus, setAssigneeStatus] = useState<any | null>(false)
   const [technicianList, setTechnicianList] = useState<any | null>([])
@@ -159,7 +159,7 @@ const PPMScheduleDetails = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -273,7 +273,7 @@ const PPMScheduleDetails = (props: any) => {
         </Card>
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Equipment Details")}</p>
+            <p>{ ("Equipment Details")}</p>
           </div>
           <div className="mt-2 grid grid-cols-1 gap-x-2 gap-y-2 md:grid-cols-3 lg:grid-cols-3">
 
@@ -390,7 +390,7 @@ const PPMScheduleDetails = (props: any) => {
           </div>
           <div>
             <DataTable value={options?.woDetails} showGridlines
-              emptyMessage={t("No Data found.")} scrollable scrollHeight="400px">
+              emptyMessage={ ("No Data found.")} scrollable scrollHeight="400px">
               <Column field="WO_TYPE" sortable header="Type"></Column>
               <Column field="WO_NO" sortable header="Work Order No."></Column>
               <Column field="WO_DATE" header="Date" sortable body={(rowData: any) => {
@@ -412,7 +412,7 @@ const PPMScheduleDetails = (props: any) => {
           </div>
           <div>
             <DataTable value={options?.scheduleDetails} showGridlines
-              emptyMessage={t("No Data found.")} scrollable scrollHeight="400px">
+              emptyMessage={ ("No Data found.")} scrollable scrollHeight="400px">
               <Column field="TASK_DESC" sortable header="Task Description"></Column>
               <Column field="TASK_TIME" header="Hours/min"></Column>
               <Column field="SKILL_NAME" header="Skill Required" sortable ></Column>
@@ -421,11 +421,11 @@ const PPMScheduleDetails = (props: any) => {
         </Card>
         <Card className="mt-2">
           <div className="headingConainer">
-            <p>{t("Equipment Documents")}</p>
+            <p>{ ("Equipment Documents")}</p>
           </div>
           <div>
             <DataTable value={options?.assetDocDetails} showGridlines
-              emptyMessage={t("No Data found.")} scrollable scrollHeight="400px">
+              emptyMessage={ ("No Data found.")} scrollable scrollHeight="400px">
               <Column field="DOC_ORIG_NAME" sortable header="Document Name"></Column>
             </DataTable>
           </div>

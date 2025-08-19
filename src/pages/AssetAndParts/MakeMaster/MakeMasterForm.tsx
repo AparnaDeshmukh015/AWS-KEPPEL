@@ -15,7 +15,7 @@ import { saveTracker } from '../../../utils/constants';
 import { decryptData } from '../../../utils/encryption_decryption';
 
 const MakeMasterForm = (props: any) => {
-  const { t } = useTranslation();
+
   const { search } = useLocation();
   const getId: any = localStorage.getItem("Id")
   const dataId = JSON.parse(getId)
@@ -34,8 +34,8 @@ const MakeMasterForm = (props: any) => {
   } = useForm({
     defaultValues: {
       MODE: props?.selectedData || search === '?edit=' ? 'E' : 'A',
-      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2": t('Updated') }
-        : { "para1": `${props?.headerName}`, "para2": t('Added') },
+      PARA: props?.selectedData || search === '?edit=' ? { "para1": `${props?.headerName}`, "para2":  ('Updated') }
+        : { "para1": `${props?.headerName}`, "para2":  ('Added') },
       MAKE_ID: props?.selectedData ? props?.selectedData?.MAKE_ID : search === '?edit=' ? dataId?.MAKE_ID : 0,
       MAKE_NAME: props?.selectedData ? props?.selectedData?.MAKE_NAME : search === '?edit=' ? dataId?.MAKE_NAME : "",
       ACTIVE: search === '?edit=' ? dataId?.ACTIVE : true,
@@ -83,7 +83,7 @@ const MakeMasterForm = (props: any) => {
   useEffect(() => {
     if ((!isSubmitting && Object?.values(errors)[0]?.type === "required") || (!isSubmitting && Object?.values(errors)[0]?.type === "validate")) {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -120,8 +120,8 @@ const MakeMasterForm = (props: any) => {
                     return (
                       <InputField
                         {...register("MAKE_NAME", {
-                          required: t("Please fill the required fields."),
-                          validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                          required:  ("Please fill the required fields."),
+                          validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                         })}
                         require={true}
                         label="Make Name"

@@ -44,7 +44,7 @@ const TaskMasterForm = (props: any) => {
     { name: "Equipment ", key: "A" },
     { name: "Soft Service", key: "N" },
   ];
-  const { t } = useTranslation();
+ 
   const [options, setOptions] = useState<any>([]);
   // const [taskoption, setTaskOptions] = useState<any | null>([
   //   { TASK_ID: 0, TASK_NAME: "" },
@@ -63,8 +63,8 @@ const TaskMasterForm = (props: any) => {
     defaultValues: {
       MODE: props?.selectedData ? "E" : "A",
       PARA: props?.selectedData
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       SKILL_NAME: props?.selectedData?.SKILL_NAME || "",
 
       ASSEST_TYPE: "",
@@ -244,7 +244,7 @@ const TaskMasterForm = (props: any) => {
 
 
   const onError: SubmitErrorHandler<FormData> = () => {
-    toast.error(t("Please fill the required fields."))
+    toast.error( ("Please fill the required fields."))
   };
 
   return (
@@ -267,7 +267,7 @@ const TaskMasterForm = (props: any) => {
                     <>
                       <Radio
                         {...register("ASSEST_TYPE", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         labelHead="Type"
                         disabled={
@@ -300,7 +300,7 @@ const TaskMasterForm = (props: any) => {
                             : options?.softServicesOptions
                         }
                         {...register("ASSEST_TYPE_NAME", {
-                          required: t("Please fill the required fields."),
+                          required:  ("Please fill the required fields."),
                         })}
                         label={`${assestType?.key === "A" ? "Equipment " : "Soft Service"
                           } Type `}
@@ -329,7 +329,7 @@ const TaskMasterForm = (props: any) => {
               <label
                 className="Text_Secondary Input_Label col-span-2 me-2"
               >
-                {t(`Task Name`)}
+                { (`Task Name`)}
                 <span className="text-red-600"> *</span>
               </label>
               <Button
@@ -357,8 +357,8 @@ const TaskMasterForm = (props: any) => {
                               {...register(
                                 `TASK_LIST.${index}.TASK_NAME` as any,
                                 {
-                                  required: t("Please fill the required fields."),
-                                  validate: value => value.trim() !== "" || t("Please fill the required fields.")
+                                  required:  ("Please fill the required fields."),
+                                  validate: value => value.trim() !== "" ||  ("Please fill the required fields.")
                                 }
                               )}
 

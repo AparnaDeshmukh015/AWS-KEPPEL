@@ -19,7 +19,7 @@ import { saveTracker } from "../../../utils/constants";
 const WeekOfMasterForm = (props: any) => {
   const [selectedIndex, setSelectedIndex] = useState<any | null>(null);
   const listRef = useRef<any | null>(null);
-  const { t } = useTranslation();
+  const {   } = useTranslation();
   let { pathname } = useLocation();
   const [, menuList]: any = useOutletContext();
   const { search } = useLocation();
@@ -44,8 +44,8 @@ const WeekOfMasterForm = (props: any) => {
     defaultValues: {
       MODE:search === '?edit='  ? "E" : "A",
       PARA: search === '?edit=' 
-        ? { para1: `${props?.headerName}`, para2: t("Updated") }
-        : { para1: `${props?.headerName}`, para2: t("Added") },
+        ? { para1: `${props?.headerName}`, para2:  ("Updated") }
+        : { para1: `${props?.headerName}`, para2:  ("Added") },
       WEEKOFF_ID:search === '?edit='  ? dataId?.WEEKOFF_ID : 0,
       ACTIVE:search === '?edit='  ? dataId?.ACTIVE  : true,
       WEEKOFF_DESC: search === '?edit='  ? dataId?.WEEKOFF_DESC: "",
@@ -62,12 +62,12 @@ const WeekOfMasterForm = (props: any) => {
       }
     }
     if (checkflag === 0) {
-      toast.error(t("Atleast 1 day should be selected"));
+      toast.error( ("Atleast 1 day should be selected"));
       return;
     }
     for (let i = 0; i < weekData.length; i++) {
       if (weekData[i].Day === true && weekData[i].count.length === 0) {
-        toast.error(t("Atleast 1 week should be selected inside a day"));
+        toast.error( ("Atleast 1 week should be selected inside a day"));
         return;
       }
     }
@@ -219,7 +219,7 @@ const WeekOfMasterForm = (props: any) => {
   useEffect(() => {
     if (!isSubmitting && Object?.values(errors)[0]?.type === "required") {
       const check: any = Object?.values(errors)[0]?.message;
-      toast?.error(t(check));
+      toast?.error( (check));
     }
   }, [isSubmitting]);
 
@@ -248,7 +248,7 @@ const WeekOfMasterForm = (props: any) => {
                   return (
                     <InputField
                       {...register("WEEKOFF_DESC", {
-                        required: t("Please fill the required fields."),
+                        required:  ("Please fill the required fields."),
                       })}
                       label="Week Off Description"
                       require={true}
@@ -264,7 +264,7 @@ const WeekOfMasterForm = (props: any) => {
             <div>
               <div>
                 <label className="Text_Secondary Input_Label">
-                  {t("Select Day")}
+                  { ("Select Day")}
                 </label>
               </div>
 
